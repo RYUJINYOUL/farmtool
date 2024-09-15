@@ -1,9 +1,9 @@
 import React from 'react'
 
-const page = (props) => {
+const page = () => {
   return (
     <div>
-      농원/농장 {props.searchParams.list}
+      HomePage
     </div>
   )
 }
