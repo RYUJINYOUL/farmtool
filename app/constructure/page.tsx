@@ -1,10 +1,9 @@
-import { sleep } from '@/lib/utils'
 import React from 'react'
 
-const page = async () => {
+const page = () => {
   return (
     <div>
-      HomePage
+      내정보
     </div>
   )
 }
