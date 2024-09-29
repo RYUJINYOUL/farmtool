@@ -1,11 +1,11 @@
-import React from 'react'
+import Header from "@/components/Header";
 
-const layout = ({children}) => {
+const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
-      {children}
+    <div className="w-full h-full">
+      <Header>{children}</Header>
     </div>
-  )
-}
+  );
+};
 
-export default layout
+export default layout;

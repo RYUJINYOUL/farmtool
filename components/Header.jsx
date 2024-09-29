@@ -93,7 +93,7 @@ const Header = ({children}) => {
         
 
       </section>
-      <section className='absolute'>{children}</section>
+      <section className='relative'>{children}</section>
     </header>
   )
 }
