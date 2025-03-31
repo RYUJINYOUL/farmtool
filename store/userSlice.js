@@ -2,9 +2,9 @@ import { createSlice, current } from "@reduxjs/toolkit";
 
 const initialState = {
     currentUser: {
-       uid: JSON.parse(localStorage.getItem('uid')) || '',
-       photoURL: JSON.parse(localStorage.getItem("photoURL")) || '',
-       displayName: JSON.parse(localStorage.getItem('displayName')) || '',
+       uid: (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem('uid')) : '',
+       photoURL: (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem("photoURL")) : '',
+       displayName: (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem('displayName')) : '',
     }
 }
 
