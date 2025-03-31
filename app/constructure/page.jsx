@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import PagePadding from '@/components/pagePadding'
+import PagePadding from '@/components/pagePadding.jsx'
 import Category from '@/components/Category'
 import PlayListCard2 from '@/components/PlayListCard2'
 import app from '../../firebase.js';
