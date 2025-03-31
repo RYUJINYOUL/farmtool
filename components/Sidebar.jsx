@@ -5,7 +5,7 @@ import Navigator from './elements/Navigator.jsx'
 const Sidebar = ({children}) => {
 
   return (
-    <div className='flex flex-row h-full' >
+    <div className='flex flex-row h-dvh' >
       <nav className='hidden lg:block w-[240px] border-r-[1px] border-gray-600'>
         <div className='p-[24px]'>
             <Logo />

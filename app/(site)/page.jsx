@@ -1,14 +1,7 @@
 "use client"
 import React from 'react'
-import Category from '../../components/Category.jsx' 
 import useUIState from '@/hooks/useUIState';
-import PagePadding from '@/components/pagePadding';
-import PlayListCard from '@/components/PlayListCard.jsx'
 import { dummyPlaylistArray, getPlaylistById } from "@/lib/dummyData";
-import { getRandomElementFromArray } from "@/lib/utils";
-// import PlayListCarousel from '@/components/PlayListCarousel.jsx';
-import UserIcon from "@/components/UserIcon";
-import PlayListCarousel from '@/components/PlayListCarousel';
 import AuthLayout from '@/components/AuthLayout.jsx';
 
 
