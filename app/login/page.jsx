@@ -1,11 +1,12 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import Link from "next/link";
 import styles from "../../index.module.css";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from 'react-redux';
+import useAuth from '@/hooks/useAuth'
 
 const LoginPage = () => {
     const auth = getAuth();
@@ -15,6 +16,7 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const { currentUser } = useSelector(state => state.user)
     const { push } = useRouter();
+    const login = useAuth();
 
     const onSubmit = async (data) => {
         try {
@@ -32,16 +34,20 @@ const LoginPage = () => {
         }
     }
 
-    useEffect(() => {
-        if(currentUser !== null) {
-            push("/");
-        }
-
-        return () => {
-           
-          }
-        }, [])
-
+    // useEffect(() => {
+    //     const unsubscribe = onAuthStateChanged(auth, (user) => {  //user 정보를 가져오고 user에 auth가 바뀔때마다 실행
+        
+    //       if(user) {  //로그인이 되었으며
+    //         push("/");
+    //       } else {
+    //         push("/login");
+    //       }
+    //     })
+      
+    //     return () => {
+    //       unsubscribe();
+    //     }
+    //   }, [])
     
 
     return (

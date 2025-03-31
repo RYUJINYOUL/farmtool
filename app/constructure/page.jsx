@@ -2,16 +2,10 @@
 import React, { useEffect, useState } from 'react'
 import PagePadding from '@/components/pagePadding'
 import Category from '@/components/Category'
-import PlayListCarousel from '@/components/PlayListCarousel'
-import UserIcon from '@/components/UserIcon'
 import PlayListCard2 from '@/components/PlayListCard2'
-import { getRandomElementFromArray } from '@/lib/utils'
-import { dummyPlaylistArray2 } from '@/lib/dummyData'
-import { dummyAllSongList } from '@/lib/dummyData'
 import app from '../../firebase.js';
 import useUIState from '@/hooks/useUIState';
 import { getFirestore, collection, where, setDoc, onSnapshot, query} from "firebase/firestore";
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -19,13 +13,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu.tsx"
 import { AiFillCaretDown } from "react-icons/ai";
 import { FiCheck } from "react-icons/fi";
+import { useDispatch, useSelector } from 'react-redux';
 
 
 
-const page = () => {
+const Page = () => {
   const db2 = getFirestore(app);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [message, setMessages] = useState([]);
@@ -33,18 +28,19 @@ const page = () => {
   const { homeCategory, setHomeCategory } = useUIState();
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [reg, setReg] = useState("전체");
+  const { currentUser } = useSelector(state => state.user)
 
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    addMessagesListener(homeCategory, reg)
-   
+    addMessagesListener(new Map(categoryList2).get(homeCategory), reg)
     return () => {
     }
   }, [ homeCategory, reg ])
 
 
   const addMessagesListener = async (homeCategory, reg) => {
+
     const tweetsQuery = (reg === "전체")
     ? query(collection(db2, homeCategory))
     : query(collection(db2, homeCategory), where("지역", "==", reg))
@@ -71,13 +67,13 @@ const page = () => {
   ]
 
   const region = [
-    "수도권/경기", "강원도", "충북", "충남", "경북", "경남", "전북", "전남", "제주도"
+    "전체", "수도권/경기", "강원도", "충북", "충남", "경북", "경남", "전북", "전남", "제주도"
   ]
 
   const onClickRegion = (regs) => {
     if (reg === regs) {
         // setHeaderImageSrc("")
-        setReg("")
+        setReg(regs)
     }else{
         // setHeaderImageSrc(item.src)
         setReg(regs)
@@ -129,11 +125,8 @@ const page = () => {
            playlist={[...message]} />                
       </section>
       </div>
-      <div className='mt-12'>
-      <button onClick={addMessagesListener(new Map(categoryList2).get(homeCategory), reg)}>{reg}</button>
-      </div>
     </PagePadding>
   )
 }
 
-export default page
+export default Page

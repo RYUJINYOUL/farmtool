@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 const initialState = {
     currentUser: {
-       uid: '',
-       photoURL: '',
-       displayName:''
+       uid: JSON.parse(localStorage.getItem('uid')) || '',
+       photoURL: JSON.parse(localStorage.getItem("photoURL")) || '',
+       displayName: JSON.parse(localStorage.getItem('displayName')) || '',
     }
 }
 
@@ -16,6 +16,14 @@ export const userSlice = createSlice({
             state.currentUser.uid = action.payload.uid;
             state.currentUser.photoURL = action.payload.photoURL;
             state.currentUser.displayName = action.payload.displayName;
+
+            let uid = JSON.stringify(state.currentUser.uid);
+            let photoURL = JSON.stringify(state.currentUser.photoURL);
+            let displayName = JSON.stringify(state.currentUser.displayName);
+
+            localStorage.setItem("uid", uid);
+            localStorage.setItem("photoURL", photoURL);
+            localStorage.setItem("displayName", displayName);
         },
         clearUser: (state) => {
             state.currentUser = {};

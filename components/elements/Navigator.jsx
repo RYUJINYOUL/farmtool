@@ -114,8 +114,10 @@ const Navigator = () => {
          flex flex-row items-center bg-gray-700 my-6 rounded-3xl p-2 font-[200] justify-center gap-2" onClick={()=>document.getElementById('my_modal_1').showModal()}>
        
           <FiPlus className='text-white' size={24}></FiPlus>
+          <Link href="/upload">
           <span className='text-white'>업로드</span>
-      
+          </Link>
+         
         </div>
         {/* </Link> */}
         </section>
