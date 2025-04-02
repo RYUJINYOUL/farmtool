@@ -29,6 +29,9 @@ const page = () => {
   const [image, setImage] = useState([]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [uploadFile, setUploadFile] = useState([]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const inputOpenImageRef = useRef(null);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -61,7 +64,7 @@ const page = () => {
   
 
   async function uploadUrl() {
-   images.map((file) => {
+    uploadFile.map((file) => {
       const metadata = { contentType: file.type };
       const storageRef = strRef(storage, `test/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
@@ -116,15 +119,19 @@ const page = () => {
   
     function onFileSelect(event){   //보여주고 handle로 넘어가게 한다.
       const files = event.target.files
+      const uploadFile = Array.from(files)
+      setUploadFile((prevImages) => 
+        prevImages.concat(uploadFile)
+      )
       if (files.length === 0) return;
       for (let i = 0; i < files.length; i++) {
         if (files[i].type.split('/')[0] !== 'image') continue;
         if (!images.some((e)=> e.name === files[i].name)) {
           setImages((prevImages) => [
-            ...prevImages,
+            ...prevImages, 
            {
             name: files[i].name,
-            url: URL.createObjectURL(files[i]),
+            url: URL.createObjectURL(files[i])
            },
         ]);
       }
@@ -133,6 +140,9 @@ const page = () => {
   
     function deleteImage(index) {
       setImages((prevImages) => 
+        prevImages.filter((_, i)=> i !== index)
+      )
+      setUploadFile((prevImages) => 
         prevImages.filter((_, i)=> i !== index)
       )
     }

@@ -6,6 +6,7 @@ import PagePadding from '@/components/pagePadding'
 import { FaChromecast } from 'react-icons/fa'
 import { FiSearch } from 'react-icons/fi'
 import { cn } from "@/lib/utils"
+import Gallery from '@/components/Caroucel3'
 import {
     Drawer,
     DrawerContent,
@@ -33,9 +34,21 @@ import Navigator from './elements/Navigator'
     )
   }
 
-const Header = ({children}) => {
+const Header3 = ({children}) => {
+  // const { headerImageSrc } = useUIState();
   const [isScrolled, setIsScrolled] = useState(false);
-  const headRef = useRef();
+  const headRef = useRef()
+  let slides = [
+    "/Image/main2.jpg"
+     ,
+    "/Image/main1.jpg"
+     ,
+    "/Image/main3.jpg"
+     ,
+     "/Image/main4.jpg"
+     ,    
+     "/Image/main5.jpg"   
+   ]
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,35 +64,19 @@ const Header = ({children}) => {
 
 
   return (
-    <header ref={headRef} className='relative overflow-y-auto w-full h-full'>
-      <section className='absolute top-0 w-full'>
-        <div className='relative h-[400px] w-full'>
-            <Image 
-            alt="mediaItem"
-            className='object-cover'
-            fill
-            src={ "https://www.redwoodhikes.com/JedSmith/JedSmith1.jpg" } />
-        </div>
-        <div className='absolute h-[400px] top-0 bg-white opacity-40 w-full'></div>
-        <div className='absolute h-[400px] top-0 bg-gradient-to-t from-white w-full'></div>
+    <header ref={headRef} className='overflow-y-auto w-full h-full'>
+      <section className='relative top-0 w-full'>
+        <div className='sticky top-100 mb-8 w-full'><Gallery images={slides} /></div>
       </section>
-      <section className={cn('sticky top-0 left-0 z-10', isScrolled&&"bg-white")}>
+      <section className={cn('lg:sticky sm:absolute w-full top-0 left-0 z-10', isScrolled&&"bg-white")}>
         <PagePadding>
         <div className='h-[64px] flex flex-row justify-between items-center'>
-          <article className='h-[42px] min-w-[480px] hidden lg:flex flex-row items-center bg-[rgba(244,246,243,0.74)] rounded-2xl px-[16px] gap-[16px] border border-neutral-500 '>
-            <div>
-             <FiSearch size={24} />
-            </div>
-            <input className='h-full w-full bg-transparent'
-            placeholder='나무 검색하세요'
-            type='text' />
-          </article>
             <HeaderDrawer>
             <article className='lg:hidden'>
                <Logo />
               </article>
             </HeaderDrawer>
-           <article className='flex flex-row gap-6 items-center'>
+           <article className='flex flex-row gap-6 items-center pr-5'>
             <FaChromecast size={26} />
           <UserIcon />
         </article>
@@ -93,4 +90,4 @@ const Header = ({children}) => {
   )
 }
 
-export default Header
+export default Header3

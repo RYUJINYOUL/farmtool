@@ -6,9 +6,15 @@ import PagePadding from '@/components/pagePadding'
 import { FaChromecast } from 'react-icons/fa'
 import { FiSearch } from 'react-icons/fi'
 import { cn } from "@/lib/utils"
+import useUIState from "@/hooks/useUIState"
 import {
     Drawer,
+    DrawerClose,
     DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
     DrawerTrigger,
   } from "@/components/ui/drawer"
 import Logo from './elements/Logo'
@@ -33,7 +39,8 @@ import Navigator from './elements/Navigator'
     )
   }
 
-const Header = ({children}) => {
+const Header2 = ({children}) => {
+  const { headerImageSrc } = useUIState();
   const [isScrolled, setIsScrolled] = useState(false);
   const headRef = useRef();
 
@@ -58,7 +65,7 @@ const Header = ({children}) => {
             alt="mediaItem"
             className='object-cover'
             fill
-            src={ "https://www.redwoodhikes.com/JedSmith/JedSmith1.jpg" } />
+            src={ headerImageSrc || "https://www.redwoodhikes.com/JedSmith/JedSmith1.jpg" } />
         </div>
         <div className='absolute h-[400px] top-0 bg-white opacity-40 w-full'></div>
         <div className='absolute h-[400px] top-0 bg-gradient-to-t from-white w-full'></div>
@@ -93,4 +100,4 @@ const Header = ({children}) => {
   )
 }
 
-export default Header
+export default Header2

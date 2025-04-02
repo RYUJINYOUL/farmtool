@@ -1,7 +1,8 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import PagePadding from '@/components/pagePadding.jsx'
-import Category from '@/components/Category'
+// import Category from '@/components/Category'
+import Category from "./components/Category"
 import PlayListCard2 from '@/components/PlayListCard2'
 import app from '../../firebase.js';
 import useUIState from '@/hooks/useUIState';
@@ -20,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 
 
+
 const Page = () => {
   const db2 = getFirestore(app);
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -33,7 +35,10 @@ const Page = () => {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
+    console.log(homeCategory)
+    // addMessagesListener(new Map(categoryList2).get(homeCategory), reg)
     addMessagesListener(new Map(categoryList2).get(homeCategory), reg)
+ 
     return () => {
     }
   }, [ homeCategory, reg ])
@@ -82,9 +87,13 @@ const Page = () => {
 
   return (
     <PagePadding>
-     <div className="mt-9"></div>
-     <div className='flex flex-row justify-between items-center gap-4 flex-wrap'>
-      <Category category={categoryList}/>
+     {/* <div className="mt-9"></div> */}
+     {/* <div className='flex flex-row justify-between items-center gap-4 flex-wrap'> */}
+      {/* <Category category={categoryList}/>
+      <div className="min-h-[600px]"> */}
+        <div className="mt-9"></div>
+        <div className='flex flex-row justify-between items-center gap-4 flex-wrap'>
+        <Category />
       <div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

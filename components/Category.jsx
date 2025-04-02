@@ -16,22 +16,14 @@ import { AiFillCaretDown } from "react-icons/ai";
 import { FiCheck } from "react-icons/fi";
 
 const Category = (props) => {
-
-    // const categoryList = [
-    //     "조경수매물보기", "조경수매물등록", "조경수삽니다", "시설물질문", "조경공사요청", "파일업로드"
-    // ]
-
-    const [showStatusBar, setShowStatusBar] = React.useState(true)
-    const [showActivityBar, setShowActivityBar] = React.useState(false)
-    const [showPanel, setShowPanel] = React.useState(false)
-    const { homeCategory, setHomeCategory } = useUIState();
+    const { homeCategory, setHomeCategory, setHeaderImageSrc } = useUIState();
 
     const onClickCategory = (item) => {
         if (homeCategory === item) {
-            // setHeaderImageSrc("")
+            setHeaderImageSrc("")
             setHomeCategory("")
         }else{
-            // setHeaderImageSrc(item.src)
+            setHeaderImageSrc(item.src)
             setHomeCategory(item)
         }
     }
