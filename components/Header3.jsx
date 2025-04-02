@@ -68,7 +68,7 @@ const Header3 = ({children}) => {
       <section className='relative top-0 w-full'>
         <div className='sticky top-100 mb-8 w-full'><Gallery images={slides} /></div>
       </section>
-      <section className={cn('lg:sticky sm:absolute w-full top-0 left-0 z-10', isScrolled&&"bg-white")}>
+      <section className={cn('lg:sticky min-[425px]:absolute w-full top-0 left-0 z-10', isScrolled&&"bg-white")}>
         <PagePadding>
         <div className='h-[64px] flex flex-row justify-between items-center'>
             <HeaderDrawer>
