@@ -35,8 +35,8 @@ const Page = () => {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    console.log(homeCategory)
     // addMessagesListener(new Map(categoryList2).get(homeCategory), reg)
+    
     addMessagesListener(new Map(categoryList2).get(homeCategory), reg)
  
     return () => {
@@ -108,7 +108,7 @@ const Page = () => {
               </div>
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[300px] bg-white-800">
+          <DropdownMenuContent align="end" className="w-[300px] bg-white">
             <DropdownMenuLabel className="p-4">{reg}</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white-700" />
             {region.map((reg) => {
@@ -131,7 +131,8 @@ const Page = () => {
       <div>
       <section>
       <PlayListCard2 
-           playlist={[...message]} />                
+           playlist={[...message]}
+           collection={new Map(categoryList2).get(homeCategory)} />                
       </section>
       </div>
     </PagePadding>
