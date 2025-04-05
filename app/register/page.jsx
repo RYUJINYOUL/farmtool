@@ -26,7 +26,6 @@ const RegisterPage = () => {
       try{
         setLoading(true);
         const createdUser = await createUserWithEmailAndPassword(auth, data.email, data.password)
-        console.log(createdUser);
   
         await updateProfile(auth.currentUser, {
           displayName: data.name,
@@ -59,7 +58,6 @@ const RegisterPage = () => {
       dispatch(setUser(userData));
   
       } catch (error) {
-        console.log(error);
         setErrorFromSubmit(error.message);
         setTimeout(() => {
           setErrorFromSubmit("");

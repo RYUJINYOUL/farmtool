@@ -11,7 +11,7 @@ const UserIcon = ({ size = "sm" }) => {
     signOut(auth).then(() => {
 
     }).catch((err) => {
-      console.error(err);
+    
     })
   }
 

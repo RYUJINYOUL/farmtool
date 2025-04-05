@@ -114,12 +114,12 @@ const Page = () => {
             <DropdownMenuSeparator className="bg-white-700" />
             {region.map((reg) => {
               return <DropdownMenuCheckboxItem 
-              className="p-4" 
+              className="p-2" 
               key={reg}
               onClick={() => onClickRegion(reg)}
               >
               <span className="min-w-[40px]">
-                <FiCheck size={20} />
+                <FiCheck size={10} />
               </span>
               {reg}
             </DropdownMenuCheckboxItem>

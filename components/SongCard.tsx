@@ -25,7 +25,6 @@ const SongCard: React.FC<SongCardProps> = ({ song }) => {
       <div className=" w-[48px] h-[48px] relative">
         <Image src={song.imageSrc} alt="img" fill className=" object-cover" />
         <section
-          onClick={console.log}
           className="hidden group-hover:flex absolute top-0 w-[48px] h-[48px] items-center justify-center bg-[rgba(222,216,216,0.7)]
         cursor-pointer
         "

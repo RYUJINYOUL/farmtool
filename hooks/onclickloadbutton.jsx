@@ -14,10 +14,10 @@ export const onClickUpLoadButton = async (imageUrl, data) => {
       id : i++,
       url : imageUrl
     }])
-    // console.log(image)
+    // .log(image)
 
     // if(imgs.length > 1){
-    //   console.log(imgs)
+    //   .log(imgs)
     // }
    
 

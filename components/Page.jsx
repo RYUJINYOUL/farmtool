@@ -88,14 +88,12 @@ const page = () => {
 
   const handleUploadImage = (event) => {
     const file = event.target.files[0];
-  
-        console.log(file)
+
       const metadata = { contentType: file.type };
       
       const storageRef = strRef(storage, `/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file, metadata);
-  
-      console.log(uploadTask)
+
   
       const messagesRef = doc(collection(db2, "chatRooms", "3432", "messages")); 
   
@@ -103,15 +101,15 @@ const page = () => {
               (snapshot) => {
                   // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                   const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                  console.log('Upload is ' + progress + '% done');
+                 
                   setPercentage(Math.round(process));
   
                   switch (snapshot.state) {
                       case 'paused':
-                          console.log('Upload is paused');
+                         
                           break;
                       case 'running':
-                          console.log('Upload is running');
+                      
                           break;
                       default:
                           break;
@@ -151,7 +149,7 @@ const page = () => {
     setContent(event.target.value);
     const typingRef = doc(db2, "typing", "3223"); 
     if(event.target.value) {
-      console.log(typingRef);
+    
       await setDoc(typingRef, {
         typing: [],
         typing: arrayUnion(currentUser.displayName)

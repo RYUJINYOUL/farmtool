@@ -12,9 +12,6 @@ const page = async (props) => {
    const key = props.searchParams.list
    const col= props.searchParams.col
 
-   console.log(key)
-   console.log(col)
-
 
      // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
@@ -33,9 +30,6 @@ const page = async (props) => {
           setMessages(doc.data())
          });
      };
-  
-  
-   console.log(message)
 
   return (
    

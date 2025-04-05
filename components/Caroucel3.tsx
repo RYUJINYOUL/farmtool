@@ -12,7 +12,7 @@ import {
 import Image from "next/image";
 
 interface GalleryProps {
-  images: string[];
+  images: [{ src: string, title: string, desc: string[]}];
 }
 
 const Gallery = ({ images }: GalleryProps) => {
@@ -20,20 +20,30 @@ const Gallery = ({ images }: GalleryProps) => {
   const [thumbnailApi, setThumbnailApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
-  const mainImage = useMemo(
-    () =>
-      images.map((image, index) => (
-        <CarouselItem key={index} className="relative aspect-video w-full">
-          <Image
-            src={image}
-            alt={`Carousel Main Image ${index + 1}`}
-            fill
-            style={{ objectFit: "cover" }}
-          />
-        </CarouselItem>
-      )),
-    [images],
-  );
+   const mainImage = useMemo(
+      () =>
+        images.map((image, index) => (
+          <CarouselItem key={index} className="relative aspect-video w-full">
+            <Image
+              src={image.src}
+              alt={`Carousel Main Image ${index + 1}`}
+              fill
+              className='object-cover w-full ml-4'
+            />
+            {/* <div className='absolute h-[400px] top-0 bg-white opacity-10 w-full'></div>
+            <div className='absolute h-[400px] top-0 bg-gradient-to-t from-white w-full'></div> */}
+            <div className="absolute text-red-600 text-3xl top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              {image.title}
+            </div>
+            {image.desc.map((description, index) => (
+            <div key={index} className="absolute text-white text-1xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            {description}
+          </div>
+           ))}
+          </CarouselItem>
+        )),
+      [images],
+    );
 
   const thumbnailImages = useMemo(
     () =>
@@ -45,7 +55,7 @@ const Gallery = ({ images }: GalleryProps) => {
         >
           <Image
             className={`${index === current ? "border-2" : ""}`}
-            src={image}
+            src={image.src}
             width={60}
             height={60}
             alt={`Carousel Thumbnail Image ${index + 1}`}

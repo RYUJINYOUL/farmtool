@@ -43,12 +43,6 @@ const page = () => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       // let setdownloadURL = [];
   let i = 0
- 
-
-  // useEffect(() => {
-  //   console.log(`useffect ${image}`)
-
-  // },[image])
 
  
   const onClickUpLoadButton = async (data) => {  

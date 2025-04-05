@@ -22,8 +22,6 @@ const PlayListCard2 = ({ playlist = [], collection = "" } = {}) => {
   } 
   = playlist ?? [];
 
-  console.log(collection)
-
   const onClickCard = (id) => {
     push(`/test?list=${id}&col=${collection}`);
     // push(`/test/?name=${id}collection=${collection}`);

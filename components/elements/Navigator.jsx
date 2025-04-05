@@ -54,37 +54,6 @@ const Navigator = () => {
     }, [pathname]);
 
 
-    const handleSubmit = async (e) => {
-
-        const user = auth.currentUser;
-       
-        e.preventDefault();
-        
-        if (isFormValid(name, description)) {
-          const chatRoomsRef = doc(db2, "chatRooms", name); 
-          try{
-            await setDoc(chatRoomsRef, {
-              id: chatRoomsRef.id,
-              name: name,
-              description: description,
-              typing: [],
-              createdBy: {
-                name: currentUser.displayName,
-                image: currentUser.photoURL
-              }
-            });
-            setName('');
-            setDescription('');
-            setShow(false);
-            document.getElementById('my_modal_1').close()
-          } catch(error) {
-           console.log(error)
-          }
-    }
-      }
-
-
-
     return (
         <div>
          <section className='flex flex-col gap-2 p-4'>
@@ -111,7 +80,7 @@ const Navigator = () => {
       </section>
       <section className="px-6">
       <div className="btn hover:bg-gray-500 cursor-pointer
-         flex flex-row items-center bg-gray-700 my-6 rounded-3xl p-2 font-[200] justify-center gap-2" onClick={()=>document.getElementById('my_modal_1').showModal()}>
+         flex flex-row items-center bg-gray-700 my-6 rounded-3xl p-2 font-[200] justify-center gap-2">
        
           <FiPlus className='text-white' size={24}></FiPlus>
           <Link href="/upload">
@@ -119,69 +88,7 @@ const Navigator = () => {
           </Link>
          
         </div>
-        {/* </Link> */}
         </section>
-
-        <dialog id="my_modal_1" className="modal w-[500px] rounded-2xl">
-        <h6 className='bg-white p-4 text-black'>채팅방 생성하기</h6>
-        <div className="modal-box bg-white gap-2">
-          <div className="group relative flex flex-col gap-2 p-4">
-            <div className='text-black'>방 이름</div>
-            
-            <input className="bg-white rounded-md border-2 border-gray-300 h-9" label="방 이름을 입력하세요" onChange={(e) => setName(e.target.value)}/>
-            
-            <div className='text-black'>방 설명</div>
-          
-            <input className="bg-white rounded-md border-2 border-gray-300 h-9" label="방 설명을 입력하세요" onChange={(e) => setDescription(e.target.value)}/>
-          
-        </div>
-   
-          <div className="modal-action flex gap-3 p-4">
-            <form method="dialog">
-              <button className="btn text-black">닫힘</button>
-            </form>
-            <form onClick={handleSubmit}>
-              <button className="btn text-black">생성</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
-   
-      <Modal show={show} onHide={() => setShow(false)}>
-      <Modal.Header closeButton>
-        <Modal.Title>채팅 방 생성하기</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group>
-            <Form.Label>방 이름</Form.Label>
-            <Form.Control
-            onChange={(e) => setName(e.target.value)}
-            type='text'
-            placeholder='채팅 방 이름을 입력하세요'
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>방 이름</Form.Label>
-            <Form.Control
-            onChange={(e) => setDescription(e.target.value)}
-            type='text'
-            placeholder='채팅 방 설명을 작성하세요'
-            />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShow(false)}>
-          취소
-        </Button>
-        <Button variant='primary' onClick={handleSubmit}>
-          생성
-        </Button>
-      </Modal.Footer>
-    </Modal>
-
-
         </div>
 
         
