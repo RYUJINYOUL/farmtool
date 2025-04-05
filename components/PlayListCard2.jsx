@@ -6,23 +6,27 @@ import { useRouter } from "next/navigation";
 import { MdMoreVert } from "react-icons/md";
 import { FiPlay } from "react-icons/fi";
 import IconButton from "./elements/IconButton";
+import Link from 'next/link'
 
 
-const PlayListCard2 = ({ playlist = [], collection = category } = {}) => {
-  console.log(collection);
- 
+const PlayListCard2 = ({ playlist = [], collection = "" } = {}) => {
+
   const { push } = useRouter();
   const { 
     name="", 
-    channelId, 
+    channelId="", 
     channel = "", 
     src = "", 
-    imageSrc = ""
+    imageSrc = "",
+    id
   } 
   = playlist ?? [];
 
+  console.log(collection)
+
   const onClickCard = (id) => {
-    push(`/playlist?list=${id}`);
+    push(`/test?list=${id}&col=${collection}`);
+    // push(`/test/?name=${id}collection=${collection}`);
   };
 
   return (
@@ -30,7 +34,7 @@ const PlayListCard2 = ({ playlist = [], collection = category } = {}) => {
       {playlist?.map((playlist, index) => {
         return (
           <div key={index}>
-        <section onClick={()=>onClickCard(playlist.channelId)} className=" relative h-[136px] ">
+        <section onClick={()=>onClickCard(playlist.id)} className=" relative h-[136px] ">
         <Image
           src={
             playlist.imageSrc ||
@@ -48,7 +52,7 @@ const PlayListCard2 = ({ playlist = [], collection = category } = {}) => {
       </section>
       <section className="mt-2">
         <div>{playlist.name}</div>
-        <div className="text-neutral-500">{`${channel} - 트랙 ${channelId}개`}</div>
+        <div className="text-neutral-500">{`${playlist.channel} - 트랙 ${playlist.channelId}개`}</div>
       </section>
       </div>
         )

@@ -15,8 +15,6 @@ interface PlaylistPageProps {
 const page = async (props: PlaylistPageProps) => {
   const playlist = await getPlaylistById(Number(props.searchParams.list))
 
-  console.log(playlist)
-
   if(!playlist) permanentRedirect("/");
 
   const imageSrc = getRandomElementFromArray(playlist.songList)?.imageSrc;

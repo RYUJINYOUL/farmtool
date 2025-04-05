@@ -52,8 +52,9 @@ const Page = () => {
     await onSnapshot(tweetsQuery, (snapshot) => { // <---- 
       const tweetList = snapshot.docs.map((doc) => {
         const { name, channelId, channel, src, imageSrc, 지역 } = doc.data();
+        const id = doc.id
         return {
-          name, channelId, channel, src, imageSrc, 지역
+          name, channelId, channel, src, imageSrc, 지역, id
         };
       });
         setMessages(tweetList);
