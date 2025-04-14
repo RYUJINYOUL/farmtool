@@ -13,12 +13,9 @@ const PlayListCard2 = ({ playlist = [], collection = "" } = {}) => {
 
   const { push } = useRouter();
   const { 
-    name="", 
-    channelId="", 
-    channel = "", 
-    src = "", 
-    imageSrc = "",
-    id
+    name, description, url, 
+    title, address, phoneNumber, userKey, category,
+    createdDate, NumOfLikes, geoFirePoint, id
   } 
   = playlist ?? [];
 
@@ -26,6 +23,7 @@ const PlayListCard2 = ({ playlist = [], collection = "" } = {}) => {
     push(`/test?list=${id}&col=${collection}`);
     // push(`/test/?name=${id}collection=${collection}`);
   };
+  
 
   return (
     <article className="grid grid-cols-2 gap-6 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
@@ -35,12 +33,12 @@ const PlayListCard2 = ({ playlist = [], collection = "" } = {}) => {
         <section onClick={()=>onClickCard(playlist.id)} className=" relative h-[136px] ">
         <Image
           src={
-            playlist.imageSrc ||
+            playlist?.url[0] ||
             "https://www.redwoodhikes.com/JedSmith/JedSmith1.jpg"
           }
           fill={true}
           alt="thumbnail"
-          className="object-cover rounded-md"
+          className="object-fill rounded-md"
         />
         <div className="hidden relative group-hover:block bg-gradient-to-b from-[rgba(0,0,0,0.7)] top-0 w-full h-[136px] ">
           <div className=" absolute top-2 right-4">

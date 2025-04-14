@@ -51,10 +51,15 @@ const Page = () => {
     : query(collection(db2, homeCategory), where("지역", "==", reg))
     await onSnapshot(tweetsQuery, (snapshot) => { // <---- 
       const tweetList = snapshot.docs.map((doc) => {
-        const { name, channelId, channel, src, imageSrc, 지역 } = doc.data();
+        const { name, description, url, 
+          title, address, phoneNumber, userKey, category,
+          createdDate, NumOfLikes, geoFirePoint
+        } = doc.data();
         const id = doc.id
         return {
-          name, channelId, channel, src, imageSrc, 지역, id
+          name, description, url, 
+          title, address, phoneNumber, userKey, category,
+          createdDate, NumOfLikes, geoFirePoint, id
         };
       });
         setMessages(tweetList);

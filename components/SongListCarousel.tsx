@@ -65,7 +65,7 @@ const SongListCarousel: React.FC<SongListCarouselProps> = ({
             return (
               <CarouselItem
                 key={index}
-                className="lg:basis-1/2 "
+                className="lg:basis-1/3 "
               >
                 <SongColumn songList={songList} />
               </CarouselItem>

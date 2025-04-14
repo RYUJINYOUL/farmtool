@@ -14,6 +14,14 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "*.pixabay.com",
               },
+              {
+                protocol: "https",
+                hostname: "*.api.vworld.kr",
+              },
+              {
+                protocol: "https",
+                hostname: "firebasestorage.googleapis.com",
+              },
         ]
     }
 };

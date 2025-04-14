@@ -11,6 +11,9 @@ import SongListCarousel from '@/components/SongListCarousel'
 import { dymmyGenreList, getAllPlaylist, getSongListTop10 } from '@/lib/dummyData'
 import YouTube from 'react-youtube';
 import Gallery2 from '@/components/Caroucel4'
+import PlayListCarousel2 from './PlayListCarousel2';
+import YoutubeCarousel from '@/components/YoutubeCarousel'
+
 
 const AuthLayout = async () => {
 
@@ -40,7 +43,6 @@ const AuthLayout = async () => {
 
   return (
     <PagePadding>
-   
    <PlayListCarousel
     playlistArray={playlistArray}
     Thumbnail={
@@ -52,7 +54,7 @@ const AuthLayout = async () => {
     subTitle="도도"
    />
    <div className="mt-20"></div>
-      <PlayListCarousel
+      <PlayListCarousel2
         playlistArray={[...dummyPlaylistArray2]}
         title="케이시 - Full Bloom"
         subTitle="새로운 앨범"
@@ -68,7 +70,7 @@ const AuthLayout = async () => {
         title="분위기 및 장르"
       />  
           <div className="mt-20"></div>   
-          <div className='lg:hidden pt-16 w-full'>
+          {/* <div className='lg:hidden pt-16 w-full'>
             <Gallery2 images={slides} />
           
           </div>
@@ -118,7 +120,8 @@ const AuthLayout = async () => {
               
                 onEnd={(e)=>{e.target.stopVideo(0);}}      
               />
-      </div>   
+      </div>    */}
+      <YoutubeCarousel />
           <div className="mt-20"></div>   
           <div className="mt-20"></div>   
           <div className="mt-20"></div>   

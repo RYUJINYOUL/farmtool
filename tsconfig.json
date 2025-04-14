@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(site)/page.tsx", "app/register/page.jsx", "app/tree/page.jsx", "app/constructure/page.jsx", "app/upload/page.jsx", "app/constructure/layout.tsx", "components/elements/promise.jsx", "app/test/page.jsx", "components/Caroucel3.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(site)/page.tsx", "app/register/page.jsx", "app/tree/page.jsx", "app/constructure/page.jsx", "app/upload/page.jsx", "app/constructure/layout.tsx", "components/elements/promise.jsx", "app/test/page.jsx", "components/Caroucel3.tsx", "components/Geocoding.jsx", "app/todos/page.jsx", "components/GeocodingTest.jsx", "components/YoutubeCarousel.jsx", "app/address/page.jsx"],
   "exclude": ["node_modules"]
 }

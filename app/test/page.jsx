@@ -34,7 +34,7 @@ const page = async (props) => {
   return (
    
 
-      <div className='mt-12'>{message.name}</div>
+      <div className='mt-12'>{message?.name}</div>
   
     
   )

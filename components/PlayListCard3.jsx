@@ -8,7 +8,7 @@ import { FiPlay } from "react-icons/fi";
 import IconButton from "./elements/IconButton";
 
 
-const PlayListCard = ({ playlist = {} } = {}) => {
+const PlayListCard3 = ({ playlist = {} } = {}) => {
  
   const { push } = useRouter();
   const { id, owner = "", playlistName = "", songList = [] } = playlist ?? {};
@@ -25,8 +25,8 @@ const PlayListCard = ({ playlist = {} } = {}) => {
   };
 
   return (
-    <article className="h-[500px] cursor-pointer group">
-      <section onClick={onClickCard} className=" relative h-[350px] ">
+    <article className=" h-[240px] cursor-pointer group">
+      <section onClick={onClickCard} className=" relative h-[136px] ">
         <Image
           src={
             // imageSrc ||
@@ -36,7 +36,7 @@ const PlayListCard = ({ playlist = {} } = {}) => {
           alt="thumbnail"
           className="object-cover rounded-md"
         />
-        <div className="hidden relative group-hover:block bg-gradient-to-b rounded-md from-[rgba(0,0,0,0.7)] top-0 w-full h-[330px] ">
+        <div className="hidden relative group-hover:block bg-gradient-to-b from-[rgba(0,0,0,0.7)] top-0 w-full h-[136px] ">
           <div className=" absolute top-2 right-4">
             <IconButton icon={<MdMoreVert size={20} />} />
           </div>
@@ -60,4 +60,4 @@ const PlayListCard = ({ playlist = {} } = {}) => {
   );
 };
 
-export default PlayListCard;
+export default PlayListCard3;
