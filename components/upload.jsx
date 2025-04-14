@@ -172,9 +172,7 @@ function Upload ({props}){
     }
   
     async function uploadImage(){
-      let dddee= await get2("주덕읍")
-      console.log(dddee)
-      // uploadUrl()
+      uploadUrl()
       alert("이미지가 업로드 되었습니다.")
     }
 

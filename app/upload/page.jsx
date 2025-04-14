@@ -6,8 +6,6 @@ async function page (props) {
   const x = props.searchParams.x
   const y = props.searchParams.y
 
-  console.log(key, x, y)
-
   return (
     <Upload props={[key, x, y]}/>
   )
