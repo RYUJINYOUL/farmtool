@@ -18,7 +18,6 @@ import { BiSolidPhotoAlbum } from "react-icons/bi";
 
 
 function Upload ({props}){
-  console.log(props[1])
   const db2 = getFirestore(app);
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
