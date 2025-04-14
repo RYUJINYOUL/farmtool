@@ -8,7 +8,7 @@ import app, { storage } from '../firebase';
 import styles from "../index.module.css";
 import { useRouter } from "next/navigation";
 import ImageUpload from '@/components/uploadImage.js'
-import { get } from '../lib/geo'
+import { get2 } from '../lib/geo'
 import { useSelector } from 'react-redux';
 import { RiDragDropLine } from "react-icons/ri";
 import { BiSolidPhotoAlbum } from "react-icons/bi";
@@ -172,8 +172,8 @@ function Upload ({props}){
     }
   
     async function uploadImage(){
-      await get("cndnwnltl")
-      let addrs= await get("주덕읍")
+      // await get("cndnwnltl")
+      let addrs= await get2("주덕읍")
       console.log(addrs)
       // uploadUrl()
       alert("이미지가 업로드 되었습니다.")
