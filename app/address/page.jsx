@@ -31,7 +31,7 @@ const page = async () => {
     return setAddr(result)
   }
 
-  console.log(addr)
+
 
   const onClickAddr = (id) => {
     push(`/upload?addr=${id.juso}&x=${id.x}&y=${id.y}`);
