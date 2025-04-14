@@ -23,7 +23,7 @@ const page = async () => {
   async function addrs (data) {
     setAddr([])
     const res = await get2(data.address)
-
+    console.log(res)
     
     for (let i of res) {
       result.push({juso: i.address.road, x: i.point.x, y: i.point.y}) 
