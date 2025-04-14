@@ -48,7 +48,7 @@ function Upload ({props}){
         "category": data.category,
         "createdDate": new Date(),
         "NumOfLikes": [],
-        "geoFirePoint": await get(data?.address),
+        "geoFirePoint": props[1],
         "region": stringArr(data.address),  
       })
 
@@ -172,9 +172,8 @@ function Upload ({props}){
     }
   
     async function uploadImage(){
-      // await get("cndnwnltl")
-      let addrs= await get2("주덕읍")
-      console.log(addrs)
+      let dddee= await get2("cndnwnltl")
+      console.log(dddee)
       // uploadUrl()
       alert("이미지가 업로드 되었습니다.")
     }
