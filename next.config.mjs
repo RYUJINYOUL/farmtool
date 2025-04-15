@@ -15,7 +15,7 @@ const nextConfig = {
                 hostname: "*.pixabay.com",
               },
               {
-                protocol: "https",
+                protocol: "http",
                 hostname: "*.api.vworld.kr",
               },
               {
