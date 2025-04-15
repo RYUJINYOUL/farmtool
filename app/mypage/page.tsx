@@ -1,13 +1,13 @@
 import React from 'react'
+import { getMovies } from '../../lib/geo'
 
-
-const page = () => {
-  
+const page = async () => {
+  const movies = await getMovies();
   return (
-    <div>
-    마이페이지
-  </div>
-  )
-}
+    <>
+      <div>{JSON.stringify(movies)}</div>
+    </>
+  );
+};
 
 export default page
