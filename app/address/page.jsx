@@ -20,10 +20,13 @@ const page = async () => {
   const result = [];
   
 
-  async function addrs (data) {
-    console.log(data)
+  async function addrs () {
+    // console.log(data)
     setAddr([])
+    // const res = await get2(data.address)
     const res = await get2("주덕읍")
+    console.log(res)
+    const res2 = res.response.result?.items
     console.log(res)
     
     for (let i of res) {
