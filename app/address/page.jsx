@@ -4,7 +4,7 @@ import {get2} from '../../lib/geo'
 import { useForm } from 'react-hook-form';
 import PagePadding from '@/components/pagePadding.jsx'
 import { useRouter } from "next/navigation";
-
+export const dynamic = "force-dynamic";
 
 const page = async () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -69,4 +69,4 @@ const page = async () => {
 }
 
 export default page
-export const dynamic = "force-dynamic";
+
