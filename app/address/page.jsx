@@ -21,6 +21,7 @@ const page = async () => {
   
 
   async function addrs (data) {
+    console.log(data)
     setAddr([])
     const res = await get2(data.address)
     console.log(res)
