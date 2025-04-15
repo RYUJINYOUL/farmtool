@@ -20,14 +20,9 @@ const page = async () => {
   const result = [];
   
 
-  async function addrs () {
-    // console.log(data)
+  async function addrs (data) {
     setAddr([])
-    // const res = await get2(data.address)
-    const res = await get2("주덕읍")
-    console.log(res)
-    const res2 = res.response.result?.items
-    console.log(res)
+    const res = await get2(data.address)
     
     for (let i of res) {
       result.push({juso: i.address.road, x: i.point.x, y: i.point.y}) 
