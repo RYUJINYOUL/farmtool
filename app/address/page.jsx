@@ -23,7 +23,7 @@ const page = async () => {
   async function addrs (data) {
     console.log(data)
     setAddr([])
-    const res = await get2(data.address)
+    const res = await get2("주덕읍")
     console.log(res)
     
     for (let i of res) {
