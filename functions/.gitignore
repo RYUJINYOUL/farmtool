@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Local env files
+*.local
+.env
+
+# Service Account Key - !! 절대 Git에 올리지 마세요 !!
+serviceAccountKey.json
+
+# Firebase Emulator logs
+firebase-debug.log*

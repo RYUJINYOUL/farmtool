@@ -1,0 +1,262 @@
+.authwrapper {
+    /* display: flex; */
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+  }
+  
+  .authwrapper form {
+    width: 375px;
+    margin: 0 auto;
+  }
+  
+  .authwrapper h1 {
+    font-weight: 100;
+    color: white;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgb(79, 98, 148);
+  }
+  
+  .authwrapper .form {
+    background: #0e101c;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .authwrapper .p {
+    color: #bf1650;
+  }
+  
+  .authwrapper p::before {
+    display: inline;
+    content: "�� ";
+  }
+  
+  .authwrapper input {
+    display: block;
+    box-sizing: border-box;
+    /* width: 100%; */
+    border-radius: 4px;
+    border: 1px solid black;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .authwrapper button[type="uuuu"] {
+    display: block;
+    box-sizing: border-box;
+    text-align: left;
+    /* width: 375px; */
+    border-radius: 4px;
+    border: 1px solid black;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .authwrapper select {
+    display: block;
+    box-sizing: border-box;
+    /* width: 100%; */
+    border-radius: 4px;
+    border: 1px solid black;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .authwrapper textarea {
+    display: block;
+    box-sizing: border-box;
+    /* width: 100%; */
+    border-radius: 4px;
+    border: 1px solid black;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  
+  .authwrapper label {
+    line-height: 2;
+    text-align: left;
+    display: block;
+    margin: 5px 0;
+    font-size: 14px;
+    font-weight: 200;
+  }
+  
+  .authwrapper button[type="submit"],
+  .authwrapper input[type="submit"] {
+    background: #0086fe;
+    color: white;
+    text-transform: uppercase;
+    border: none;
+    margin-top: 40px;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 10px;
+  }
+  
+  .message-form-button {
+    background: #7A84EB;
+    color: white;
+    text-transform: uppercase;
+    border: none;
+    margin-top: 40px;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 100;
+    letter-spacing: 10px;
+  }
+  
+  
+  .message-form-button:hover {
+    background: #636ee6;
+  }
+  
+  .authwrapper button[type="submit"]:hover,
+  .authwrapper input[type="submit"]:hover {
+    background: #636ee6;
+  }
+  
+  .authwrapper button[type="submit"]:active,
+  .authwrapper input[type="button"]:active,
+  .authwrapper input[type="submit"]:active {
+    transition: 0.3s all;
+    transform: translateY(3px);
+    border: 1px solid transparent;
+    opacity: 0.8;
+  }
+  
+  .authwrapper input:disabled {
+    opacity: 0.4;
+  }
+  
+  .authwrapper input[type="button"]:hover {
+    transition: 0.3s all;
+  }
+  
+  .authwrapper button[type="submit"],
+  .authwrapper input[type="button"],
+  .authwrapper input[type="submit"] {
+    -webkit-appearance: none;
+  }
+  
+  .authwrapper button[type="button"] {
+    display: block;
+    appearance: none;
+    background: #333;
+    color: white;
+    border: none;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 4px;
+  }
+  
+  /* hr {
+    margin-top: 30px;
+  } */
+  
+  .authwrapper button {
+    display: block;
+    appearance: none;
+    margin-top: 40px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 4px;
+  }
+
+
+
+  .card {
+    padding: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 400px;
+  }
+  .card .top{
+    text-align: center;
+  }
+  .card p {
+    font-weight: bold;
+    color: #0086fe;
+  }
+  .card button[type="ssss"]{
+    outline: 0;
+    border: 0;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 400;
+    padding: 8px 13px;
+    width: 100%;
+    background: #0086fe
+  }
+  .dragArea{
+    height: 200px;
+    border-radius: 5px;
+
+    color: #0086fe;
+    background: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-user-select: none;
+    margin-top: 10px;
+    font-size: 18px;
+  }
+  .select{
+    color: #5256ad;
+    margin-left: 5px;
+    cursor: pointer;
+    transition: 0.4s
+  }
+  .select hover{
+    opacity: 0.6;
+  }
+  .container{
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+  .image{
+    width: 70px;
+    margin-right: 5px;
+    height: 75px;
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .img{
+    width:100%;
+    height:100%;
+    border-radius: 5px;
+  }
+  .image span{
+    position: absolute;
+    top: -2px;
+    right: 9px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .card input,
+  .card .drag-area .on-drop,
+  .card .drag-area.dragover .visible {
+    display: none;
+  }
+  
+  .delete{
+    z-index: 999;
+    color:#0086fe
+  }

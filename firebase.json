@@ -1,0 +1,38 @@
+{
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "runtime": "nodejs20", 
+      "environmentVariables": { 
+        "KAKAO_KEY": "7b17be9f2b4d0308caf1e29d0dd7d43b",
+        "KAKAO_REDIRECT_URI_PROD": "https://kakaocallback-qlxozmlvvq-uc.a.run.app",
+        "KAKAO_REDIRECT_URI_LOCAL": "http://localhost:5001/farmtool-75b0f/us-central1/kakaoCallback"
+      },
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ],
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": { 
+      "rules": "firestore.rules",
+      "port": 8080 
+    },
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    },
+    "singleProjectMode": true
+  }
+}
