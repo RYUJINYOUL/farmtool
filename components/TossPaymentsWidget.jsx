@@ -137,42 +137,40 @@ const TossPaymentsWidget = ({
 
 
   return (
-    <div>
-      {/* 위젯 로딩 상태에 따른 UI 피드백 */}
-      {isLoadingWidget && (
-        <div style={{ textAlign: 'center', padding: '50px' }}>결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
-      )}
-      {loadError && (
-        <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
-          오류: {loadError}
-        </div>
-      )}
+  <div>
+    {/* 위젯 컨테이너는 항상 렌더링되도록 변경 */}
+    <div id="payment-widget" style={{ width: '100%', minHeight: '200px' }} />
+    <div id="agreement-widget" style={{ width: '100%', minHeight: '100px', marginTop: '20px' }} />
 
-      {/* 위젯이 로드되었을 때만 위젯 컨테이너와 버튼 표시 */}
-      {!isLoadingWidget && !loadError && (
-        <>
-          <div id="payment-widget" style={{ width: '100%', minHeight: '200px' }} />
-          <div id="agreement-widget" style={{ width: '100%', minHeight: '100px', marginTop: '20px' }} />
-          <button
-            onClick={requestPayment}
-            disabled={isLoadingWidget || !!loadError}
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: (isLoadingWidget || !!loadError) ? 'not-allowed' : 'pointer',
-              opacity: (isLoadingWidget || !!loadError) ? 0.6 : 1,
-            }}
-          >
-            {variant === 'default' ? '결제하기' : '약관 동의 및 결제하기'}
-          </button>
-        </>
-      )}
-    </div>
-  );
+    {/* 로딩/에러 메시지는 별도로 표시 */}
+    {isLoadingWidget && (
+      <div style={{ textAlign: 'center', padding: '50px' }}>결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
+    )}
+    {loadError && (
+      <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
+        오류: {loadError}
+      </div>
+    )}
+
+    {/* 버튼은 위젯 로딩 완료 및 에러 없을 때만 활성화 */}
+    <button
+      onClick={requestPayment}
+      disabled={isLoadingWidget || !!loadError} // 로딩 중이거나 에러 있으면 비활성화
+      style={{
+        marginTop: '20px',
+        padding: '10px 20px',
+        backgroundColor: '#0070f3',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: (isLoadingWidget || !!loadError) ? 'not-allowed' : 'pointer',
+        opacity: (isLoadingWidget || !!loadError) ? 0.6 : 1,
+      }}
+    >
+      {variant === 'default' ? '결제하기' : '약관 동의 및 결제하기'}
+    </button>
+  </div>
+);
 };
 
 export default TossPaymentsWidget;
