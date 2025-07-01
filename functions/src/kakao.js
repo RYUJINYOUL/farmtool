@@ -33,13 +33,7 @@ exports.kakaoCallback = onRequest(
 
     try {
       const kakaoKey = KAKAO_KEY.value();
-
-      if (kakaoKey) {
-        console.log(`[Secret Debug] KAKAO_KEY secret is loaded. Length: ${kakaoKey.length}`);
-      } else {
-        console.error(`[Secret Debug] KAKAO_KEY secret is undefined or empty!`);
-      }
-
+      
       console.log(`Debug: KAKAO_KEY value length: ${kakaoKey ? kakaoKey.length : '0'}`);
       
       const redirectUriProd = KAKAO_REDIRECT_URI_PROD.value();
