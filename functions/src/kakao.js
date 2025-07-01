@@ -45,8 +45,6 @@ exports.kakaoCallback = onRequest(
       console.log(`Debug: FRONTEND_REDIRECT_URI_LOCAL: ${frontendRedirectUriLocal}`);
 
       const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
-      console.log(`Debug: isEmulator: ${isEmulator}`);
-
       const kakaoRedirectUriForKakaoAPI = isEmulator
         ? redirectUriLocal
         : redirectUriProd;
