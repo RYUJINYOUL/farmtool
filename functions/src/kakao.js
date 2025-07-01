@@ -26,30 +26,21 @@ exports.kakaoCallback = onRequest(
       FRONTEND_REDIRECT_URI_LOCAL
     ],
     region: "us-central1",
-    timeoutSeconds: 180, // ⭐ 함수 타임아웃을 3분(180초)으로 늘림
+    timeoutSeconds: 180,
   },
   async (req, res) => {
-    let frontendFinalRedirectUri = "http://localhost:3000/kakao"
-
     try {
       const kakaoKey = KAKAO_KEY.value();
-      
-      console.log(`Debug: KAKAO_KEY value length: ${kakaoKey ? kakaoKey.length : '0'}`);
-      
       const redirectUriProd = KAKAO_REDIRECT_URI_PROD.value();
-      console.log(`Debug: KAKAO_REDIRECT_URI_PROD: ${redirectUriProd}`);
-
       const redirectUriLocal = KAKAO_REDIRECT_URI_LOCAL.value();
-      console.log(`Debug: KAKAO_REDIRECT_URI_LOCAL: ${redirectUriLocal}`);
-
       const frontendRedirectUriLocal = FRONTEND_REDIRECT_URI_LOCAL.value();
-      console.log(`Debug: FRONTEND_REDIRECT_URI_LOCAL: ${frontendRedirectUriLocal}`);
 
       const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
       const kakaoRedirectUriForKakaoAPI = isEmulator
         ? redirectUriLocal
         : redirectUriProd;
 
+      // ✅ 여기서만 선언!
       const frontendFinalRedirectUri = isEmulator
         ? frontendRedirectUriLocal
         : "https://farmtool.vercel.app/kakao";
@@ -129,8 +120,12 @@ exports.kakaoCallback = onRequest(
       return res.redirect(`${frontendFinalRedirectUri}?token=${customToken}`);
 
     } catch (e) {
+      const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
+      const frontendRedirectUriLocal = process.env.FRONTEND_REDIRECT_URI_LOCAL || (FRONTEND_REDIRECT_URI_LOCAL && FRONTEND_REDIRECT_URI_LOCAL.value && FRONTEND_REDIRECT_URI_LOCAL.value());
+      const frontendFinalRedirectUri = isEmulator
+        ? frontendRedirectUriLocal
+        : "https://farmtool.vercel.app/kakao";
       console.error("!!! Unhandled error in kakaoCallback catch block !!!", e);
-      // 에러 발생 시 프론트엔드로 에러 파라미터와 함께 리디렉션
       return res.status(500).redirect(`${frontendFinalRedirectUri}?error=auth_failed_unhandled&details=${e.message}`);
     }
   }
