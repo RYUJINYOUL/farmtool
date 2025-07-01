@@ -6,7 +6,7 @@
       "runtime": "nodejs20", 
       "environmentVariables": { 
         "KAKAO_KEY": "7b17be9f2b4d0308caf1e29d0dd7d43b",
-        "KAKAO_REDIRECT_URI_PROD": "https://kakaocallback-qlxozmlvvq-uc.a.run.app",
+        "KAKAO_REDIRECT_URI_PROD": "https://us-central1-farmtool-75b0f.cloudfunctions.net/kakaoCallback",
         "KAKAO_REDIRECT_URI_LOCAL": "http://localhost:5001/farmtool-75b0f/us-central1/kakaoCallback"
       },
       "ignore": [

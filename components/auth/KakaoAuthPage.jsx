@@ -78,7 +78,7 @@ const KakaoAuthPage = () => {
         });
     } else if (code) {
       setLoadingMessage("인증 코드 처리 중...");
-      const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_LOCAL; // `.env.local`에서 정의된 값 사용
+      const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_PROD; // `.env.local`에서 정의된 값 사용
       
       // ⭐ Fetch 요청 전후 디버그 로그 추가 ⭐
       console.log(`[Frontend Debug] Attempting to call Firebase Function with code:`, code);

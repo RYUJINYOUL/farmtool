@@ -82,12 +82,24 @@ const TossPaymentsWidget = ({
   }, [amount, orderName, customerName, variant, isAgreementOnly, widgetSelector, agreementSelector, clientKey]);
 
   const requestPayment = useCallback(async () => {
-    if (isLoadingWidget) return;
-    if (loadError) return;
-    if (!paymentWidgetRef.current) return;
-    if (!confirmUrl || !failUrl) return;
-
-    if (setIsPaying) setIsPaying(true);
+    if (isLoadingWidget) {
+      console.warn("Payment widget is still loading. Please wait.");
+      return;
+    }
+    if (loadError) {
+      console.error("Cannot request payment due to a widget loading error.");
+      alert(`결제 위젯 오류: ${loadError}`);
+      return;
+    }
+    if (!paymentWidgetRef.current) {
+      console.error("Payment widget reference is null after loading check.");
+      return;
+    }
+    if (!confirmUrl || !failUrl) {
+      console.error("Firebase Functions URLs are not defined in .env.local.");
+      alert("결제 처리 URL이 설정되지 않았습니다. 개발자에게 문의하세요.");
+      return;
+    }
 
     try {
       const paymentResult = await paymentWidgetRef.current.requestPayment({
@@ -98,49 +110,55 @@ const TossPaymentsWidget = ({
         customerName,
         amount,
       });
-      if (onSuccess) onSuccess(paymentResult.paymentKey, orderId, amount);
+
+      console.log('Payment request initiated:', paymentResult);
+      if (onSuccess) {
+        onSuccess(paymentResult.paymentKey, orderId, amount);
+      }
+
     } catch (error) {
-      if (onFail) onFail(error.code, error.message, orderId);
-      else alert(`결제 요청 실패: ${error.message} (코드: ${error.code || 'UNKNOWN'})`);
-    } finally {
-      if (setIsPaying) setIsPaying(false);
+      console.error("Error during payment request:", error);
+      if (onFail) {
+        onFail(error.code, error.message, orderId);
+      } else {
+        alert(`결제 요청 실패: ${error.message} (코드: ${error.code || 'UNKNOWN'})`);
+      }
     }
-  }, [/* ... */]);
+  }, [isLoadingWidget, loadError, orderId, orderName, customerName, amount, confirmUrl, failUrl, onSuccess, onFail]);
+
 
   return (
     <div>
-      <div id="payment-widget" style={{ width: '100%', minHeight: '220px', marginBottom: 12 }} />
-      <div id="agreement-widget" style={{ width: '100%', minHeight: '80px', marginBottom: 12 }} />
+      <div id="payment-widget" style={{ width: '100%', minHeight: '200px' }} />
+      <div id="agreement-widget" style={{ width: '100%', minHeight: '100px', marginTop: '20px' }} />
+
       {isLoadingWidget && (
-        <div style={{ textAlign: 'center', padding: '30px' }}>결제 위젯 로딩 중...</div>
+        <div style={{ textAlign: 'center', padding: '50px' }}>결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
       )}
       {loadError && (
-        <div style={{ textAlign: 'center', padding: '30px', color: 'red' }}>
+        <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
           오류: {loadError}
         </div>
       )}
-      {!isLoadingWidget && !loadError && (
+
+      {!isLoadingWidget && !loadError && ( // 이 조건부 렌더링은 여전히 유효
         <button
           onClick={requestPayment}
           disabled={isLoadingWidget || !!loadError}
           style={{
-            width: '100%',
-            padding: '14px 0',
+            marginTop: '20px',
+            padding: '10px 20px',
             backgroundColor: '#0070f3',
             color: 'white',
-            fontSize: 18,
-            fontWeight: 600,
             border: 'none',
-            borderRadius: 6,
+            borderRadius: '5px',
             cursor: (isLoadingWidget || !!loadError) ? 'not-allowed' : 'pointer',
             opacity: (isLoadingWidget || !!loadError) ? 0.6 : 1,
-            marginTop: 8
           }}
         >
           {variant === 'default' ? '결제하기' : '약관 동의 및 결제하기'}
         </button>
       )}
-      {/* 결제수단 미선택 시 안내 메시지는 TossPayments 위젯에서 기본 제공 */}
     </div>
   );
 };
