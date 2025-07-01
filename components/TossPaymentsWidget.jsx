@@ -47,14 +47,7 @@ const TossPaymentsWidget = ({
             { value: amount },
             { variant: 'default' }
           );
-          paymentMethodsWidgetRef.current = methodsWidget; // ref에도 저장
-
-          // ⭐️ 여기에서 methodsWidget에 updateOptions 호출
-          methodsWidget.updateOptions({
-            amount,
-            orderName,
-            customerName,
-          });
+          paymentMethodsWidgetRef.current = methodsWidget; 
         }
 
         agreementWidgetRef.current = paymentWidget.renderAgreement(
