@@ -5,13 +5,8 @@ const path = require('path');
 
 console.log("firebase-functions/v2 kakaoCallback module loaded.");
 
-process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
-
-
 const KAKAO_KEY = defineSecret("KAKAO_KEY");
 const KAKAO_REDIRECT_URI_PROD = defineSecret("KAKAO_REDIRECT_URI_PROD");
-const KAKAO_REDIRECT_URI_LOCAL = defineSecret("KAKAO_REDIRECT_URI_LOCAL");
-const FRONTEND_REDIRECT_URI_LOCAL = defineSecret("FRONTEND_REDIRECT_URI_LOCAL");
 
 // admin.initializeApp(
 //     {credential: admin.credential.cert(path.resolve(__dirname, '../serviceAccountKey.json')),}
@@ -21,9 +16,7 @@ exports.kakaoCallback = onRequest(
   {
     secrets: [
       KAKAO_KEY,
-      KAKAO_REDIRECT_URI_PROD,
-      KAKAO_REDIRECT_URI_LOCAL,
-      FRONTEND_REDIRECT_URI_LOCAL
+      KAKAO_REDIRECT_URI_PROD
     ],
     region: "us-central1",
     timeoutSeconds: 180,
@@ -32,18 +25,10 @@ exports.kakaoCallback = onRequest(
     try {
       const kakaoKey = KAKAO_KEY.value();
       const redirectUriProd = KAKAO_REDIRECT_URI_PROD.value();
-      const redirectUriLocal = KAKAO_REDIRECT_URI_LOCAL.value();
-      const frontendRedirectUriLocal = FRONTEND_REDIRECT_URI_LOCAL.value();
 
-      const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
-      const kakaoRedirectUriForKakaoAPI = isEmulator
-        ? redirectUriLocal
-        : redirectUriProd;
-
-      // ✅ 여기서만 선언!
-      const frontendFinalRedirectUri = isEmulator
-        ? frontendRedirectUriLocal
-        : "https://farmtool.vercel.app/kakao";
+      // ✅ 배포 환경에서만 사용
+      const frontendFinalRedirectUri = "https://farmtool.vercel.app/kakao";
+      const kakaoRedirectUriForKakaoAPI = redirectUriProd;
 
       console.log("--- Request Received Debugging Start ---");
       console.log("Request method:", req.method);
@@ -93,7 +78,7 @@ exports.kakaoCallback = onRequest(
 
       if (!access_token) {
         console.error("Failed to get Kakao access token:", tokenJson);
-        throw new Error("Access your-ttoken missing");
+        throw new Error("Access token missing");
       }
 
       // ⭐ Kakao 사용자 정보 요청 전후 상세 로그 추가 ⭐
@@ -120,11 +105,7 @@ exports.kakaoCallback = onRequest(
       return res.redirect(`${frontendFinalRedirectUri}?token=${customToken}`);
 
     } catch (e) {
-      const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
-      const frontendRedirectUriLocal = process.env.FRONTEND_REDIRECT_URI_LOCAL || (FRONTEND_REDIRECT_URI_LOCAL && FRONTEND_REDIRECT_URI_LOCAL.value && FRONTEND_REDIRECT_URI_LOCAL.value());
-      const frontendFinalRedirectUri = isEmulator
-        ? frontendRedirectUriLocal
-        : "https://farmtool.vercel.app/kakao";
+      const frontendFinalRedirectUri = "https://farmtool.vercel.app/kakao";
       console.error("!!! Unhandled error in kakaoCallback catch block !!!", e);
       return res.status(500).redirect(`${frontendFinalRedirectUri}?error=auth_failed_unhandled&details=${e.message}`);
     }
