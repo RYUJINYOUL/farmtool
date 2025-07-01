@@ -2916,9 +2916,9 @@ framer-motion@6.5.1:
     "@emotion/is-prop-valid" "^0.8.2"
 
 framer-motion@^12.9.2:
-  version "12.20.3"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-12.20.3.tgz#a0166d5445645d140287d0547c4cd698b748bb8a"
-  integrity sha512-J3BuKKY4jy0mCTYGLIQo78f4mYH1c61WkWGvkxYCIb3UxvA1iK9JkRWMR3NKHiWwXie35YjJ9tsxChdtEDMT1A==
+  version "12.20.4"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-12.20.4.tgz#59eef3d7c8a641c852222441a206fd1514dd8d8f"
+  integrity sha512-wV3I/BbHVVrTKmvB3hxfkoOocAD79IGsFCqsJzv8wvmKOiU2fxhpOo29xdRSJ5SVcZ+6yFkgRZl+9qbUGX5k4g==
   dependencies:
     motion-dom "^12.20.3"
     motion-utils "^12.19.0"
