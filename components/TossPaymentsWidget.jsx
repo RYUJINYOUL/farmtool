@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react'; // useState import 추가
-import { loadPaymentWidget, ANONYMOUS } from '@tosspayments/payment-sdk';
+import { loadPaymentWidget, ANONYMOUS } from '@tosspayments/payment-widget-sdk';
 
 const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
 const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
