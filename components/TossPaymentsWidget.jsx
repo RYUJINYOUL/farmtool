@@ -52,18 +52,22 @@ const TossPaymentsWidget = ({
             { value: amount },
             { variant: 'default' }
           );
-        }
+           paymentMethodsWidgetRef.current = methodsWidget;
+
+            // ✅ 여기에서 updateOptions 호출
+            methodsWidget.updateOptions({
+                amount,
+                orderName,
+                customerName,
+            });
+            }
+        
 
         agreementWidgetRef.current = paymentWidget.renderAgreement(
           agreementSelector,
           { variant: isAgreementOnly ? 'agreement' : 'default' }
         );
 
-        paymentWidget.updateOptions({
-          amount,
-          orderName,
-          customerName,
-        });
 
         setIsLoadingWidget(false);
         console.log("Toss Payments Widget loaded and rendered successfully.");
