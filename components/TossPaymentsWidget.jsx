@@ -1,27 +1,13 @@
 // components/TossPaymentsWidget.jsx
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react'; // useState import 추가
 import { loadPaymentWidget, ANONYMOUS } from '@tosspayments/payment-sdk';
 
 const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
 const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
 const failUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_FAIL_URL;
 
-/**
- * 토스페이먼츠 결제 위젯을 렌더링하고 결제 처리를 담당하는 컴포넌트입니다.
- * @param {object} props
- * @param {string} props.orderId - 주문 ID (고유해야 함)
- * @param {number} props.amount - 결제 금액
- * @param {string} props.orderName - 주문 이름
- * @param {string} props.customerName - 고객 이름
- * @param {function} props.onSuccess - 결제 성공 시 호출될 콜백 (paymentKey, orderId, amount를 인자로 받음)
- * @param {function} props.onFail - 결제 실패 시 호출될 콜백 (errorCode, errorMessage, orderId를 인자로 받음)
- * @param {string} [props.variant='default'] - 위젯 종류 (default, agreement 등)
- * @param {boolean} [props.isAgreementOnly=false] - 약관 동의만 표시할지 여부 (정기결제용)
- * @param {string} [props.widgetSelector='#payment-widget'] - 결제 위젯이 렌더링될 DOM 요소의 셀렉터
- * @param {string} [props.agreementSelector='#agreement-widget'] - 약관 위젯이 렌더링될 DOM 요소의 셀렉터
- */
 const TossPaymentsWidget = ({
   orderId,
   amount,
@@ -30,7 +16,7 @@ const TossPaymentsWidget = ({
   onSuccess,
   onFail,
   variant = 'default',
-  isAgreementOnly = false, // 정기결제용
+  isAgreementOnly = false,
   widgetSelector = '#payment-widget',
   agreementSelector = '#agreement-widget',
 }) => {
@@ -38,19 +24,24 @@ const TossPaymentsWidget = ({
   const paymentMethodsWidgetRef = useRef(null);
   const agreementWidgetRef = useRef(null);
 
+  // ⭐️ 위젯 로딩 상태 추가
+  const [isLoadingWidget, setIsLoadingWidget] = useState(true);
+  const [loadError, setLoadError] = useState(null); // 로딩 중 발생한 에러 메시지
+
   useEffect(() => {
     if (!clientKey) {
       console.error("NEXT_PUBLIC_TOSS_CLIENT_KEY is not defined in .env.local");
+      setLoadError("결제 위젯을 로드할 수 없습니다: 클라이언트 키 누락.");
+      setIsLoadingWidget(false);
       return;
     }
 
     const initializeWidget = async () => {
       try {
-        const paymentWidget = await loadPaymentWidget(clientKey, ANONYMOUS); // 비회원 결제
+        const paymentWidget = await loadPaymentWidget(clientKey, ANONYMOUS);
         paymentWidgetRef.current = paymentWidget;
 
         if (variant === 'default') {
-          // 일반 결제 위젯
           paymentMethodsWidgetRef.current = paymentWidget.renderPaymentMethods(
             widgetSelector,
             { value: amount },
@@ -60,34 +51,51 @@ const TossPaymentsWidget = ({
 
         agreementWidgetRef.current = paymentWidget.renderAgreement(
           agreementSelector,
-          { variant: isAgreementOnly ? 'agreement' : 'default' } // 정기결제 시 약관만 렌더링
+          { variant: isAgreementOnly ? 'agreement' : 'default' }
         );
 
-        // 결제 데이터 업데이트 (금액, 주문명 등)
+        // 결제 데이터 업데이트 (금액, 주문명 등) - 위젯 로드 후에도 필요할 수 있음
         paymentWidget.updateOptions({
           amount,
           orderName,
           customerName,
         });
 
+        setIsLoadingWidget(false); // ⭐️ 로딩 완료
+        console.log("Toss Payments Widget loaded and rendered successfully.");
+
       } catch (error) {
         console.error("Error loading Toss Payments widget:", error);
+        setLoadError(`결제 위젯 로딩 중 오류 발생: ${error.message}`); // ⭐️ 에러 메시지 설정
+        setIsLoadingWidget(false); // ⭐️ 로딩 실패
       }
     };
 
     initializeWidget();
 
-    // 컴포넌트 언마운트 시 위젯 정리 (필요하다면)
     return () => {
-      if (paymentWidgetRef.current) {
-        // paymentWidgetRef.current.destroy(); // destroy 메서드가 제공된다면
-      }
+      // 위젯 정리 로직 (예: paymentWidgetRef.current.destroy() 등)
     };
-  }, [amount, orderName, customerName, variant, isAgreementOnly, widgetSelector, agreementSelector]);
+  }, [amount, orderName, customerName, variant, isAgreementOnly, widgetSelector, agreementSelector, clientKey]); // clientKey도 의존성 배열에 추가
 
   const requestPayment = async () => {
-    if (!paymentWidgetRef.current) {
-      console.error("Payment widget not loaded yet.");
+    // ⭐️ 위젯 로딩 중이거나 에러가 있다면 요청 방지
+    if (isLoadingWidget) {
+      console.warn("Payment widget is still loading. Please wait.");
+      return;
+    }
+    if (loadError) {
+      console.error("Cannot request payment due to a widget loading error.");
+      alert(`결제 위젯 오류: ${loadError}`); // 사용자에게 알림
+      return;
+    }
+    if (!paymentWidgetRef.current) { // 이 검사는 이제 거의 필요 없지만, 방어적으로 유지
+      console.error("Payment widget reference is null after loading check.");
+      return;
+    }
+    if (!confirmUrl || !failUrl) {
+      console.error("Firebase Functions URLs are not defined in .env.local.");
+      alert("결제 처리 URL이 설정되지 않았습니다. 개발자에게 문의하세요.");
       return;
     }
 
@@ -96,48 +104,60 @@ const TossPaymentsWidget = ({
         orderId,
         orderName,
         successUrl: confirmUrl,
-        failUrl: failUrl,  
+        failUrl: failUrl,
         customerName,
         amount,
-        // 가상계좌의 경우 추가 옵션
-        // cashReceipt: {
-        //   type: '소득공제',
-        //   amount: amount,
-        //   phoneNumber: '010-1234-5678',
-        // },
       });
 
-      // requestPayment는 성공/실패 URL로 리디렉션하므로, 여기서는 직접적인 성공/실패 콜백을 받지 않습니다.
-      // successUrl, failUrl로 리디렉션될 때 Firebase Functions에서 처리합니다.
       console.log('Payment request initiated:', paymentResult);
 
     } catch (error) {
-      // 결제 위젯 자체에서 발생한 오류 (예: 사용자가 결제 창을 닫음)
       console.error("Error during payment request:", error);
       if (onFail) {
         onFail(error.code, error.message, orderId);
+      } else {
+        // 콜백이 없으면 기본 알림
+        alert(`결제 요청 실패: ${error.message} (코드: ${error.code || 'UNKNOWN'})`);
       }
     }
   };
 
   return (
     <div>
-      <div id="payment-widget" style={{ width: '100%' }} />
-      <div id="agreement-widget" style={{ width: '100%' }} />
-      <button
-        onClick={requestPayment}
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-        }}
-      >
-        {variant === 'default' ? '결제하기' : '약관 동의 및 결제하기'}
-      </button>
+      {/* 위젯 로딩 상태에 따른 UI 피드백 */}
+      {isLoadingWidget && (
+        <div style={{ textAlign: 'center', padding: '50px' }}>결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
+      )}
+      {loadError && (
+        <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
+          오류: {loadError}
+        </div>
+      )}
+
+      {/* 위젯이 로드되었을 때만 위젯 컨테이너와 버튼 표시 */}
+      {!isLoadingWidget && !loadError && (
+        <>
+          <div id="payment-widget" style={{ width: '100%', minHeight: '200px' }} />
+          <div id="agreement-widget" style={{ width: '100%', minHeight: '100px', marginTop: '20px' }} />
+          <button
+            onClick={requestPayment}
+            // ⭐️ 위젯 로딩 중이거나 오류가 있을 때 버튼을 비활성화합니다.
+            disabled={isLoadingWidget || !!loadError}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#0070f3',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: (isLoadingWidget || !!loadError) ? 'not-allowed' : 'pointer',
+              opacity: (isLoadingWidget || !!loadError) ? 0.6 : 1,
+            }}
+          >
+            {variant === 'default' ? '결제하기' : '약관 동의 및 결제하기'}
+          </button>
+        </>
+      )}
     </div>
   );
 };
