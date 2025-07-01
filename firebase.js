@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getMessaging } from "firebase/messaging";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 
 const firebaseConfig = {
@@ -25,7 +24,7 @@ if (typeof window !== "undefined" && window.location.hostname === "localhost") {
   connectAuthEmulator(auth, "http://localhost:9099");
 }
 
-console.log("FIREBASE CONFIG", firebaseConfig);
+// console.log("FIREBASE CONFIG", firebaseConfig);
 
 
 export default app;

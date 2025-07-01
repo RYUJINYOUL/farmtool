@@ -13,9 +13,9 @@ const KAKAO_REDIRECT_URI_PROD = defineSecret("KAKAO_REDIRECT_URI_PROD");
 const KAKAO_REDIRECT_URI_LOCAL = defineSecret("KAKAO_REDIRECT_URI_LOCAL");
 const FRONTEND_REDIRECT_URI_LOCAL = defineSecret("FRONTEND_REDIRECT_URI_LOCAL");
 
-admin.initializeApp(
-    {credential: admin.credential.cert(path.resolve(__dirname, 'serviceAccountKey.json')),}
-);
+// admin.initializeApp(
+//     {credential: admin.credential.cert(path.resolve(__dirname, '../serviceAccountKey.json')),}
+// );
 
 exports.kakaoCallback = onRequest(
   {
