@@ -26,6 +26,8 @@ exports.kakaoCallback = onRequest(
       const kakaoKey = KAKAO_KEY.value();
       const redirectUriProd = KAKAO_REDIRECT_URI_PROD.value();
 
+      
+
       // ✅ 배포 환경에서만 사용
       const frontendFinalRedirectUri = "https://farmtool.vercel.app/kakao";
       const kakaoRedirectUriForKakaoAPI = redirectUriProd;
