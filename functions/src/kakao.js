@@ -53,7 +53,7 @@ exports.kakaoCallback = onRequest(
 
       const frontendFinalRedirectUri = isEmulator
         ? frontendRedirectUriLocal
-        : "https://your-temporary-prod-frontend-url.com/auth/kakao";
+        : "https://farmtool.vercel.app/kakao";
 
       console.log("--- Request Received Debugging Start ---");
       console.log("Request method:", req.method);
@@ -103,7 +103,7 @@ exports.kakaoCallback = onRequest(
 
       if (!access_token) {
         console.error("Failed to get Kakao access token:", tokenJson);
-        throw new Error("Access token missing");
+        throw new Error("Access your-ttoken missing");
       }
 
       // ⭐ Kakao 사용자 정보 요청 전후 상세 로그 추가 ⭐
