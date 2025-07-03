@@ -7,4 +7,5 @@ const fetchG2BBidResults = require('./fetchG2BBidResults')
 exports.confirmPayment = payments.confirmPayment;
 exports.failPayment = payments.failPayment;
 exports.kakaoCallback = kakao.kakaoCallback; // 카카오 함수 export
-exports.fetchG2BBidResults = fetchG2BBidResults.scheduledFetchG2B;
+exports.scheduledFetchG2B = fetchG2BBidResults.scheduledFetchG2B;
+exports.fetchG2BOnDemand = fetchG2BBidResults.fetchG2BOnDemand;
