@@ -59,7 +59,7 @@ export default function BidResultsPage() {
     try {
       const functions = getFunctions();
      
-      const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL || 'https://kakaocallback-qlxozmlvvq-uc.a.run.app';
+      const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL || 'https://asia-northeast3-farmtool-75b0f.cloudfunctions.net/fetchG2BOnDemand';
       
       const response = await fetch(functionsUrl, {
         method: 'POST',
