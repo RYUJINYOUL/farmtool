@@ -41,7 +41,25 @@ exports.fetchG2BOnDemand = onRequest(
 
   try {
     const response = await fetch(url);
-    const data = await response.json();
+    const responseBodyText = await response.text();
+      logger.info(`나라장터 API 응답 상태: ${response.status}`);
+      logger.info(`나라장터 API 응답 본문 (일부): ${responseBodyText.substring(0, 500)}`); // 응답 본문 앞 500자만 로깅
+
+      let data;
+      try {
+        // 텍스트를 JSON으로 수동 파싱 시도
+        data = JSON.parse(responseBodyText);
+      } catch (parseError) {
+        // JSON 파싱 실패 시, 클라이언트에게 오류 메시지와 함께 원본 응답 텍스트를 전달합니다.
+        logger.error('나라장터 API 응답 JSON 파싱 실패:', parseError.message);
+        logger.error('파싱 실패한 원본 응답 텍스트:', responseBodyText);
+        return res.status(500).json({
+          success: false,
+          error: `나라장터 API 응답 형식이 올바르지 않습니다: ${parseError.message}`,
+          rawResponse: responseBodyText // 클라이언트에게 원본 응답을 보내 디버깅에 도움을 줍니다.
+        });
+      }
+
     const items = data?.response?.body?.items?.item || [];
 
     const db = admin.firestore();
