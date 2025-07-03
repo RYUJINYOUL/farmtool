@@ -21,15 +21,20 @@ export default function NaraBidList() {
     setItems([]);
     try {
       const endpoint = API_ENDPOINTS[type];
-      const url = `${API_BASE_URL}/${endpoint}?serviceKey=${SERVICE_KEY}&pageNo=1&numOfRows=20&inqryDiv=1&type=${type}&inqryBgnDt=${inqryBgnDt}&inqryEndDt=${inqryEndDt}&_type=json`;
+      const typeParam = encodeURIComponent(type);
+      const url = `${API_BASE_URL}/${endpoint}?serviceKey=${SERVICE_KEY}&pageNo=1&numOfRows=20&inqryDiv=1&type=${typeParam}&inqryBgnDt=${inqryBgnDt}&inqryEndDt=${inqryEndDt}&_type=json`;
 
       const res = await fetch(url);
-      const data = await res.json();
-
-      if (data.response?.header?.resultCode === '00') {
-        setItems(data.response.body.items || []);
+      const contentType = res.headers.get('content-type');
+      let data;
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
       } else {
-        alert(`API 오류: ${data.response?.header?.resultMsg || '알 수 없는 오류'}`);
+        const text = await res.text();
+        // XML 파싱 또는 에러 메시지 출력
+        console.error('API 응답이 JSON이 아닙니다:', text);
+        alert('API 응답이 JSON이 아닙니다. 콘솔을 확인하세요.');
+        return;
       }
     } catch (err) {
       alert('데이터를 불러오는 중 오류가 발생했습니다.');
