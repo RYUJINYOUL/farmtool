@@ -25,6 +25,9 @@ export default async function UserPublicPage({ params }: {params :Props}) {
 
   const data = userSnap.data();
   const uid = data?.uid;
+
+
+ 
   
 
   // 해당 사용자의 links 서브컬렉션 불러오기
@@ -32,6 +35,7 @@ export default async function UserPublicPage({ params }: {params :Props}) {
  const linksSnap = await getDoc(linksDocRef);
  const components = linksSnap.exists() ? linksSnap.data().components || [] : [];
  const commonProps = { username, uid };
+
 
 
   return (

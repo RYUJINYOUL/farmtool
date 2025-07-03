@@ -19,12 +19,15 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 
-if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-  connectFirestoreEmulator(db, "localhost", 8080); // Firestore 에뮬레이터 기본 포트
+if (
+  typeof window !== "undefined" &&
+  window.location.hostname === "localhost" &&
+  process.env.NEXT_PUBLIC_USE_EMULATOR === "true"
+) {
+  console.log("🔥 Firebase Emulator 모드 활성화됨");
+  connectFirestoreEmulator(db, "localhost", 8080);
   connectAuthEmulator(auth, "http://localhost:9099");
 }
-
-// console.log("FIREBASE CONFIG", firebaseConfig);
 
 
 export default app;

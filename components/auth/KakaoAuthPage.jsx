@@ -28,19 +28,15 @@ const KakaoAuthPage = () => {
 
     if (errorParam) {
         setLoadingMessage(`로그인 실패: ${errorParam}`);
-        console.error('Kakao authentication error from backend:', errorParam);
         router.push(`/login?error=${errorParam}`);
         return;
     }
 
     if (customToken) {
-      console.log(auth)
-      console.log(customToken)
       setLoadingMessage("Firebase 로그인 중...");
       signInWithCustomToken(auth, customToken)
         .then( async (userCredential) => {
           const user = userCredential.user;  
-          console.log('Firebase login successful!', userCredential.user);
           dispatch(setUser({
             uid: user.uid,
             displayName: user.displayName, // 커스텀 토큰 클레임에 displayName이 포함될 수 있음
@@ -72,7 +68,6 @@ const KakaoAuthPage = () => {
           router.push('/');
         })
         .catch((error) => {
-          console.error('Firebase login failed:', error);
           setLoadingMessage("Firebase 로그인 실패!");
           router.push('/login?error=firebase_auth_failed');
         });
@@ -80,12 +75,8 @@ const KakaoAuthPage = () => {
       setLoadingMessage("인증 코드 처리 중...");
       const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_PROD; // `.env.local`에서 정의된 값 사용
       
-      // ⭐ Fetch 요청 전후 디버그 로그 추가 ⭐
-      console.log(`[Frontend Debug] Attempting to call Firebase Function with code:`, code);
-      console.log(`[Frontend Debug] Functions URL:`, functionsUrl); // URL 값 확인
 
       if (!functionsUrl) {
-          console.error("[Frontend Error] NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_LOCAL is not defined!");
           setLoadingMessage("환경 설정 오류: 함수 URL 없음.");
           router.push('/login?error=config_error');
           return;
@@ -93,23 +84,18 @@ const KakaoAuthPage = () => {
 
       fetch(`${functionsUrl}?code=${code}`)
         .then(response => {
-          console.log(`[Frontend Debug] Response received from Function. Status: ${response.status}, Redirected: ${response.redirected}`);
           if (!response.ok && !response.redirected) {
              return response.text().then(text => {
-                 console.error(`[Frontend Error] Backend call failed with status ${response.status}:`, text);
                  throw new Error(`Backend call failed: ${response.status} - ${text}`);
              });
           }
-          console.log('[Frontend Debug] Firebase Function called successfully, expecting redirect.');
         })
         .catch(error => {
-          console.error('[Frontend Error] Error calling Firebase Function:', error);
           setLoadingMessage("백엔드 처리 중 오류 발생!");
           router.push(`/login?error=backend_call_failed&details=${error.message}`);
         });
     } else {
       setLoadingMessage("잘못된 접근입니다.");
-      console.error('No code or custom token found in URL.');
       router.push('/login?error=invalid_access');
     }
   }, [searchParams, router]);

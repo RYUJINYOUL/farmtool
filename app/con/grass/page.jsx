@@ -91,6 +91,7 @@ const GrassPage = () => {
 
 
   const handleCurrentLocationSearch = () => {
+    setAddrList([]); 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         console.log(position)
@@ -458,9 +459,12 @@ return (
                   <Button
                       type="button"
                       className="col-span-1"
-                      onClick={handleCurrentLocationSearch}
-                    >
-                      현재 위치 검색
+                      onClick={async () => {
+                      await handleCurrentLocationSearch();
+                      setIsAddrModalOpen(true);
+                    }}
+                  >
+                      현재 위치
                     </Button>
    </div>
    
