@@ -43,7 +43,7 @@ const GrassPage = () => {
   const TABLE_HEAD = ["이미지", "글제목", "글쓴이", "작성일"];
   const timeFromNow = timestamp => moment(timestamp).format('YYYY.MM.DD');
   const [isLocationLoading, setIsLocationLoading] = useState(false);
-  const [locationError, setLocationError] = useState(''); // 에러 메시지 저장
+  const [locationError, setLocationError] = useState('위치 검색 중 에러발생으로 주소검색으로 검색하세요'); // 에러 메시지 저장
   const [addrList, setAddrList] = useState([]);
   const [isAddrModalOpen, setIsAddrModalOpen] = useState(false);
   const [formState, setFormState] = useState({
@@ -98,7 +98,6 @@ const GrassPage = () => {
 
       navigator.geolocation.getCurrentPosition(
         async (position) => {
-          console.log(position);
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
           try {
