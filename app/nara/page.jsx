@@ -7,7 +7,7 @@ const API_ENDPOINTS = {
   '공사': 'getScsbidListSttusCnstwk',
   '용역': 'getScsbidListSttusServc',
 };
-const SERVICE_KEY = '여기에_인코딩된_서비스키_입력'; // 반드시 인코딩키 사용!
+const SERVICE_KEY = 'YxEK%2F6QD5IwHBrY4oaoTzhXMTaKLqZJd6AmsBG0eKIHz8hp3EaO59cfalOxCr0jtXQhG3Qh1Mr4GdpBGHgYn9Q%3D%3D'; // 반드시 인코딩키 사용!
 
 export default function NaraBidList() {
   const [type, setType] = useState('공사');
