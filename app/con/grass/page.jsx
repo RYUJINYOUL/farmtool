@@ -42,7 +42,8 @@ const GrassPage = () => {
 
   const TABLE_HEAD = ["이미지", "글제목", "글쓴이", "작성일"];
   const timeFromNow = timestamp => moment(timestamp).format('YYYY.MM.DD');
-
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState(''); // 에러 메시지 저장
   const [addrList, setAddrList] = useState([]);
   const [isAddrModalOpen, setIsAddrModalOpen] = useState(false);
   const [formState, setFormState] = useState({
@@ -91,31 +92,43 @@ const GrassPage = () => {
 
 
   const handleCurrentLocationSearch = () => {
-    setAddrList([]); 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        console.log(position)
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        const result = await getAddressByLatLon(lon, lat);
-        setAddrList(result);
-        setIsAddrModalOpen(true);
-      },
-      (error) => {
-        if (error.code === 1) {
-          alert(
-            "위치 권한이 거부되었습니다. 브라우저 주소창 왼쪽 자물쇠 아이콘을 클릭해 '위치' 권한을 허용해 주세요. 권한을 허용한 후, 다시 '현재 위치 검색' 버튼을 눌러주세요."
-          );
-        } else if (error.code === 2) {
-          alert("위치 정보를 사용할 수 없습니다.");
-        } else if (error.code === 3) {
-          alert("위치 정보 요청이 시간 초과되었습니다.");
-        } else {
-          alert("위치 정보를 가져올 수 없습니다.");
-        }
-      }
-    );
-  };
+      setAddrList([]);
+      setLocationError(''); // 이전 에러 초기화
+      setIsLocationLoading(true); // 로딩 시작
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          console.log(position);
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          try {
+            const result = await getAddressByLatLon(lon, lat);
+            setAddrList(result);
+            setIsAddrModalOpen(true); // 성공했을 때만 모달 열기
+          } catch (apiError) {
+            console.error("주소 API 호출 에러:", apiError);
+            setLocationError("주소 정보를 가져오는 데 실패했습니다.");
+            setIsAddrModalOpen(true); // API 에러 시에도 모달 열고 에러 메시지 표시
+          } finally {
+            setIsLocationLoading(false); // 로딩 종료
+          }
+        },
+        (error) => {
+          setIsLocationLoading(false); // 로딩 종료
+          let errorMessage = "위치 정보를 가져올 수 없습니다.";
+          if (error.code === 1) {
+            errorMessage = "위치 권한이 거부되었습니다. 브라우저 주소창 왼쪽 자물쇠 아이콘을 클릭해 '위치' 권한을 허용해 주세요. 권한을 허용한 후, 다시 '현재 위치 검색' 버튼을 눌러주세요.";
+          } else if (error.code === 2) {
+            errorMessage = "위치 정보를 사용할 수 없습니다.";
+          } else if (error.code === 3) {
+            errorMessage = "위치 정보 요청이 시간 초과되었습니다.";
+          }
+          setLocationError(errorMessage);
+          setIsAddrModalOpen(true); // 에러 발생 시 모달 열기
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // 옵션 추가 (정확도 높임, 타임아웃 설정)
+      );
+    };
 
   function handleSelectAddr(item) {
     const lat = Number(item.y);
@@ -471,7 +484,11 @@ return (
              
                 <Dialog open={isAddrModalOpen} onOpenChange={setIsAddrModalOpen}>
                   <DialogContent>
-                    {addrList.length > 0 ? (
+                    {isLocationLoading ? (
+                      <div>위치 정보를 가져오는 중...</div>
+                    ) : locationError ? (
+                      <div>{locationError}</div>
+                    ) : addrList.length > 0 ? (
                       <div>
                         {addrList.map((item, idx) => (
                           <div
