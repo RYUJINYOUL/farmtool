@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import dayjs from 'dayjs';
 
 // 업종명/지역 목록
 const industryNames = [
@@ -16,16 +17,16 @@ const regions = [
 
 // 시간 옵션 생성 (00:00 ~ 23:30, 30분 단위)
 const timeOptions = Array.from({length: 48}, (_, i) => {
-  const h = String(Math.floor(i/2)).padStart(2, '0');
-  const m = i%2 === 0 ? '00' : '30';
+  const h = String(Math.floor(i/2)).padStart(2, '0');   //00, 01
+  const m = i%2 === 0 ? '00' : '30';  //
   return `${h}:${m}`;
 });
 
 export default function NaraBidList() {
   // 날짜/시간
-  const [startDate, setStartDate] = useState('2024-07-01');
+  const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [startTime, setStartTime] = useState('00:00');
-  const [endDate, setEndDate] = useState('2024-07-05');
+  const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [endTime, setEndTime] = useState('23:59');
 
   // 업종/지역 다중선택
@@ -128,12 +129,15 @@ export default function NaraBidList() {
       if (contentType && contentType.includes('application/json')) {
         data = await res.json();
         setTotalCount(data.response?.body?.totalCount || 0);
-        const itemsArr = Array.isArray(data.response?.body?.items?.item)
-          ? data.response.body.items.item
-          : data.response?.body?.items?.item
-            ? [data.response.body.items.item]
-            : [];
+        const rawItems = data.response?.body?.items;
+        const itemsArr = Array.isArray(rawItems)
+          ? rawItems // rawItems 자체가 배열이면 그대로 사용
+          : rawItems // rawItems가 단일 객체이고 존재하면 배열에 넣어줌
+            ? [rawItems]
+            : []; // 그 외에는 빈 배열
+
         setItems(itemsArr);
+
       } else {
         const text = await res.text();
         alert('API 응답이 JSON이 아닙니다. 콘솔을 확인하세요.');
