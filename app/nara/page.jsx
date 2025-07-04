@@ -60,6 +60,13 @@ export default function NaraBidList() {
     ? "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch"
     : "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getOpengResultListInfoServcPPSSrch";
 
+
+    const handleTypeChange = (e) => {
+      const value = e.target.value;
+      setType(value);
+      setIsConstruction(value === '공사');
+      };  
+
   // Debounced API call for search button
   const handleFetch = useCallback(async () => {
     setLoading(true);
