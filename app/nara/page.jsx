@@ -129,15 +129,12 @@ export default function NaraBidList() {
       if (contentType && contentType.includes('application/json')) {
         data = await res.json();
         setTotalCount(data.response?.body?.totalCount || 0);
-        const rawItems = data.response?.body?.items;
-        const itemsArr = Array.isArray(rawItems)
-          ? rawItems // rawItems 자체가 배열이면 그대로 사용
-          : rawItems // rawItems가 단일 객체이고 존재하면 배열에 넣어줌
-            ? [rawItems]
-            : []; // 그 외에는 빈 배열
-
+        const itemsArr = Array.isArray(data.response?.body?.items?.item)
+          ? data.response.body.items.item
+          : data.response?.body?.items?.item
+            ? [data.response.body.items.item]
+            : [];
         setItems(itemsArr);
-
       } else {
         const text = await res.text();
         alert('API 응답이 JSON이 아닙니다. 콘솔을 확인하세요.');
