@@ -578,7 +578,7 @@ const PCFilterUI = (
   return (
     <div className="min-h-screen bg-gray-50 pt-15">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <h1 className="text-xl font-bold text-gray-900 mb-6">나라장터 낙찰 목록</h1>
+        <h1 className="text-xl font-bold text-gray-900 mb-6">낙찰 목록</h1>
         
         {/* 모바일: Floating Action Button */}
         <div className="fixed bottom-6 right-6 md:hidden z-40">

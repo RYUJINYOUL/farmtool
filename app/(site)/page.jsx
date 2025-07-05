@@ -130,7 +130,7 @@ export default function Page() {
   return (
     <div className='pt-5'>
       <div className="flex flex-col items-center justify-center py-12 text-center mb-12">
-        <h1 className="text-4xl font-bold text-black mb-4">팜툴</h1>
+        <h1 className="text-4xl font-bold text-black mb-4">건설톡</h1>
         <p className="text-lg text-black mb-10">나만의 특별한 한페이지를 만들어보세요</p>
 
         <div className="grid gap-3 w-full md:max-w-sm mx-auto mb-16">
@@ -139,12 +139,12 @@ export default function Page() {
         </div>
 
         <h2 className="md:hidden text-xl font-medium text-black mb-12 leading-relaxed">
-          팜툴는 대한민국 5,500만명에게
+          건설톡은 건설관련종사자들에게
           작지만 의미 있는 한페이지를 선물합니다.
         </h2>
 
         <h2 className="md:block hidden text-2xl font-medium text-black mb-12 leading-relaxed">
-          팜툴는 대한민국 5,500만명에게<br />
+          건설톡은 건설관련종사자들에게<br />
           작지만 의미 있는 한페이지를 선물합니다.
         </h2>
 

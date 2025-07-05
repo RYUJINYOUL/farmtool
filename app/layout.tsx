@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
-  title: '팜툴 - 나만의 링크 모음',
+  title: '건설톡 - 건설의 모든 정보',
   description: '당신만의 특별한 링크 모음을 만들어보세요',
 }
 
