@@ -31,7 +31,7 @@ function Logo(props) {
             total.total&&"text-black",
             // pathname!=="/"&&"text-black",
           )}
-             >팜툴</div>
+             >건설톡</div>
         </div>
        
     </section>

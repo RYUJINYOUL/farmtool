@@ -33,7 +33,7 @@ const KakaoAuthPage = () => {
     }
 
     if (customToken) {
-      setLoadingMessage("Firebase 로그인 중...");
+      setLoadingMessage("건설톡 로그인 중...");
       signInWithCustomToken(auth, customToken)
         .then( async (userCredential) => {
           const user = userCredential.user;  
@@ -68,7 +68,7 @@ const KakaoAuthPage = () => {
           router.push('/');
         })
         .catch((error) => {
-          setLoadingMessage("Firebase 로그인 실패!");
+          setLoadingMessage("건설톡 로그인 실패!");
           router.push('/login?error=firebase_auth_failed');
         });
     } else if (code) {
