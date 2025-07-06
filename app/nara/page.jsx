@@ -44,9 +44,13 @@ function MobileFilterUI({
   setPresmptPrceEnd,
   formatPrice,
   timeOptions,
+  regionNameMap
 }) {
   const [showIndustryList, setShowIndustryList] = useState(false);
   const [showRegionList, setShowRegionList] = useState(false);
+  const reverseRegionNameMap = Object.fromEntries(
+    Object.entries(regionNameMap).map(([short, full]) => [full, short])
+  );
 
   return (
     <>
@@ -137,21 +141,24 @@ function MobileFilterUI({
         {showRegionList && (
           <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto shadow-lg">
             <div className="flex flex-wrap gap-1">
-              {regions.map(region => (
-                <button
-                  key={region}
-                  type="button"
-                  onClick={() => handleRegionClick(region)}
-                  className={`px-3 py-1 rounded-md text-sm border transition-colors
-                    ${selectedRegions.includes(region) 
-                      ? 'bg-green-500 text-white border-green-500' 
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
-                    ${region === "전국" ? 'font-semibold' : ''}
-                  `}
-                >
-                  {region}
-                </button>
-              ))}
+            {regions.map(region => {
+                const mappedRegion = regionNameMap[region] || region;
+                return (
+                  <button
+                    key={region}
+                    type="button"
+                    onClick={() => handleRegionClick(region)}
+                    className={`px-3 py-1 rounded-md text-sm border transition-colors
+                      ${selectedRegions.includes(mappedRegion) 
+                        ? 'bg-green-500 text-white border-green-500' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
+                      ${region === "전국" ? 'font-semibold' : ''}
+                    `}
+                  >
+                    {region}
+                  </button>
+                );
+              })}
             </div>
             <button 
               type="button" 
@@ -162,12 +169,12 @@ function MobileFilterUI({
             </button>
           </div>
         )}
-        {/* 선택된 지역 태그 */}
+       {/* 선택된 지역 태그 */}
         {selectedRegions.length > 0 && !(selectedRegions.length === 1 && selectedRegions[0] === "전국") && (
           <div className="flex flex-wrap gap-2 mt-2">
             {selectedRegions.filter(region => region !== "전국").map(region => (
               <span key={region} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
-                {region}
+                {reverseRegionNameMap[region] || region}
                 <button 
                   type="button" 
                   className="ml-2 text-green-600 hover:text-red-500 transition-colors" 
@@ -353,8 +360,9 @@ export default function NaraBidList() {
   };
 
   const handleRegionRemove = (region) => {
+    const mappedRegion = regionNameMap[region] || region;
     setSelectedRegions(prev => {
-      let next = prev.filter(r => r !== region);
+      let next = prev.filter(r => r !== mappedRegion);
       if (next.includes("전국") && next.length > 1) next = next.filter(r => r !== "전국");
       if (next.length === 0) return ["전국"];
       return next;
@@ -466,13 +474,15 @@ const PCFilterUI = (
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">지역</label>
         <div className="flex flex-wrap gap-1">
-          {regions.map(region => (
+          {regions.map(region => {
+             const mappedRegion = regionNameMap[region] || region;
+            return (
             <button
               key={region}
               type="button"
               onClick={() => handleRegionClick(region)}
               className={`px-3 py-1 text-sm border rounded-lg transition-colors
-                ${selectedRegions.includes(region) 
+                ${selectedRegions.includes(mappedRegion) 
                   ? 'bg-green-500 text-white border-green-500' 
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                 ${region === "전국" ? 'font-semibold' : ''}
@@ -480,7 +490,8 @@ const PCFilterUI = (
             >
               {region}
             </button>
-          ))}
+           );
+          })}
         </div>
       
     
@@ -772,6 +783,7 @@ const PCFilterUI = (
                 setPresmptPrceEnd={setPresmptPrceEnd}
                 formatPrice={formatPrice}
                 timeOptions={timeOptions}
+                regionNameMap={regionNameMap}
               />
               <div className="flex gap-3 mt-6">
                 <button
