@@ -326,21 +326,32 @@ export default function NaraBidList() {
     });
   };
 
-  // 지역 다중선택 핸들러
+  const regionNameMap = {
+    "충북": "충청북도",
+    "충남": "충청남도",
+    "경북": "경상북도",
+    "경남": "경상남도",
+    "전북": "전라북도",
+    "전남": "전라남도",
+    "광주": "광주광역시",
+  };
+  
   const handleRegionClick = (region) => {
+    const mappedRegion = regionNameMap[region] || region;
     if (region === "전국") {
       setSelectedRegions(["전국"]);
     } else {
       setSelectedRegions(prev => {
-        let next = prev.includes(region)
-          ? prev.filter(r => r !== region)
-          : [...prev.filter(r => r !== "전국"), region];
+        let next = prev.includes(mappedRegion)
+          ? prev.filter(r => r !== mappedRegion)
+          : [...prev.filter(r => r !== "전국"), mappedRegion];
         if (next.includes("전국") && next.length > 1) next = next.filter(r => r !== "전국");
         if (next.length === 0) return ["전국"];
         return next;
       });
     }
   };
+
   const handleRegionRemove = (region) => {
     setSelectedRegions(prev => {
       let next = prev.filter(r => r !== region);

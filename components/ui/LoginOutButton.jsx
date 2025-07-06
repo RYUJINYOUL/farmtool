@@ -38,7 +38,7 @@ export default function LoginOutButton() {
     <nav className="bg-gray-100 shadow-lg border-b border-gray-100">
       <div className="md:w-[1100px] container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="text-xl font-bold text-black hover:text-black-500 transition-colors">
-          팜툴
+          건설톡
         </Link>
         <div className="flex gap-4 items-center">
           {currentUser?.uid && (
