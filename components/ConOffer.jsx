@@ -11,7 +11,7 @@ import { getFirestore, collection, where, orderBy, query, getDocs, limit, startA
 import app from '../firebase'; // <-- firebase import 경로 확인 (components 폴더로 옮겼으므로 경로 변경 필요)
 import Image from "next/image";
 import Link from 'next/link';
-import ConUpload from '@/components/ConUpload'
+import ConUpload from '@/components/conUpload'
 
 const ITEMS_PER_PAGE = 12;
 
