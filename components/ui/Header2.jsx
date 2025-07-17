@@ -99,10 +99,13 @@ const Header2 = ({children}) => {
         </div>
 
         {/* ▼ 아래로 내려간 카테고리 메뉴 */}
-        {(homeCategory === '조경공사' ||
-          homeCategory === '조경수' ||
-          homeCategory === '조경시설물' ||
-          homeCategory === '장비및철거') &&
+        {/* {(homeCategory === '건설업' ||
+          homeCategory === '건설장비' ||
+          homeCategory === '공사자재' ||
+          homeCategory === '인허가' ||
+          homeCategory === '나라장터' ||
+          homeCategory === '구인구직' ||
+          homeCategory === '전문인력') &&
           pathname !== "/" && ( // ← 홈일 땐 표시 안 함
             <div className="w-full bg-[#fafafa]">
               <div className="mx-auto lg:w-[1100px]">
@@ -114,7 +117,7 @@ const Header2 = ({children}) => {
                 <hr className="border-1 bg-neutral-100 opacity-100 dark:opacity-50" />
               </div>
             </div>
-      )}
+      )} */}
       </section>
 
     </div>

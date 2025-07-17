@@ -12,9 +12,9 @@ import { FiLogIn, FiLogOut } from 'react-icons/fi';
 const scrollMap = {
   // "/con": [0, 0],
   // "/tree": [50, 0],
-  "/sisul": [100, 0],
-  "/jang": [150, 0],
-   "/nara": [200, 0],
+  // "/sisul": [100, 0],
+  // "/jang": [150, 0],
+  //  "/nara": [200, 0],
 };
 
 export default function Menu(props) {
@@ -29,20 +29,20 @@ export default function Menu(props) {
   let total = props;
   const homeCategoryList = [
     {
-      label: "조경공사",
-      src: "/con/grass",
+      label: "건설업",
+      src: "/con",
     },
     {
-      label: "조경수",
-      src: "/tree/unique",
+      label: "건설장비",
+      src: "/jang",
     },
     {
-      label: "조경시설물",
-      src: "/sisul/bench",
+      label: "공사자재",
+      src: "/mat",
     },
     {
-      label: "장비및철거",
-      src: "/jang/poc",
+      label: "인허가",
+      src: "/permit",
     },
     {
       label: "나라장터낙찰",
@@ -50,6 +50,10 @@ export default function Menu(props) {
     },
     {
       label: "구인구직",
+      src: "/job",
+    },
+    {
+      label: "전문인력",
       src: "/saram",
     },
   ];

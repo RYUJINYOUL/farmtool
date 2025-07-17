@@ -1,17 +1,10 @@
 "use client"
 import React, { useState, useMemo, useEffect } from 'react';
 import dayjs from 'dayjs';
+import { industryNames, regions, hierarchicalRegions } from '@/lib/constants';
 
-const industryNames = [
-  "전체",
-  "토목공사업", "건축공사업", "토목건축공사업", "조경공사업", "정보통신공사업", "환경전문공사업", "전기공사업",
-  "일반소방시설공사업", "전문소방시설공사업", "산림사업법인(숲가꾸기 및 병해충방제)", "조경식재ㆍ시설물공사업",
-  "실내건축공사업", "산림조합", "산림사업법인(산림토목)", "금속창호ㆍ지붕건축물조립공사업지하수개발",
-  "폐기물종합처분업", "폐기물수집·운반업", "건설폐기물 중간처리업"
-];
-const regions = [
-  "전국", "서울", "경기", "인천", "부산", "광주", "대전", "대구", "세종", "울산", "강원", "충북", "충남", "경북", "경남", "전북", "전남", "제주"
-];
+
+
 const timeOptions = Array.from({length: 48}, (_, i) => {
   const h = String(Math.floor(i/2)).padStart(2, '0');
   const m = i%2 === 0 ? '00' : '30';
@@ -26,8 +19,8 @@ function MobileFilterUI({
   selectedRegions,
   handleIndustryClick,
   handleIndustryRemove,
-  handleRegionClick,
-  handleRegionRemove,
+  setSelectedSubRegions,
+  setSelectedRegions,
   type,
   handleTypeChange,
   startDate,
@@ -44,13 +37,40 @@ function MobileFilterUI({
   setPresmptPrceEnd,
   formatPrice,
   timeOptions,
-  regionNameMap
+  regionNameMap,
+  hselectedRegion,
+  hierarchicalRegions,
+  selectedSubRegions,
 }) {
   const [showIndustryList, setShowIndustryList] = useState(false);
   const [showRegionList, setShowRegionList] = useState(false);
+  const [showSubRegionList, setSubShowRegionList] = useState(false);
   const reverseRegionNameMap = Object.fromEntries(
     Object.entries(regionNameMap).map(([short, full]) => [full, short])
   );
+
+
+  const handleRegionClick = (region) => {
+    setSelectedSubRegions('')
+    setSelectedRegions(region)
+    setShowRegionList(false)
+    setSubShowRegionList(true)
+    };
+
+    const handleRegionClick2 = (region) => {
+      setSelectedSubRegions(region)
+      setSubShowRegionList(false)
+    };
+
+    const handleRegionRemove = (region) => {
+        setSelectedRegions('')
+    };
+
+
+    const handleRegionRemove2 = (region) => {
+      setSelectedSubRegions('')
+    };
+  
 
   return (
     <>
@@ -125,16 +145,17 @@ function MobileFilterUI({
           </div>
         )}
       </div>
+
       {/* 지역 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">지역(다중선택)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">시도</label>
         <button
           type="button"
           onClick={() => setShowRegionList(v => !v)}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <span className="text-gray-900">
-           전국
+           {selectedRegions !== '전국' ? selectedRegions : '전국'}
           </span>
           <span className="float-right text-gray-400">{showRegionList ? '▲' : '▼'}</span>
         </button>
@@ -149,7 +170,7 @@ function MobileFilterUI({
                     type="button"
                     onClick={() => handleRegionClick(region)}
                     className={`px-3 py-1 rounded-md text-sm border transition-colors
-                      ${selectedRegions.includes(mappedRegion) 
+                      ${selectedRegions === mappedRegion
                         ? 'bg-green-500 text-white border-green-500' 
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                       ${region === "전국" ? 'font-semibold' : ''}
@@ -169,24 +190,54 @@ function MobileFilterUI({
             </button>
           </div>
         )}
-       {/* 선택된 지역 태그 */}
-        {selectedRegions.length > 0 && !(selectedRegions.length === 1 && selectedRegions[0] === "전국") && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {selectedRegions.filter(region => region !== "전국").map(region => (
-              <span key={region} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
-                {reverseRegionNameMap[region] || region}
-                <button 
-                  type="button" 
-                  className="ml-2 text-green-600 hover:text-red-500 transition-colors" 
-                  onClick={() => handleRegionRemove(region)}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
+      </div>
+
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">시군구</label>
+        <button
+          type="button"
+          onClick={() => setSubShowRegionList(v => !v)}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <span className="text-gray-900">
+          {selectedSubRegions !== '시군구' ? selectedSubRegions : '시군구'}
+          </span>
+          <span className="float-right text-gray-400">{showSubRegionList ? '▲' : '▼'}</span>
+        </button>
+        {showSubRegionList && (
+          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto shadow-lg">
+            <div className="flex flex-wrap gap-1">
+            {hselectedRegion.subRegions.map(region => {
+                return (
+                  <button
+                    key={region}
+                    type="button"
+                    onClick={() => handleRegionClick2(region)}
+                    className={`px-3 py-1 rounded-md text-sm border transition-colors
+                      ${selectedSubRegions === region 
+                        ? 'bg-green-500 text-white border-green-500' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
+                      ${region === "시군구" ? 'font-semibold' : ''}
+                    `}
+                  >
+                    {region}
+                  </button>
+                );
+              })}
+            </div>
+            <button 
+              type="button" 
+              className="mt-3 text-sm text-green-600 hover:text-green-800 underline" 
+              onClick={() => setSubShowRegionList(false)}
+            >
+              닫기
+            </button>
           </div>
         )}
       </div>
+
+
       {/* 날짜/시간 */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">조회 시작일</label>
@@ -262,7 +313,8 @@ export default function NaraBidList() {
 
   // 업종/지역 다중선택
   const [selectedIndustries, setSelectedIndustries] = useState(["전체"]);
-  const [selectedRegions, setSelectedRegions] = useState(["전국"]);
+  const [selectedRegions, setSelectedRegions] = useState('전국');
+  const [selectedSubRegions, setSelectedSubRegions] = useState('');
 
   // 가격
   const [presmptPrceBgn, setPresmptPrceBgn] = useState('');
@@ -304,7 +356,7 @@ export default function NaraBidList() {
   }, [showDrawer]);
 
   // API URL
-  const SERVICE_KEY = 'YxEK%2F6QD5IwHBrY4oaoTzhXMTaKLqZJd6AmsBG0eKIHz8hp3EaO59cfalOxCr0jtXQhG3Qh1Mr4GdpBGHgYn9Q%3D%3D';
+  const SERVICE_KEY = process.env.NEXT_PUBLIC_API_SERVICE_KEY;
   const API_URL = isConstruction
     ? "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch"
     : "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getOpengResultListInfoServcPPSSrch";
@@ -344,30 +396,24 @@ export default function NaraBidList() {
   };
   
   const handleRegionClick = (region) => {
-    const mappedRegion = regionNameMap[region] || region;
-    if (region === "전국") {
-      setSelectedRegions(["전국"]);
-    } else {
-      setSelectedRegions(prev => {
-        let next = prev.includes(mappedRegion)
-          ? prev.filter(r => r !== mappedRegion)
-          : [...prev.filter(r => r !== "전국"), mappedRegion];
-        if (next.includes("전국") && next.length > 1) next = next.filter(r => r !== "전국");
-        if (next.length === 0) return ["전국"];
-        return next;
-      });
-    }
+      setSelectedSubRegions('')
+      setSelectedRegions(region)
   };
 
+  const handleRegionClick2 = (region) => {
+    setSelectedSubRegions(region)
+};
+
   const handleRegionRemove = (region) => {
-    const mappedRegion = regionNameMap[region] || region;
-    setSelectedRegions(prev => {
-      let next = prev.filter(r => r !== mappedRegion);
-      if (next.includes("전국") && next.length > 1) next = next.filter(r => r !== "전국");
-      if (next.length === 0) return ["전국"];
-      return next;
-    });
+      setSelectedRegions('')
   };
+
+
+  const handleRegionRemove2 = (region) => {
+    setSelectedSubRegions('')
+};
+
+  const hselectedRegion = hierarchicalRegions.find(region => region.name === selectedRegions);
 
   // 구분(공사/용역) 변경
   const handleTypeChange = (e) => {
@@ -378,6 +424,7 @@ export default function NaraBidList() {
 
   // API 호출
   const handleFetch = async () => {
+    console.log(selectedRegions);
     setLoading(true);
     setItems([]);
     try {
@@ -392,12 +439,23 @@ export default function NaraBidList() {
         `inqryBgnDt=${inqryBgnDt}`,
         `inqryEndDt=${inqryEndDt}`,
       ];
+      if (selectedRegions === "전국" && (!selectedSubRegions || selectedSubRegions.length === 0)) {
+        // '전국'일 때는 파라미터에서 제외 (빈 값으로 보내지 않음)
+        // 아무것도 추가하지 않음
+      } else if (selectedSubRegions && selectedSubRegions.length > 0) {
+        // selectedSubRegions에 값이 있다면 해당 값으로 설정
+        params.push(`prtcptLmtRgnNm=${encodeURIComponent(selectedSubRegions)}`);
+      } else {
+        // 그 외의 경우 (예: '서울' 같은 특정 시/도를 선택하고 하위 지역이 선택되지 않은 경우)
+        // selectedRegions의 값을 사용
+        params.push(`prtcptLmtRgnNm=${encodeURIComponent(selectedRegions)}`);
+      }
       if (!(selectedIndustries.length === 1 && selectedIndustries[0] === "전체")) {
         params.push(`indstrytyNm=${selectedIndustries.map(encodeURIComponent).join(',')}`);
       }
-      if (!(selectedRegions.length === 1 && selectedRegions[0] === "전국")) {
-        params.push(`prtcptLmtRgnNm=${selectedRegions.map(encodeURIComponent).join(',')}`);
-      }
+      // if (!(selectedRegions.length === 1 && selectedRegions[0] === "전국")) {
+      //   params.push(`prtcptLmtRgnNm=${selectedRegions.map(encodeURIComponent).join(',')}`);
+      // }
       if (presmptPrceBgn) params.push(`presmptPrceBgn=${presmptPrceBgn.replace(/,/g, '')}`);
       if (presmptPrceEnd) params.push(`presmptPrceEnd=${presmptPrceEnd.replace(/,/g, '')}`);
       const url = `${API_URL}?${params.join('&')}`;
@@ -457,45 +515,58 @@ export default function NaraBidList() {
 const PCFilterUI = (
   <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      {/* 구분 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">구분</label>
-        <select
-          value={type}
-          onChange={handleTypeChange}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="공사">공사</option>
-          <option value="용역">용역</option>
-        </select>
-      </div>
-      
       {/* 지역 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">지역</label>
         <div className="flex flex-wrap gap-1">
-          {regions.map(region => {
+         {regions.map(region => {
              const mappedRegion = regionNameMap[region] || region;
             return (
             <button
               key={region}
               type="button"
-              onClick={() => handleRegionClick(region)}
+              onClick={() => handleRegionClick(mappedRegion)}
               className={`px-3 py-1 text-sm border rounded-lg transition-colors
-                ${selectedRegions.includes(mappedRegion) 
+                ${selectedRegions === mappedRegion
                   ? 'bg-green-500 text-white border-green-500' 
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                 ${region === "전국" ? 'font-semibold' : ''}
               `}
             >
               {region}
+
             </button>
            );
           })}
         </div>
-      
-    
       </div>
+
+      {/* 지역 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">시/군/구</label>
+        <div className="flex flex-wrap gap-1">
+          
+            {hselectedRegion.subRegions.map(region => {
+                 return (
+                  <button
+                    key={region}
+                    type="button"
+                    onClick={() => handleRegionClick2(region)}
+                    className={`px-3 py-1 text-sm border rounded-lg transition-colors
+                      ${selectedSubRegions === region 
+                        ? 'bg-green-500 text-white border-green-500' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
+                      ${region === "전국" ? 'font-semibold' : ''}
+                    `}
+                  >
+                    {region}
+                  </button>
+                 );
+                })}
+        </div>
+      </div>
+      
+
       {/* 업종명 (2칸 통합) */}
       <div className="lg:col-span-2">
         <label className="block text-sm font-medium text-gray-700 mb-2">업종명</label>
@@ -585,7 +656,17 @@ const PCFilterUI = (
     </div>
     
     {/* 검색 버튼 (가격 종료 아래) */}
-    <div className="flex justify-end mt-3">
+    <div className="flex flex-row justify-end mt-3 gap-3">
+    <div>
+        <select
+          value={type}
+          onChange={handleTypeChange}
+          className="bg-gray-100 border border-gray-300 rounded-lg py-3.5 px-3 focus:outline-none"
+        >
+          <option value="공사">공사</option>
+          <option value="용역">용역</option>
+        </select>
+      </div>
       <button 
         onClick={handleSearch}
         disabled={loading}
@@ -765,7 +846,7 @@ const PCFilterUI = (
                 selectedRegions={selectedRegions}
                 handleIndustryClick={handleIndustryClick}
                 handleIndustryRemove={handleIndustryRemove}
-                handleRegionClick={handleRegionClick}
+                setSelectedSubRegions={setSelectedSubRegions}
                 handleRegionRemove={handleRegionRemove}
                 type={type}
                 handleTypeChange={handleTypeChange}
@@ -784,6 +865,10 @@ const PCFilterUI = (
                 formatPrice={formatPrice}
                 timeOptions={timeOptions}
                 regionNameMap={regionNameMap}
+                hselectedRegion={hselectedRegion}
+                hierarchicalRegions={hierarchicalRegions}
+                selectedSubRegions={selectedSubRegions}
+                setSelectedRegions={setSelectedRegions}
               />
               <div className="flex gap-3 mt-6">
                 <button

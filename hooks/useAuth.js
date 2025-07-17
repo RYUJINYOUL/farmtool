@@ -27,7 +27,7 @@ export default function useAuth() {
     
             }));
 
-            await saveFcmToken(user.uid);
+            // await saveFcmToken(user.uid);
 
 
           } else {

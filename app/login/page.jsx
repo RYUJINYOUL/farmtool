@@ -13,6 +13,7 @@ import {
   getDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import { saveFcmToken } from "@/lib/fcm";
 
 const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_PROD}`;
 
@@ -50,7 +51,38 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      const result = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const user = result.user;
+
+      dispatch(setUser({
+        uid: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        email: user.email, // 이메일도 저장
+      }));
+
+      let fcmToken = null;
+        try {
+          fcmToken = await saveFcmToken();
+        } catch (error) {
+          console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
+        }
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          createdAt: serverTimestamp(),
+          displayName: user.displayName || null, // displayName도 저장
+          photoURL: user.photoURL || null,   
+          fcmToken: fcmToken,
+          badge: 0,
+          notice: false,
+          pushTime: serverTimestamp()  // photoURL도 저장
+        });
+      }
       setLoading(false);
       push('/');
     } catch (error) {
@@ -76,6 +108,14 @@ const LoginPage = () => {
         email: user.email, // 이메일도 저장
       }));
 
+
+      let fcmToken = null;
+        try {
+          fcmToken = await saveFcmToken(user.uid);
+        } catch (error) {
+          console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
+        }
+
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
@@ -84,11 +124,11 @@ const LoginPage = () => {
           email: user.email,
           createdAt: serverTimestamp(),
           displayName: user.displayName || null, // displayName도 저장
-          photoURL: user.photoURL || null,      // photoURL도 저장
-        });
-
-        await setDoc(doc(db, "users", user.uid, "links", "page"), {
-          components: ["이미지", "링크카드", "달력", "게스트북"],
+          photoURL: user.photoURL || null,   
+          fcmToken: fcmToken,
+          badge: 0,
+          notice: false,
+          pushTime: serverTimestamp()
         });
       }
       push('/');

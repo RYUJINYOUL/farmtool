@@ -19,6 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/store/userSlice";
+import { saveFcmToken } from "@/lib/fcm";
 
 
 const RegisterPage = () => {
@@ -44,6 +45,7 @@ const RegisterPage = () => {
     } = useForm();
 
     const username = watch("username");
+    
 
 
     // 실시간 username 중복 체크
@@ -76,6 +78,13 @@ const RegisterPage = () => {
             return;
         }
 
+        let fcmToken = null;
+                try {
+                  fcmToken = await saveFcmToken();
+                } catch (error) {
+                  console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
+                }
+
         const userCredential = await createUserWithEmailAndPassword(
             auth,
             data.email,
@@ -88,6 +97,14 @@ const RegisterPage = () => {
             email: data.email,
             username: data.name,
             createdAt: serverTimestamp(),
+            fcmToken: fcmToken,
+            uid: user.uid,
+                displayName: user.displayName || null, // displayName도 저장
+                photoURL: user.photoURL || null,   
+                fcmToken: fcmToken,
+                badge: 0,
+                notice: false,
+                pushTime: serverTimestamp()
         });
 
         dispatch(
@@ -97,23 +114,6 @@ const RegisterPage = () => {
                 photoURL: user.photoURL,
             })
             );
-        
-
-        // usernames 컬렉션 등록
-        await setDoc(usernameDoc, {
-            uid: user.uid,
-        });
-
-
-         // usernames 컬렉션 등록
-        await setDoc(doc(db, "users", user.uid, "links", "page"), {
-            components: ["이미지", "링크카드", "달력", "게스트북"],
-        });
-
-        // Firebase 사용자 프로필 업데이트
-        await updateProfile(user, {
-            displayName: data.username,
-        });
 
         push("/"); // 가입 완료 후 이동
 
@@ -135,7 +135,14 @@ const RegisterPage = () => {
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-            // 이미 Firestore에 등록된 사용자
+            let fcmToken = null;
+                try {
+                  fcmToken = await saveFcmToken();
+                } catch (error) {
+                  console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
+                }
+                
+
             dispatch(
             setUser({
                 uid: user.uid,
@@ -143,6 +150,18 @@ const RegisterPage = () => {
                 photoURL: user.photoURL,
             })
             );
+
+            await setDoc(doc(db, "users", user.uid), {
+                email: user.email,
+                createdAt: serverTimestamp(),
+                displayName: user.displayName || null, // displayName도 저장
+                photoURL: user.photoURL || null,   
+                fcmToken: fcmToken,
+                badge: 0,
+                notice: false,
+                pushTime: serverTimestamp()  // photoURL도 저장
+        });
+        
             push("/");
         } else {
             // 신규 사용자 → username 입력받기
