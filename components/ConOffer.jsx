@@ -19,7 +19,6 @@ const ITEMS_PER_PAGE = 12;
 const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받기
   selectedIndustries,
   selectedRegions, 
-  selectedSubRegions
 }) => {
   const db2 = getFirestore(app);
   const [messages, setMessages] = useState([]);
