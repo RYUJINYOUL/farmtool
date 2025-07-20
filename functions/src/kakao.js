@@ -63,7 +63,7 @@ exports.kakaoCallback = onRequest(
 
       const user = await userRes.json();
       
-      const uid = `kakao:${user.id}`;
+      const uid = `kakao${user.id}`;
 
       const customToken = await admin.auth().createCustomToken(uid, {
         provider: "kakao",

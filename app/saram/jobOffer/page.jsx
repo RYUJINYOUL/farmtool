@@ -459,7 +459,7 @@ const page = () => {
                 <Label htmlFor="phoneNumber" className="text-right">연락처</Label>
                 <Input id="phoneNumber" value={formState.phoneNumber} onChange={handleInputChange} className="col-span-3" />
               </div>
-              {user?.uid === 'kakao:4331474214' || user?.uid === 'kakao:4322975727' && (
+              {user?.uid === 'PkVnwSuEg1WE071zAZDgxuVr2ro1' || user?.uid === 'kakao:PkVnwSuEg1WE071zAZDgxuVr2ro1' && (
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="isNotice" className="text-left">공지사항</Label>
                   <Input id="isNotice" type="checkbox" checked={formState.isNotice} onChange={handleInputChange} className="" />

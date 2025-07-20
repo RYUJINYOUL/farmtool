@@ -70,9 +70,7 @@ export default async function ArchitecturalPermitsPage({ searchParams }: Archite
 
   return (
     <div className='pt-15'>
-    <main style={{ maxWidth: '1000px', margin: '40px auto', padding: '20px', fontFamily: 'Arial, sans-serif', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', backgroundColor: '#fff' }}>
-      <h1 style={{ color: '#333', textAlign: 'center', marginBottom: '30px', fontSize: '2.2em' }}>건축 인허가 정보 조회</h1>
-      <p style={{ textAlign: 'center', color: '#555', fontSize: '1.1em', marginBottom: '30px' }}>시도, 시군구, 법정동 및 기간을 선택하여 건축 인허가 정보를 조회하세요.</p>
+    <main style={{ maxWidth: '1100px', margin: '40px auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
 
       {/* 검색 컨트롤 컴포넌트 */}
       <PermitSearchControls
@@ -83,9 +81,7 @@ export default async function ArchitecturalPermitsPage({ searchParams }: Archite
         initialEndDate={currentEndDate}
       />
       
-      <hr style={{ margin: '30px 0', borderColor: '#eee' }} />
-
-      <h2 style={{ color: '#333', marginBottom: '20px', fontSize: '1.8em' }}>조회 결과</h2>
+      <hr style={{ margin: '20px 0', borderColor: '#eee' }} />
 
       {error ? (
         <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.1em' }}>오류 발생: {error}</p>

@@ -181,33 +181,36 @@ export default function PermitSearchControls({
   const defaultStartDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toISOString().slice(0, 10).replace(/-/g, ''); // 1년 전
 
   return (
-    <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#fdfdfd' }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '20px', alignItems: 'center' }}>
+   
+      <div className="flex md:flex-row flex-col gap-3 w-full">
         {/* 대분류 선택 드롭다운 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <label htmlFor="main-region-select" style={{ fontWeight: 'bold' }}>시도:</label>
-          <select id="main-region-select" value={tempMainRegion} onChange={(e) => {
-            setTempMainRegion(e.target.value);
-            setTempSubRegion(''); // 시도 변경 시 시군구 초기화
-            setTempLegalDongCode(''); // 시도 변경 시 법정동 초기화
-          }} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}>
-            <option value="">시도 선택</option>
-            {hierarchicalRegions.filter(r => r.name !== '전국').map((region) => ( // '전국' 옵션 제외
-              <option key={region.name} value={region.name}>
-                {region.name}
-              </option>
-            ))}
-          </select>
+        <div className="mb-1 flex-1 relative">
+          <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            {/* <label htmlFor="main-region-select" style={{ fontWeight: 'bold' }}>시도:</label> */}
+            <select id="main-region-select" value={tempMainRegion} className='focus:outline-none'
+            onChange={(e) => {
+              setTempMainRegion(e.target.value);
+              setTempSubRegion(''); // 시도 변경 시 시군구 초기화
+              setTempLegalDongCode(''); // 시도 변경 시 법정동 초기화
+            }}>
+              <option value="">시도 선택</option>
+              {hierarchicalRegions.filter(r => r.name !== '전국').map((region) => ( // '전국' 옵션 제외
+                <option key={region.name} value={region.name}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
+      <div className="mb-1 flex-1 relative"> 
         {/* 소분류 선택 드롭다운 (시도 선택 시 활성화) */}
         {tempMainRegion && tempMainRegion !== '전국' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <label htmlFor="sub-region-select" style={{ fontWeight: 'bold' }}>시군구:</label>
-            <select id="sub-region-select" value={tempSubRegion} onChange={(e) => {
+           <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <select id="sub-region-select" value={tempSubRegion} className='focus:outline-none' onChange={(e) => {
               setTempSubRegion(e.target.value);
               setTempLegalDongCode(''); // 시군구 변경 시 법정동 초기화
-            }} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}>
+            }}>
               <option value="">시군구 선택</option>
               {subRegions.map((subRegion) => (
                 <option key={subRegion} value={subRegion}>
@@ -217,12 +220,13 @@ export default function PermitSearchControls({
             </select>
           </div>
         )}
+        </div>
 
+      <div className="mb-1 flex-1 relative"> 
         {/* 법정동 선택 드롭다운 (시군구 선택 시 활성화) */}
         {tempSubRegion && tempSubRegion !== '시군구 선택' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <label htmlFor="legal-dong-select" style={{ fontWeight: 'bold' }}>법정동:</label>
-            <select id="legal-dong-select" value={tempLegalDongCode} onChange={(e) => setTempLegalDongCode(e.target.value)} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}>
+          <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <select id="legal-dong-select" value={tempLegalDongCode} className='focus:outline-none' onChange={(e) => setTempLegalDongCode(e.target.value)}>
               <option value="">법정동 선택</option>
               {isFetchingDongs ? (
                 <option value="" disabled>로딩 중...</option>
@@ -240,37 +244,16 @@ export default function PermitSearchControls({
             </select>
           </div>
         )}
-
-       {/*날짜 선택 */}
-        {/* <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <label htmlFor="start-date" style={{ fontWeight: 'bold' }}>시작일:</label>
-          <input
-            type="date"
-            id="start-date"
-            value={tempStartDate ? tempStartDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : defaultStartDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')}
-            onChange={(e) => setTempStartDate(e.target.value.replace(/-/g, ''))}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-          />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <label htmlFor="end-date" style={{ fontWeight: 'bold' }}>종료일:</label>
-          <input
-            type="date"
-            id="end-date"
-            value={tempEndDate ? tempEndDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : defaultEndDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')}
-            onChange={(e) => setTempEndDate(e.target.value.replace(/-/g, ''))}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-          />
-        </div> */}
 
         <button
           onClick={handleSearchClick}
-          style={{ padding: '8px 15px', borderRadius: '4px', border: '1px solid #28a745', backgroundColor: '#28a745', color: 'white', cursor: 'pointer', marginLeft: '10px' }}
+          className="px-3 py-2 rounded border border-green-600 bg-green-600 text-white focus:ring-2 cursor-pointer h-[42px]"
         >
           검색
         </button>
       </div>
-    </div>
+ 
   );
 }
 

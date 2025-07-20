@@ -46,7 +46,8 @@ export default function ClientPermitList({
   const [permits, setPermits] = useState<ArchitecturalPermitItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(initialPageNo);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(initialPermits.length === 0 && initialTotalCount > 0);
+ 
   const [error, setError] = useState<string | null>(null);
 
  
@@ -55,6 +56,7 @@ export default function ClientPermitList({
   useEffect(() => {
     setIsLoading(true);
     setError(null);
+   
 
     // initialPermits를 받아서 바로 클라이언트에서 필터링하고 정렬합니다.
     const filteredAndSortedInitialPermits = initialPermits
@@ -71,12 +73,11 @@ export default function ClientPermitList({
       });
 
     setPermits(filteredAndSortedInitialPermits);
-    // initialTotalCount는 API가 반환한 값 그대로 사용하거나, 필터링 후 남은 개수를 사용할지 결정해야 합니다.
-    // 여기서는 API가 반환한 원본 totalCount를 따르도록 initialTotalCount를 그대로 설정합니다.
-    // (UI의 "총 X건의 인허가 정보"는 API의 총 개수를 의미하고, 실제 보이는 리스트는 필터링된 것이 됩니다)
-    setTotalCount(filteredAndSortedInitialPermits.length);
+    setTotalCount(initialTotalCount);
     setCurrentPage(initialPageNo);
     setIsLoading(false); // 초기 로딩 완료
+
+    console.log(isLoading)
 
     // 검색 조건 변경 시 상태 초기화 (여기서는 initialPermits 변화에 반응)
   }, [initialPermits, initialTotalCount, initialPageNo, sigunguCd, bjdongCd, startDate, endDate, dong, clientFilterCutoffDate]);
@@ -137,43 +138,54 @@ export default function ClientPermitList({
 
   const hasMore = permits.length < totalCount;
 
+    if (isLoading && permits.length === 0 && totalCount > 0) {
+    return <div className="text-center mt-20">데이터 로딩 중입니다...</div>;
+    }
+    // 추가: 검색 결과가 아예 없을 때 (초기 로드 포함)
+    if (!isLoading && permits.length === 0 && totalCount === 0) {
+        return <p className="text-center mt-20 text-gray-600">선택된 조건에 해당하는 인허가 정보가 없습니다.</p>;
+    }
+
+
+
   return (
     <div>
       {error ? (
         <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.1em' }}>오류 발생: {error}</p>
       ) : (
         <div>
-          <p style={{ fontSize: '1.2em', fontWeight: 'bold', marginBottom: '20px', color: '#444' }}>
-            총 {totalCount}건의 인허가 정보 ({currentMainRegionName} {currentSubRegionName} {dong} - {startDate})
+          <p style={{ fontSize: '1.0em', fontWeight: 'bold', marginBottom: '20px', color: '#444' }}>
+             {currentMainRegionName} {currentSubRegionName} {dong} 
           </p>
 
           {permits.length === 0 && !isLoading && totalCount === 0 ? (
             <p style={{ fontSize: '1.1em', color: '#666' }}>선택된 조건에 해당하는 인허가 정보가 없습니다.</p>
           ) : (
-            <ul style={{ listStyleType: 'none', padding: 0 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {permits.map((permit, index) => (
-                <li
+                <div
                   key={`${permit.mgmPmsrgstPk}-${index}`} // 고유키 조합
                   style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px', marginBottom: '15px', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
                 >
-                  <h3 style={{ color: '#0056b3', marginTop: 0, marginBottom: '10px', fontSize: '1.5em' }}>{permit.bldNm || '건물명 정보 없음'}</h3>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>대지위치:</strong> {permit.platPlc}</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>건축구분:</strong> {permit.archGbCdNm}</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>주용도:</strong> {permit.mainPurpsCdNm}</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>대지면적:</strong> {permit.platArea} m²</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>연면적:</strong> {permit.totArea} m²</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>건축면적:</strong> {permit.archArea} m²</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>용적률:</strong> {permit.vlRat} m²</p>
-                  <p style={{ margin: '8px 0', fontSize: '1.05em' }}><strong>건폐율:</strong> {permit.bcRat} m²</p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
+                     <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 pb-2">{permit.bldNm || '건물명 정보 없음'}</h3>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">대지위치:</span>
+                    <span className="font-medium">{permit.platPlc || '-'}</span>
+                  </div>
+                    <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>대지위치:{permit.platPlc}</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
                     허가일: {permit.archPmsDay ? String(permit.archPmsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
                   </p>
                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
                     착공일: {permit.realStcnsDay ? String(permit.realStcnsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
                   </p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    사용승인일: {permit.useAprDay ? String(permit.useAprDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
+                 <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>건축구분:{permit.archGbCdNm}</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>주용도: {permit.mainPurpsCdNm}</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>대지면적: {permit.platArea} m²</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>연면적: {permit.totArea} m²</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>건축면적: {permit.archArea} m²</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>용적률: {permit.vlRat}</p>
+                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>건폐율: {permit.bcRat}</p>
                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
                     착공예정일: {permit.stcnsSchedDay ? String(permit.stcnsSchedDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
                   </p>
@@ -184,12 +196,11 @@ export default function ClientPermitList({
                     실제착공일: {permit.realStcnsDay ? String(permit.realStcnsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
                   </p>
                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    건축구분코드: {permit.archGbCd ? String(permit.archGbCd).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
+                    사용승인일: {permit.useAprDay ? String(permit.useAprDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
                   </p>
-            
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
 
           {hasMore && (
