@@ -149,7 +149,7 @@ export default function ClientPermitList({
 
 
   return (
-    <div>
+    <div className='min-h-screen bg-gray-50'>
       {error ? (
         <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.1em' }}>오류 발생: {error}</p>
       ) : (
@@ -160,47 +160,70 @@ export default function ClientPermitList({
 
           {permits.length === 0 && !isLoading && totalCount === 0 ? (
             <p style={{ fontSize: '1.1em', color: '#666' }}>선택된 조건에 해당하는 인허가 정보가 없습니다.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {permits.map((permit, index) => (
-                <div
-                  key={`${permit.mgmPmsrgstPk}-${index}`} // 고유키 조합
-                  style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '20px', marginBottom: '15px', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
-                >
-                     <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 pb-2">{permit.bldNm || '건물명 정보 없음'}</h3>
+          ) : (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {permits.map((permit, index) => (
+              <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+                    {permit.bldNm || '건물명 정보 없음'}
+                  </h3>
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">허가</span>
+                </div>
+                <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex justify-between">
                     <span className="text-gray-500">대지위치:</span>
                     <span className="font-medium">{permit.platPlc || '-'}</span>
                   </div>
-                    <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>대지위치:{permit.platPlc}</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    허가일: {permit.archPmsDay ? String(permit.archPmsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    착공일: {permit.realStcnsDay ? String(permit.realStcnsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
-                 <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>건축구분:{permit.archGbCdNm}</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>주용도: {permit.mainPurpsCdNm}</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>대지면적: {permit.platArea} m²</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>연면적: {permit.totArea} m²</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>건축면적: {permit.archArea} m²</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>용적률: {permit.vlRat}</p>
-                   <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>건폐율: {permit.bcRat}</p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    착공예정일: {permit.stcnsSchedDay ? String(permit.stcnsSchedDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    착공연기일: {permit.stcnsDelayDay ? String(permit.stcnsDelayDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    실제착공일: {permit.realStcnsDay ? String(permit.realStcnsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
-                  <p style={{ margin: '8px 0', fontSize: '0.95em', color: '#777' }}>
-                    사용승인일: {permit.useAprDay ? String(permit.useAprDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
-                  </p>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">허가일:</span>
+                    <span className="font-medium">{permit.archPmsDay ? String(permit.archPmsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">착공일:</span>
+                    <span className="font-semibold text-green-600">
+                      {permit.realStcnsDay ? String(permit.realStcnsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">건축구분:</span>
+                    <span className="font-medium">{permit.mainPurpsCdNm || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">대지면적:</span>
+                    <span className="font-medium">{permit.platArea || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">연면적:</span>
+                    <span className="font-medium">{permit.totArea || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">건축면적:</span>
+                    <span className="font-medium">{permit.archArea || '-'}</span>
+                  </div>
+                   <div className="flex justify-between">
+                    <span className="text-gray-500">용적률:</span>
+                    <span className="font-medium">{permit.vlRat || '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">건폐율:</span>
+                    <span className="font-medium">{permit.bcRat || '-'}</span>
+                  </div>
+                  {/* {item.bidwinnrAdrs && (
+                    <div className="pt-2 border-t border-gray-100">
+                      <div className="text-gray-500 text-xs mb-1">주소:</div>
+                      <div className="text-xs text-gray-600 line-clamp-2">{item.bidwinnrAdrs}</div>
+                    </div>
+                  )}
+                  {item.bidwinnrTelNo && (
+                    <div className="pt-2 border-t border-gray-100">
+                      <div className="text-gray-500 text-xs mb-1">전화번호:</div>
+                      <div className="text-xs text-gray-600">{item.bidwinnrTelNo}</div>
+                    </div>
+                  )} */}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
           )}
 
           {hasMore && (
