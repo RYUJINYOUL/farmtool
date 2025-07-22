@@ -12,6 +12,7 @@ import {
   setDoc,
   getDoc,
   serverTimestamp,
+  updateDoc
 } from "firebase/firestore";
 import { saveFcmToken } from "@/lib/fcm";
 
@@ -72,15 +73,15 @@ const LoginPage = () => {
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          email: user.email,
-          createdAt: serverTimestamp(),
-          displayName: user.displayName || null, // displayName도 저장
-          photoURL: user.photoURL || null,   
+        await updateDoc(userRef, {
+          // email: user.email,
+          // createdAt: serverTimestamp(),
+          // displayName: user.displayName || null, // displayName도 저장
+          // photoURL: user.photoURL || null,   
           fcmToken: fcmToken,
-          badge: 0,
-          notice: false,
-          pushTime: serverTimestamp()  // photoURL도 저장
+         
+          // notice: false,
+          // pushTime: serverTimestamp(),
         });
       }
       setLoading(false);
@@ -116,11 +117,8 @@ const LoginPage = () => {
           console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
         }
 
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
 
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
+       await setDoc(doc(db, "users", user.uid), {
           email: user.email,
           createdAt: serverTimestamp(),
           displayName: user.displayName || null, // displayName도 저장
@@ -128,9 +126,11 @@ const LoginPage = () => {
           fcmToken: fcmToken,
           badge: 0,
           notice: false,
-          pushTime: serverTimestamp()
+          pushTime: serverTimestamp(),
+          userKey: user.uid,
+          wishList: []
         });
-      }
+      
       push('/');
     } catch (error) {
       console.error("Google login error", error);
@@ -149,7 +149,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-black">
       <div className="w-full max-w-md bg-white/10 rounded-2xl shadow-lg p-10 flex flex-col items-center">
         <h1 className="text-3xl font-bold text-white mb-4">로그인</h1>
-        <p className="text-white/80 mb-8">modootree에 오신 것을 환영합니다!</p>
+        <p className="text-white/80 mb-8">건설톡에 오신 것을 환영합니다!</p>
 
         {/* Google 로그인 버튼 */}
         <button

@@ -86,7 +86,7 @@ const Page = (props) => {
             <div className='flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full'>
               <div className='lg:text-start font-semibold text-center text-[20px]'>{message.companyName}</div>
               
-              <div className='lg:text-end text-center text-[14px]'>{message.contactPerson} | {message.SubCategories.join(', ')} | {timeFromNow(message.createdDate)} | {message.businessLicense} | {message.address} | {message.phoneNumber}
+              <div className='lg:text-end text-center text-[14px]'>{timeFromNow(message.createdDate)}
                 </div>
             </div>
             
@@ -94,6 +94,38 @@ const Page = (props) => {
             <PlayListCarousel4
               playlistArray={message.imageDownloadUrls}
             />
+             <div className="overflow-x-auto">
+                <table className="min-w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
+                  <tbody>
+                    <tr>
+                      <th className="px-4 py-2 bg-gray-50 font-medium">대표자</th>
+                      <td className="px-4 py-2">{message.contactPerson || '-'}</td>
+                    </tr>
+                    <tr className="border-b border-gray-200">
+                      <th className="px-4 py-2 bg-gray-50 font-medium">사업자등록번호</th>
+                      <td className="px-4 py-2">{message.businessLicense || '-'}</td>
+                    </tr>
+                    <tr className="border-b border-gray-200">
+                      <th className="px-4 py-2 bg-gray-50 font-medium">해당업종</th>
+                      <td className="px-4 py-2">{(message.SubCategories || []).join(', ') || '-'}</td>
+                    </tr>
+                    <tr className="border-b border-gray-200">
+                      <th className="px-4 py-2 bg-gray-50 font-medium">주소</th>
+                      <td className="px-4 py-2">{message.address || '-'}</td>
+                    </tr>
+                    <tr>
+                      <th className="px-4 py-2 bg-gray-50 font-medium">연락처</th>
+                      <td className="px-4 py-2"><a
+                            href={`tel:${message.phoneNumber}`}
+                            className="text-blue-600 hover:underline font-medium"
+                          >
+                            {message.phoneNumber || '-'}
+                          </a>
+                          </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             <div className='mt-10' />
             <div className='text-[15px] h-full text-start leading-7'>
               <p style={{ whiteSpace: "pre-wrap" }}>{message.constructionExperience}</p>

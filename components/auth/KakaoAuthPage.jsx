@@ -45,9 +45,7 @@ const KakaoAuthPage = () => {
             email: user.email,           // 커스텀 토큰 클레임에 email이 포함될 수 있음
           }));
     
-          // Firestore 'users' 컬렉션에 사용자가 이미 존재하는지 확인
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
+     
 
           let fcmToken = null;
             try {
@@ -56,10 +54,10 @@ const KakaoAuthPage = () => {
               console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
             }
     
-          if (!userSnap.exists()) {
-            const kakaoNickname = searchParams.get('uid'); 
+     
+            // const kakaoNickname = searchParams.get('uid'); 
             // 사용자 문서가 존재하지 않으면 생성
-            await setDoc(userRef, {
+           await setDoc(doc(db, "users", user.uid), {
               email: user.email,
               createdAt: serverTimestamp(),
               displayName: user.displayName || null, // displayName도 저장
@@ -67,9 +65,10 @@ const KakaoAuthPage = () => {
               fcmToken: fcmToken,
               badge: 0,
               notice: false,
-              pushTime: serverTimestamp()
+              pushTime: serverTimestamp(),
+              userKey: user.uid,
+              wishList: []
             });
-          }
           // --- Firestore에 사용자 저장/업데이트 로직 끝 ---
     
           router.push('/');

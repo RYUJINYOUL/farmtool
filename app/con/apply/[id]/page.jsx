@@ -3,21 +3,39 @@ import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import moment from 'moment';
 import PostDetailWithQuotation from '@/components/template/Quotation';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore"; // updateDoc 추가
 import PlayListCarousel4 from '@/components/PlayListCarousel4';
-import { db } from '@/firebase'; // @/firebase에서 db 가져오기
+import { db } from '@/firebase';
+import { useSelector } from 'react-redux';
 
 const Page = (props) => {
   const { id } = props.params;
   const [postData, setPostData] = useState(null);
   const [message, setMessages] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useSelector(state => state.user);
 
   const timeFromNow = (timestamp) => {
     if (timestamp && typeof timestamp.toDate === 'function') {
       return moment(timestamp.toDate()).format('YYYY.MM.DD');
     }
     return moment(timestamp).format('YYYY.MM.DD');
+  };
+
+  // ✅ Firestore의 confirmed 값 업데이트
+  const toggleConfirmed = async () => {
+    try {
+      const docRef = doc(db, 'conApply', id);
+      await updateDoc(docRef, {
+        confirmed: !message.confirmed, // 현재 값의 반대로 변경
+      });
+      setMessages((prev) => ({
+        ...prev,
+        confirmed: !prev.confirmed,
+      }));
+    } catch (error) {
+      console.error("확정/대기 상태 업데이트 실패:", error);
+    }
   };
 
   useEffect(() => {
@@ -33,9 +51,8 @@ const Page = (props) => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const data = docSnap.data(); // 단일 문서의 데이터
+          const data = docSnap.data();
 
-          // ✨ 여기에서 명시적으로 원하는 데이터 구조를 만듭니다 ✨
           const formattedMessage = {
             id: doc.id,
             address: data.address,
@@ -48,10 +65,12 @@ const Page = (props) => {
             companyName: data.conApply_name,
             phoneNumber: data.conApply_phoneNumber,
             description: data.conApply_description,
-            uid: data.uid || null, // 게시물을 생성할 때 저장한 사용자 UID
+            uid: data.uid || null,
+            userKey: data.userKey,
+            confirmed: data.confirmed, // ✅ 현재 확정 상태
           };
-          
-          setMessages(formattedMessage); // 명시적으로 만든 객체로 상태 업데이트
+
+          setMessages(formattedMessage);
         } else {
           setMessages(null);
           console.warn(`문서 ID ${id}를 찾을 수 없습니다.`);
@@ -67,11 +86,9 @@ const Page = (props) => {
     loadConData();
   }, [id]);
 
-
   if (loading) {
     return <div className="text-center mt-20">데이터 로딩 중입니다...</div>;
   }
-
 
   if (!message) {
     return <div className="text-center mt-20">데이터를 찾을 수 없거나 올바르지 않은 접근입니다.</div>;
@@ -79,42 +96,92 @@ const Page = (props) => {
 
   return (
     <div>
-      <div className='lg:my-10 p-3.5 w-full'>
+      <div className="lg:my-10 p-3.5 w-full">
         <section className="flex gap-[50px] min-h-1/2 flex-col justify-center items-center">
-          <div className='mt-10' />
-          <div className='flex flex-col lg:w-[1100px] w-full'>
-            <div className='flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full'>
-              <div className='lg:text-start font-semibold text-center text-[20px]'>{message.companyName}</div>
-              
-              <div className='lg:text-end text-center text-[14px]'>{message.document} | {message.SubCategories.join(', ')} | {timeFromNow(message.createdDate)} | {message.businessLicense} | {message.address} | {message.phoneNumber}
+          <div className="mt-10" />
+          <div className="flex flex-col lg:w-[1100px] w-full">
+            <div className="flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full">
+              <div className="lg:text-start font-semibold text-center text-[20px]">
+                {message.companyName}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="lg:text-end text-center text-[14px]">
+                  {timeFromNow(message.createdDate)}
                 </div>
+             {currentUser?.uid === message.userKey && (
+                <button
+                  onClick={toggleConfirmed}
+                  className={`px-3 py-1 rounded text-white font-medium ${
+                    message.confirmed
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-blue-500 hover:bg-blue-600"
+                  }`}
+                >
+                  {message.confirmed ? "확정" : "대기"}
+                </button>
+                 )}
+              </div>
             </div>
-            
+
             <hr className="my-1 h-0.5 border-t-0 bg-neutral-200 opacity-100 dark:opacity-50" />
-            <PlayListCarousel4
-              playlistArray={message.imageDownloadUrls}
-            />
-            <div className='mt-10' />
-            <div className='text-[15px] h-full text-start leading-7'>
-              <p style={{ whiteSpace: "pre-wrap" }}>{message.constructionExperience}</p>
+
+            <PlayListCarousel4 playlistArray={message.imageDownloadUrls} />
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
+                <tbody>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-4 py-2 bg-gray-50 font-medium w-32">업력</th>
+                    <td className="px-4 py-2">
+                      {message.constructionExperience || "-"}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-4 py-2 bg-gray-50 font-medium">필요서류</th>
+                    <td className="px-4 py-2">{message.document || "-"}</td>
+                  </tr>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-4 py-2 bg-gray-50 font-medium">해당업종</th>
+                    <td className="px-4 py-2">
+                      {(message.SubCategories || []).join(", ") || "-"}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-4 py-2 bg-gray-50 font-medium">공사주소</th>
+                    <td className="px-4 py-2">{message.address || "-"}</td>
+                  </tr>
+                  <tr>
+                    <th className="px-4 py-2 bg-gray-50 font-medium">연락처</th>
+                    <td className="px-4 py-2">
+                      <a
+                        href={`tel:${message.phoneNumber}`}
+                        className="text-blue-600 hover:underline font-medium"
+                      >
+                        {message.phoneNumber || "-"}
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className='text-[15px] h-full text-start leading-7'>
+
+            <div className="text-[15px] h-full text-start leading-7 px-4 py-5">
               <p style={{ whiteSpace: "pre-wrap" }}>{message.description}</p>
             </div>
-            <div className='mt-10' />
+            <div className="mt-10" />
           </div>
         </section>
-        <div className='bg-[#fafafa]' />
-        <PostDetailWithQuotation
-            id={id} // The post ID
-            col="conApply" // The collection where your main posts are stored
-            postAuthorUid={message.uid} // Crucial: The UID of the post's author
-            postImageUrls={message.imageDownloadUrls} // Pass image URLs for deletion
-            listBasePath={"/con"} // Pass the base path for navigation
-          />
 
-      <div className='h-[150px]' />
-    </div>
+        <PostDetailWithQuotation
+          id={id}
+          col="conApply"
+          postAuthorUid={message.uid}
+          postImageUrls={message.imageDownloadUrls}
+          listBasePath={"/con"}
+        />
+
+        <div className="h-[150px]" />
+      </div>
     </div>
   );
 };

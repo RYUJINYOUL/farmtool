@@ -104,7 +104,9 @@ const RegisterPage = () => {
                 fcmToken: fcmToken,
                 badge: 0,
                 notice: false,
-                pushTime: serverTimestamp()
+                pushTime: serverTimestamp(),
+            userKey: user.uid,
+            wishList: []
         });
 
         dispatch(
@@ -159,7 +161,9 @@ const RegisterPage = () => {
                 fcmToken: fcmToken,
                 badge: 0,
                 notice: false,
-                pushTime: serverTimestamp()  // photoURL도 저장
+                pushTime: serverTimestamp(),
+                userKey: user.uid,
+                wishList: []
         });
         
             push("/");
@@ -178,50 +182,13 @@ const RegisterPage = () => {
     
 
 
-    const handleGoogleUsernameSubmit = async () => {
-        if (!googleUsername || !tempGoogleUser) return;
-
-        const usernameDoc = doc(db, "usernames", googleUsername);
-        const usernameSnap = await getDoc(usernameDoc);
-
-        if (usernameSnap.exists()) {
-            setError("Username", { message: "이미 사용 중인 이름입니다." });
-            setValue("Username", ""); // 입력값 비우기
-            return;
-        }
-        
-        await updateProfile(tempGoogleUser, {
-        displayName: googleUsername,
-        });
-
-        await setDoc(doc(db, "users", tempGoogleUser.uid), {
-        email: tempGoogleUser.email,
-        username: googleUsername,
-        photoURL: tempGoogleUser.photoURL || null,
-        createdAt: serverTimestamp(),
-        });
-
-        await setDoc(usernameDoc, {
-        uid: tempGoogleUser.uid,
-      });
-
-        dispatch(
-        setUser({
-            uid: tempGoogleUser.uid,
-            displayName: googleUsername,
-            photoURL: tempGoogleUser.photoURL,
-        })
-        );
-
-        push("/");
-    };
   
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="w-full max-w-md bg-white/10 rounded-2xl shadow-lg p-10 flex flex-col items-center">
           <h1 className="text-3xl font-bold text-white mb-4">회원가입</h1>
-          <p className="text-white/80 mb-8">modootree에 오신 것을 환영합니다!</p>
+          <p className="text-white/80 mb-8">건설톡에 오신 것을 환영합니다!</p>
                             <button
             className="w-full flex items-center justify-center gap-2 py-3 mb-6 rounded-xl bg-white text-black font-semibold shadow hover:bg-gray-100 transition"
                                 onClick={handleGoogleSign}
@@ -229,29 +196,8 @@ const RegisterPage = () => {
             <svg className="w-5 h-5" viewBox="0 0 533.5 544.3"><path d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z" fill="#4285f4"/><path d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1c46.2 91.9 140.3 149.9 243.2 149.9z" fill="#34a853"/><path d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z" fill="#fbbc04"/><path d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z" fill="#ea4335"/></svg>
             <span>Google로 회원가입</span>
                             </button>
-  {/* username 입력 모달 */}
-                            {showUsernamePrompt && (
-                                <div className="mt-6 border p-4 bg-gray-50 rounded shadow">
-                                <p className="mb-2 font-medium">사용할 사용자 이름을 입력하세요</p>
-                                <input
-                                    type="text"
-                                    name="Username"
-                                    value={googleUsername}
-                                    onChange={(e) => setGoogleUsername(e.target.value)}
-                                    placeholder="이름은 도메인주소입니다"
-                                    className="w-full px-4 py-2 border rounded mb-2"
-                                />{errors.Username?.message && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.Username.message}</p>
-                                    )}
 
-                                <button
-                                    onClick={handleGoogleUsernameSubmit}
-                                    className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600"
-                                >
-                                    확인
-                                </button>
-                                </div>
-                            )}
+                          
 
 
           <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>

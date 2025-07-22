@@ -2,15 +2,27 @@
 "use client"
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import moment from 'moment';
-import { Button } from "@/components/ui/button"; // ui/button 사용 여부 확인
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from 'react-redux';
-import { GiSpeaker } from "react-icons/gi";
-import { BsCardText } from "react-icons/bs";
-import { getFirestore, collection, where, orderBy, query, getDocs, limit, startAfter } from "firebase/firestore";
-import app from '../firebase'; // <-- firebase import 경로 확인 (components 폴더로 옮겼으므로 경로 변경 필요)
+import { useSelector } from 'react-redux';
+import { IoMdHeartEmpty } from "react-icons/io";
+import { IoIosHeart } from "react-icons/io";
+import { 
+  getFirestore, 
+  collection, 
+  where, 
+  orderBy, 
+  query, 
+  getDocs, 
+  limit, 
+  startAfter,
+  doc, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove 
+} from "firebase/firestore";
+import app from '../firebase'; 
 import Image from "next/image";
-import Link from 'next/link';
 import ConUpload from '@/components/conUpload'
 
 const ITEMS_PER_PAGE = 12;
@@ -41,9 +53,75 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     return '날짜 정보 없음';
   }
 };
+
+  const toggleFavorite = useCallback(async (itemId, currentFavorites) => {
+    if (!currentUser?.uid) {
+      // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+      router.push('/login');
+      return;
+    }
+
+    const userId = currentUser.uid;
+    const isCurrentlyFavorited = currentFavorites.includes(userId);
+    const itemCategory = 'conApply';
+
+    const wishlistItem = { itemId: itemId, category: itemCategory };
+
+    // Optimistic UI update: UI를 먼저 업데이트하여 사용자 경험 개선
+    setMessages(prevMessages => 
+      prevMessages.map(msg => 
+        msg.id === itemId 
+          ? { 
+              ...msg, 
+              favorites: isCurrentlyFavorited 
+                ? msg.favorites.filter(uid => uid !== userId) 
+                : [...msg.favorites, userId] 
+            } 
+          : msg
+      )
+    );
+
+    try {
+      const constructionDocRef = doc(db2, 'conApply', itemId);
+      const userDocRef = doc(db2, "users", userId);
+
+      if (isCurrentlyFavorited) {
+        await updateDoc(constructionDocRef, {
+          favorites: arrayRemove(userId)
+        });
+        await updateDoc(userDocRef, {
+          wishList: arrayRemove(wishlistItem)
+        });
+        console.log(`찜 해제: Item ${itemId} from user ${userId}`);
+      } else {
+        await updateDoc(constructionDocRef, {
+          favorites: arrayUnion(userId)
+        });
+        await updateDoc(userDocRef, {
+          wishList: arrayUnion(wishlistItem)
+        });
+        console.log(`찜 설정: Item ${itemId} by user ${userId}`);
+      }
+    } catch (error) {
+      console.error("Error toggling favorite: ", error);
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === itemId 
+            ? { 
+                ...msg, 
+                favorites: isCurrentlyFavorited 
+                  ? [...msg.favorites, userId] 
+                  : msg.favorites.filter(uid => uid !== userId) 
+              } 
+            : msg
+        )
+      );
+      alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+  }, [db2, currentUser, router]);
   
 
-  // 데이터 로드 함수 (첫 로드 및 추가 로드 모두 사용)
+
   const fetchMessages = useCallback(async (isInitialLoad) => {
     if (loading || (!isInitialLoad && !hasMore)) {
       console.log("Stopping fetchMessages: loading or no more data.");
@@ -63,7 +141,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
       queryConditions.push(where("region", "==", selectedRegions));
     }
     
-    if (selectedRegions !== "전국" && selectedSubRegions) {
+    if (selectedSubRegions && selectedSubRegions !== "전체") {
       queryConditions.push(where("subRegion", "==", selectedSubRegions));
     }
 
@@ -102,7 +180,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
           document: data.conApply_documents,
           companyName: data.conApply_name,
           phoneNumber: data.conApply_phoneNumber,
-          description: data.conApply_description
+          description: data.conApply_description,
+          confirmed: data.confirmed
         };
       });
 
@@ -129,7 +208,9 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     hasMore,
     selectedIndustries, 
     selectedRegions,    
-    selectedSubRegions  
+    selectedSubRegions,
+    currentUser, 
+    toggleFavorite 
   ]);
 
   // 의존성 배열에 fetchMessages 추가 (ESLint 경고 방지 및 최신 함수 참조 보장)
@@ -184,16 +265,42 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
      <div className='w-full h-full'>
           {messages.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {messages.map(({ address, imageDownloadUrls, createdDate, SubCategories, constructionExperience, document, 
-              favorites, companyName, phoneNumber, description, id}, idx) => ( // imageDownloadUrls 추가
+              {messages.map(({ address, imageDownloadUrls, createdDate, confirmed, constructionExperience, document, 
+              favorites, companyName, phoneNumber, description, id}, idx) => { 
+                 const isWishListed = currentUser?.uid && favorites.includes(currentUser.uid);
+               return (  
                 <div key={idx}
                      className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer"
                      onClick={() => onClickCard({ id })}>
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
-                      {companyName}
-                    </h3>
-                    <span className="text-green-800 text-xs px-2 py-1 rounded-full font-medium">{favorites.length}</span>
+                    <div className="flex justify-between items-center">
+                       <span
+                            className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                              confirmed ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+                            }`}
+                          >
+                            {confirmed ? "확정" : "대기"}
+                          </span>
+
+                          <h3 className="font-semibold text-lg text-gray-900 truncate pl-2">
+                            {companyName}
+                          </h3>
+                         
+                        </div>
+                    <div className='flex flex-row gap-2'>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+                            toggleFavorite(id, favorites); // itemId와 현재 favorites 배열 전달
+                          }}
+                          className='rounded-full' >
+                          {isWishListed ? <IoIosHeart color='red' size={20} /> : <IoMdHeartEmpty size={20} />}
+                        </button>
+                        {/* 좋아요 수 표시 (favorites 배열의 길이) */}
+                        {/* <span className="text-red-600 text-[18px] rounded-full font-medium">
+                        {favorites.length}
+                        </span> */}
+                        </div>
                   </div>
                   {/* --- 이미지 표시 로직 시작 --- */}
                   {imageDownloadUrls && imageDownloadUrls.length > 0 && (
@@ -241,7 +348,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                     </div>
                   </div>
                 </div>
-              ))}
+               )
+             })}
             </div>
           ) : (
             !loading && (

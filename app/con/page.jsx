@@ -20,6 +20,7 @@ const Page = () => {
   const [selectedIndustries, setSelectedIndustries] = useState("전체");
   const [selectedRegions, setSelectedRegions] = useState('전국');
   const [selectedSubRegions, setSelectedSubRegions] = useState('');
+
   
   const hselectedRegion = hierarchicalRegions.find(region => region.name === selectedRegions) || { subRegions: [] };
 
