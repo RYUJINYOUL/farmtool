@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
-import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDoc, getDocs } from "firebase/firestore";
 import { storage } from '../../firebase';
 import { useSelector } from 'react-redux';
 import { useRouter } from "next/navigation";

@@ -35,7 +35,7 @@ const PlayListCard4 = ({ playlist = [], collection = "" } = {}) => {
         }
         fill={true}
         alt="thumbnail"
-        className="object-cover rounded-md"
+        className="object-cover rounded-md border-2"
       />
   
     </section>

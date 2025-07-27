@@ -127,7 +127,7 @@ const Page = (props) => {
 
             <PlayListCarousel4 playlistArray={message.imageDownloadUrls} />
 
-            <div className="overflow-x-auto">
+            <div className={`overflow-x-auto ${message.imageDownloadUrls.length === 0 ? "" : "pt-10" }`}>
               <table className="min-w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
                 <tbody>
                   <tr className="border-b border-gray-200">

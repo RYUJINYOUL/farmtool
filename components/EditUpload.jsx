@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { db } from '@/firebase';
-import { getDoc, updateDoc, query, doc, serverTimestamp } from 'firebase/firestore';
+import { getDoc, updateDoc, query, doc, serverTimestamp, arrayRemove } from 'firebase/firestore';
 import useAuth from '@/hooks/useAuth';
 import { uploadGrassImage } from '@/hooks/useUploadImage';
 import imageCompression from 'browser-image-compression';
@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
 import { GeoPoint } from "firebase/firestore";
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 const EditUpload = ({ isOpen, col, id, onClose }) => {
   const { user, loading } = useAuth();
@@ -27,17 +28,17 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const router = useRouter();
-  // eslint-disable-next-line no-unused-vars
-  const timeFromNow = timestamp => moment(timestamp).format('YYYY.MM.DD'); // 사용되지 않아 주석 처리됨
+  const timeFromNow = timestamp => moment(timestamp).format('YYYY.MM.DD'); 
   const [formState, setFormState] = useState({
-    category: '',
-    detail: '',
     phoneNumber: '',
-    title: '',
     address: '',
     isNotice: false,
     TopCategories: '전체',
     SubCategories: ['전체'],
+    conApply_constructionExperience: '', 
+    conApply_documents: '',             
+    conApply_description: '',          
+    conApply_name: ''                 
   });
 
    const [isLoadingPost, setIsLoadingPost] = useState(true);
@@ -67,33 +68,31 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
     const fetchPostData = async () => {
       setIsLoadingPost(true);
       try {
-        const docRef = doc(db, col, id); // 'col'과 'id'를 사용하여 문서 참조 생성
+        const docRef = doc(db, col, id); 
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          // 가져온 데이터를 formState에 채웁니다.
-          // Firestore에서 불러온 데이터를 초기 상태로 설정
+      
           setFormState({
-            category: data.category || '',
-            detail: data.detail || '',
-            phoneNumber: data.phoneNumber || '',
-            title: data.title || '',
+            conApply_name: data.conApply_name || '',
+            conApply_constructionExperience: data.conApply_constructionExperience || '',
+            conApply_documents: data.conApply_documents || '',
+            conApply_description: data.conApply_description || '',
+            conApply_phoneNumber: data.conApply_phoneNumber || '',
             address: data.address || '',
             isNotice: data.isNotice || false,
             TopCategories: data.TopCategories || '전체',
-            // SubCategories는 배열임을 확인하고, 없으면 기본값으로 ['전체']
             SubCategories: Array.isArray(data.SubCategories) ? data.SubCategories : ['전체'], 
-            existingImageUrls: Array.isArray(data.imageDownloadUrls) ? data.imageDownloadUrls : [],
-            geoFirePoint: data.geoFirePoint || null, // 지리 정보도 불러옵니다.
+            geoFirePoint: data.geoFirePoint || null, 
           });
-          // 기존 이미지를 imageFiles 상태에도 미리보기용으로 추가 (Blob 형태로 변환 필요)
-          // 실제 이미지 파일이 아니므로, 미리보기만을 위해 URL을 직접 사용합니다.
-          // 새 이미지가 추가될 때만 imageFiles에 넣고, 기존 이미지는 existingImageUrls로 관리하는 것이 더 좋습니다.
-          // 여기서는 단순히 기존 URL을 보여주는 것으로 충분합니다.
+          
+         if (Array.isArray(data.imageDownloadUrls)) {
+          setImageFiles([...data.imageDownloadUrls]);
+        }
+
         } else {
           console.log("해당 문서가 존재하지 않습니다!");
-          // 문서가 없을 경우 처리 (예: 404 페이지로 리디렉션, 사용자에게 메시지 표시)
         }
       } catch (error) {
         console.error("게시물 데이터를 가져오는 중 오류 발생:", error);
@@ -101,7 +100,6 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
         setIsLoadingPost(false);
       }
     };
-
     fetchPostData();
   }, [col, id]); // col과 id가 변경될 때마다 이펙트를 다시 실행합니다.
 
@@ -158,9 +156,45 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
     }
   };
 
-  const removeImage = (index) => {
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
-  };
+  const removeImage = async (indexToRemove) => {
+    const removedItem = imageFiles[indexToRemove];
+    setImageFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    if (typeof removedItem === 'string') {
+        try {
+            const url = new URL(removedItem);
+            const imagePath = decodeURIComponent(url.pathname.split('/o/')[1].split('?')[0]);
+            const storageRef = ref(getStorage(), imagePath);
+
+            await deleteObject(storageRef);
+
+            if (col && id) {
+                const docRef = doc(db, col, id);
+                const docSnap = await getDoc(docRef); // Firestore 문서 존재 여부 다시 확인
+                if (docSnap.exists()) {
+                    await updateDoc(docRef, {
+                        imageDownloadUrls: arrayRemove(removedItem), // 해당 URL만 배열에서 제거
+                        updatedDate: serverTimestamp(), // 문서 수정 시간 업데이트
+                    });
+                } else {
+                    alert('Firestore에서 해당 게시물을 찾을 수 없습니다. (콘솔 확인)');
+                }
+            } 
+        } catch (error) {
+            if (error.code) {
+                console.error("Firebase Error Code:", error.code);
+                console.error("Firebase Error Message:", error.message);
+            }
+            alert('이미지 삭제 중 오류가 발생했습니다. 다시 시도해주세요. (자세한 내용은 콘솔을 확인하세요)');
+        }
+    }
+      
+    if (typeof removedItem === 'string') { // 제거된 항목이 URL이었다면
+        setFormState(prev => ({
+            ...prev,
+            // existingImageUrls: prev.existingImageUrls.filter(url => url !== removedItem)
+        }));
+    }
+};
 
   const moveImage = (fromIndex, toIndex) => {
     if (toIndex < 0 || toIndex >= imageFiles.length) return;
@@ -172,57 +206,52 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
   };
 
 
-  const removeExistingImage = (indexToRemove) => {
-    setFormState(prev => ({
-      ...prev,
-      existingImageUrls: prev.existingImageUrls.filter((_, idx) => idx !== indexToRemove)
-    }));
-  };
 
-
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
       alert('로그인이 필요합니다.');
       return;
     }
 
-    if (!formState.title || !formState.TopCategories || !formState.address) {
+    if (!formState.conApply_name || !formState.TopCategories || !formState.address) {
       alert('제목, 대분류, 주소는 필수 입력 항목입니다.');
       return;
     }
 
     setIsUploading(true);
-    let newImageUrls = [];
+    let newUploadedImageUrls = []; 
 
     try {
-      // 새로 추가된 이미지 파일들 업로드
-      if (imageFiles.length > 0) {
-        const options = {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
+        // imageFiles 배열에서 File 객체(즉, 새로 선택된 이미지)만 필터링하여 업로드
+        const filesToUpload = imageFiles.filter(item => typeof item !== 'string');
+
+        if (filesToUpload.length > 0) {
+            const options = {
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1024,
+                useWebWorker: true,
+            };
+
+            for (const file of filesToUpload) {
+                const compressedFile = await imageCompression(file, options);
+                const url = await uploadGrassImage(compressedFile, user.uid, col);
+                newUploadedImageUrls.push(url);
+            }
+        }
+
+        const finalImageUrls = [
+            ...(imageFiles.filter(item => typeof item === 'string')), 
+            ...newUploadedImageUrls 
+        ];
+
+        const docDataToUpdate = {
+            ...formState,
+            imageDownloadUrls: finalImageUrls, 
+            updatedDate: serverTimestamp(),
         };
 
-        for (const file of imageFiles) {
-          const compressedFile = await imageCompression(file, options);
-          const url = await uploadGrassImage(compressedFile, user.uid);
-          newImageUrls.push(url);
-        }
-      }
 
-      // 기존 이미지 URL과 새로 업로드된 이미지 URL을 합칩니다.
-      const finalImageUrls = [...formState.existingImageUrls, ...newImageUrls];
-
-      const docDataToUpdate = {
-        ...formState,
-        imageDownloadUrls: finalImageUrls, // 최종 이미지 URL 배열
-        // createdDate는 수정 시 변경하지 않는 것이 일반적입니다.
-        // serverTimestamp()를 사용하면 수정 시간을 기록할 수 있습니다.
-        updatedDate: serverTimestamp(), // 수정 시간 기록
-      };
-
-      // geoFirePoint가 유효한 GeoPoint 객체인지 확인
       if (formState.geoFirePoint && formState.geoFirePoint.geopoint) {
         docDataToUpdate.geoFirePoint = {
           geopoint: new GeoPoint(
@@ -232,29 +261,22 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
           geohash: formState.geoFirePoint.geohash,
         };
       } else {
-         // geoFirePoint가 없거나 유효하지 않으면 삭제하거나 null로 설정 (필요에 따라)
          delete docDataToUpdate.geoFirePoint; 
       }
       
-      // 사용자 키, 이메일, 이름은 수정 시 변경하지 않습니다.
       delete docDataToUpdate.userKey;
       delete docDataToUpdate.email;
       delete docDataToUpdate.name;
-      delete docDataToUpdate.confirmed; // 확정 여부 등은 별도 로직으로 관리할 수 있습니다.
-      delete docDataToUpdate.numOfLikes; // 좋아요 수도 별도 관리
+      delete docDataToUpdate.confirmed; 
+      delete docDataToUpdate.numOfLikes; 
 
-      // Firestore 문서 업데이트
       const docRef = doc(db, col, id);
       await updateDoc(docRef, docDataToUpdate);
 
       alert('게시물이 성공적으로 수정되었습니다!');
-      // 수정 완료 후 모달 닫기
       onClose(); 
-      // 필요하다면 페이지 리로드 또는 라우터 푸시
-      // router.push('/grass'); 
 
     } catch (error) {
-      console.error("게시물 수정 중 오류 발생: ", error);
       alert('게시물 수정 중 오류가 발생했습니다.');
     } finally {
       setIsUploading(false);
@@ -264,15 +286,6 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
 
   return (
     <div className='w-full h-full'>
-      {/* + 버튼을 Dialog 바깥으로 이동시킵니다. */}
-      {/* <Button 
-        onClick={handleOpenDialog} // onClick으로 handleOpenDialog 호출
-        className="fixed bottom-8 right-8 rounded-full w-16 h-16 text-3xl shadow-lg z-50" // z-index 추가
-      >
-        +
-      </Button> */}
-
-      {/* Dialog는 모달이 열렸을 때만 화면에 나타나야 합니다. */}
       <Dialog open={isOpen} onClose={onClose} className="fixed inset-0 z-[60] flex items-center justify-center">
         {/* 모달 뒷배경 */}
         <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
@@ -331,7 +344,7 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
                         {imageFiles.map((file, index) => (
                           <div key={index} className="relative group">
                             <Image
-                              src={URL.createObjectURL(file)}
+                              src={typeof file === 'string' ? file : URL.createObjectURL(file)}
                               alt={`Preview ${index + 1}`}
                               width={100}
                               height={100}
@@ -339,7 +352,7 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
                             />
                             <button
                               type="button"
-                              onClick={() => removeExistingImage(index)}
+                              onClick={() => removeImage(index)}
                               className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600"
                             >
                               ×
@@ -493,8 +506,8 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
                      
 
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">제목</Label>
-                <Input id="title" value={formState.title} onChange={handleInputChange} className="col-span-3" />
+                <Label htmlFor="companyName" className="text-right">이름</Label>
+                <Input id="companyName" value={formState.companyName} onChange={handleInputChange} className="col-span-3" />
               </div>
               
               
@@ -517,16 +530,20 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
               
 
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">카테고리</Label>
-                <Input id="category" value={formState.category} onChange={handleInputChange} className="col-span-3" />
+                <Label htmlFor="conApply_description" className="text-right">상세 내용</Label>
+                <textarea id="conApply_description" value={formState.description} onChange={handleInputChange} className="col-span-3 border rounded p-2 min-h-[60px] resize-y" required />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="detail" className="text-right">상세 내용</Label>
-                <textarea id="detail" value={formState.detail} onChange={handleInputChange} className="col-span-3 border rounded p-2 min-h-[60px] resize-y" required />
+                <Label htmlFor="conApply_phoneNumber" className="text-right">연락처</Label>
+                <Input id="conApply_phoneNumber" value={formState.phoneNumber} onChange={handleInputChange} className="col-span-3" />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phoneNumber" className="text-right">연락처</Label>
-                <Input id="phoneNumber" value={formState.phoneNumber} onChange={handleInputChange} className="col-span-3" />
+               <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="conApply_constructionExperience" className="text-right">경력사항</Label>
+                <Input id="conApply_constructionExperience" value={formState.constructionExperience} onChange={handleInputChange} className="col-span-3" />
+              </div>
+               <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="conApply_documents" className="text-right">필요서류</Label>
+                <Input id="conApply_documents" value={formState.document} onChange={handleInputChange} className="col-span-3" />
               </div>
               {(user?.uid === 'PkVnwSuEg1WE071zAZDgxuVr2ro1' || user?.uid === 'anotherAdminUidHere') && ( // 두 번째 UID도 올바르게 확인되도록 수정
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -541,7 +558,7 @@ const EditUpload = ({ isOpen, col, id, onClose }) => {
           {/* DialogFooter 역할을 하는 부분 */}
           <div className="flex justify-end pt-4 border-t border-gray-200">
             <Button type="submit" disabled={isUploading} onClick={handleSubmit}> {/* 폼 제출 버튼에 onClick 추가 */}
-              {isUploading ? '저장 중...' : '저장하기'}
+              {isUploading ? '수정 중...' : '수정하기'}
             </Button>
           </div>
         </Dialog.Panel >

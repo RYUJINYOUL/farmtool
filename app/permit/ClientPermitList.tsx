@@ -2,6 +2,26 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchArchitecturalPermitData, ArchitecturalPermitItem } from '@/lib/ArchPmsApi';
+import { IoMdHeartEmpty } from "react-icons/io";
+import { IoIosHeart } from "react-icons/io";
+import { useSelector } from 'react-redux';
+import { useRouter } from "next/navigation";
+import { 
+  getFirestore, 
+  collection, 
+  where, 
+  orderBy, 
+  query, 
+  getDocs, 
+  limit, 
+  startAfter,
+  doc, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove 
+} from "firebase/firestore";
+import { db } from "@/firebase";
+
 
 interface ClientPermitListProps {
   initialPermits: ArchitecturalPermitItem[];
@@ -16,6 +36,19 @@ interface ClientPermitListProps {
   currentMainRegionName: string; // UI 표시용
   currentSubRegionName: string; // UI 표시용
   currentLegalDongName: string; // UI 표시용
+}
+
+interface Message {
+  id: string;
+  favorites: string[];
+}
+
+
+interface WishlistItem {
+  itemId: string, 
+  category: string, 
+  top: string, 
+  middle: 'registration'
 }
 
 export default function ClientPermitList({
@@ -47,8 +80,78 @@ export default function ClientPermitList({
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(initialPageNo);
   const [isLoading, setIsLoading] = useState(initialPermits.length === 0 && initialTotalCount > 0);
- 
+  const { currentUser } = useSelector((state: any) => state.user);
   const [error, setError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const router = useRouter();
+
+    const toggleFavorite = useCallback(async (itemId: string, currentFavorites: string[]) => {
+      if (!currentUser?.uid) {
+        // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+        router.push('/login');
+        return;
+      }
+  
+      const userId = currentUser.uid;
+      const isCurrentlyFavorited = currentFavorites.includes(userId);
+      const top = 'construction';
+      const category = "construction";
+  
+      const wishlistItem: WishlistItem = { itemId: itemId, category: category, top: top, middle: 'registration' };
+  
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === itemId 
+            ? { 
+                ...msg, 
+                favorites: isCurrentlyFavorited 
+                  ? msg.favorites.filter(uid => uid !== userId) 
+                  : [...msg.favorites, userId] 
+              } 
+            : msg
+        )
+      );
+  
+      try {
+        const constructionDocRef = doc(db, 'construction', itemId);
+        
+        const userDocRef = doc(db, "users", userId);
+  
+        if (isCurrentlyFavorited) {
+          await updateDoc(constructionDocRef, {
+            favorites: arrayRemove(userId)
+          });
+          await updateDoc(userDocRef, {
+            wishList: arrayRemove(wishlistItem)
+          });
+          console.log(`찜 해제: Item ${itemId} from user ${userId}`);
+        } else {
+          await updateDoc(constructionDocRef, {
+            favorites: arrayUnion(userId)
+          });
+          await updateDoc(userDocRef, {
+            wishList: arrayUnion(wishlistItem)
+          });
+          console.log(`찜 설정: Item ${itemId} (Category: ${category}) by user ${userId}`);
+        }
+      } catch (error) {
+        console.error("Error toggling favorite: ", error);
+        // 오류 발생 시 UI 롤백 (선택 사항)
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === itemId 
+              ? { 
+                  ...msg, 
+                  favorites: isCurrentlyFavorited 
+                    ? [...msg.favorites, userId] // 롤백: 다시 추가
+                    : msg.favorites.filter(uid => uid !== userId) // 롤백: 다시 제거
+                } 
+              : msg
+          )
+        );
+        alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
+    }, [db, currentUser, router]);
 
  
 
@@ -167,7 +270,21 @@ export default function ClientPermitList({
                   <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
                     {permit.bldNm || '건물명 정보 없음'}
                   </h3>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">허가</span>
+                  <div className='flex flex-row gap-2'>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+                                        // toggleFavorite(id, favorites); // itemId와 현재 favorites 배열 전달
+                                      }}
+                                      className='rounded-full' >
+                                      { <IoIosHeart color='red' size={20} /> }
+                                    </button>
+                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">허가</span>
+                                    {/* 좋아요 수 표시 (favorites 배열의 길이) */}
+                                    {/* <span className="text-red-600 text-[18px] rounded-full font-medium">
+                                      {favorites.length}
+                                    </span> */}
+                                    </div>
                 </div>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex justify-between">

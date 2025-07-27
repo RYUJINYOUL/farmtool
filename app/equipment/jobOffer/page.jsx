@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import DefaultTable2 from '@/components/ui/DefaultTable2'
+
 import Image from 'next/image';
 import moment from 'moment';
 import { GeoPoint } from "firebase/firestore";
-import EditUpload from "@/components/EditUpload"
+
 
 const GrassPostPage = () => {
   const TABLE_HEAD = ["이미지", "글제목", "글쓴이", "작성일"];
@@ -27,9 +27,7 @@ const GrassPostPage = () => {
 
   return (
     <div className='w-full h-full'>
-      <DefaultTable2 props={[TABLE_HEAD]} />
 
-     <EditUpload />
     </div>
     
   )

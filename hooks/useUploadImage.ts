@@ -14,8 +14,8 @@ export async function uploadLinkImage(file: File, uid:string): Promise<string> {
   return getDownloadURL(fileRef);
 }
 
-export async function uploadGrassImage(file: File, uid:string): Promise<string> {
-  const fileRef = ref(storage, `${uid}/grass/grass_${Date.now()}`);
+export async function uploadGrassImage(file: File, uid:string, col:string): Promise<string> {
+  const fileRef = ref(storage, `${uid}/${col}/${col}_${Date.now()}`);
   await uploadBytes(fileRef, file);
   return getDownloadURL(fileRef);
 }
