@@ -44,7 +44,7 @@ const Page = (props) => {
             imageDownloadUrls: data.imageDownloadUrls || [], // 배열이 아닐 경우 빈 배열
             createdDate: data.createdDate ? data.createdDate.toDate() : null, // Timestamp 변환
             SubCategories: data.SubCategories || [], // 배열이 아닐 경우 빈 배열
-            companyName: data.construction_companyName || '',
+            companyName: data.construction_name || data.construction_companyName || '',
             favorites: data.favorites || [], // 배열이 아닐 경우 빈 배열
             phoneNumber: data.construction_phoneNumber || '',
             // JSX에서 사용하던 필드 이름도 추가 (예: title, description, name)
@@ -134,7 +134,7 @@ const Page = (props) => {
           </div>
         </section>
         <div className='bg-[#fafafa]' />
-        <Comment id={id} col="construction" path={`/con/registration/${id}`} urls={message.imageDownloadUrls} />
+        <Comment id={id} col="construction" path={`/construction/registration/${id}`} urls={message.imageDownloadUrls} />
         
         <div className='h-[150px]' />
       </div>

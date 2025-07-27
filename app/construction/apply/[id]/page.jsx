@@ -175,9 +175,9 @@ const Page = (props) => {
         <PostDetailWithQuotation
           id={id}
           col="conApply"
-          postAuthorUid={message.uid}
+          postAuthorUid={message.userKey}
           postImageUrls={message.imageDownloadUrls}
-          listBasePath={"/con"}
+          listBasePath={"/construction"}
         />
 
         <div className="h-[150px]" />

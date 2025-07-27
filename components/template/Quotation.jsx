@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { ref as strRef, deleteObject } from "firebase/storage"; // 이미지 삭제
 import { db } from '../../firebase';
 import Link from "next/link";
+import EditUpload from "@/components/EditUpload"
 
 const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBasePath }) => {
   const { register, reset, handleSubmit, formState: { errors } } = useForm();
@@ -17,6 +18,7 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
   const [quotations, setQuotations] = useState([]);
   const { currentUser } = useSelector(state => state.user);
   const { push } = useRouter();
+  const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false); // 명확성을 위해 'isOpen'에서 이름 변경
 
   // 🔥 유저의 division 가져오기
   const getUserDivision = async (uid) => {
@@ -46,6 +48,14 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
       unsubscribe();
     };
   }, [id, col]);
+
+  function openCategory () {
+  if (currentUser?.uid) {
+    setIsUserProfileModalOpen(true)
+  } else {
+    router.push('/login')
+  }  
+}
 
   const addQuotationsListener = () => {
     const quotationsQuery = query(
@@ -192,10 +202,17 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
                 onClick={() => push(listBasePath)}
               >목록</button>
               {currentUser?.uid === postAuthorUid && (
-                <button
-                  className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
-                  onClick={deleteMainPost}
-                >게시물 삭제</button>
+                <>
+                  <button
+                    className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
+                    onClick={deleteMainPost}
+                  >게시물 삭제</button>
+                  
+                  <button
+                    className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
+                    onClick={() => openCategory()}
+                  >게시물 수정</button>
+                </>
               )}
             </div>
           </div>
@@ -222,7 +239,7 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
                       <tr className="border-b border-gray-100">
                         <th className="px-4 py-2 w-32 bg-gray-50 font-medium">업체명</th>
                         <td className="px-4 py-2">
-                          {viewAllowed && quotation.division ? (
+                          {viewAllowed ? (
                             <Link
                               href={`/${quotation.division}/registration/${quotation.uid}`}
                               className="text-blue-600 hover:underline font-medium"
@@ -338,6 +355,13 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
           )}
         </div>
       </section>
+
+      <EditUpload
+             isOpen={isUserProfileModalOpen} 
+             onClose={() => setIsUserProfileModalOpen(false)}
+             col={col} 
+             id={id}
+            />
     </div>
   );
 };

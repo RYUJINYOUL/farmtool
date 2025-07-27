@@ -340,56 +340,20 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
 
 
   const userDocRef = doc(db, "users", userUid);
+  const category = englishCategoryToSave;
+
+    const wishlistItem = { category: category, top: englishCategoryToSave, middle: 'registration' };
     if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
-        // 사용자의 division 배열에 현재 등록하는 카테고리 슬러그를 추가
-        // 요청에 따라 englishCategoryToSave에 따른 슬러그로 변경
         batch.update(userDocRef, {
             division: arrayUnion(
-                englishCategoryToSave === 'construction' ? 'con' :
-                englishCategoryToSave === 'professionals' ? 'saram' :
-                englishCategoryToSave === 'equipment' ? 'jang' :
-                englishCategoryToSave === 'materials' ? 'mat' :
-                englishCategoryToSave // 매핑되지 않은 경우 기본값
-            )
+                englishCategoryToSave
+            ),
+            myList: arrayUnion(
+                wishlistItem
+            ),
         });
     }
 
-
-
-    // ★ 4. 'users/{userUid}/[englishCategoryName]/{subCategoryName}' 서브컬렉션에 소분류별 문서 추가 ★
-  //   const subCategoriesToSave = formState.SubCategories.filter(sub => sub !== '전체');
-
-  //   if (englishCategoryToSave && subCategoriesToSave.length > 0) {
-  //     subCategoriesToSave.forEach(subCategoryName => {
-  //         const subCategoryDocRef = doc(
-  //             collection(db, "users", userUid, englishCategoryToSave),
-  //             subCategoryName
-  //         );
-
-  //         // 해당 소분류 문서에 저장될 데이터 (이미 cleanAndConvertToNull이 적용된 dataToSave에서 추출)
-  //         const subCategorySpecificData = dataToSave.categorySpecificData[englishCategoryToSave] || {};
-  //         const subCategoryDocData = {
-  //             username: dataToSave.username,
-  //             address: dataToSave.address,
-  //             // certificate, career, phoneNumber는 subCategorySpecificData에 포함됨
-  //             userKey: userUid,
-  //             favorites: dataToSave.favorites,
-  //             fcmToken: dataToSave.fcmToken,
-  //             TopCategory: dataToSave.TopCategories,
-  //             SubCategory: subCategoryName,
-  //             geoFirePoint: dataToSave.geoFirePoint,
-  //             region: dataToSave.region,
-  //             subRegion: dataToSave.subRegion,
-  //             imageDownloadUrls: dataToSave.imageDownloadUrls,
-  //             badge: dataToSave.badge,
-  //             notice: dataToSave.notice,
-  //             pushTime: dataToSave.pushTime,
-  //             // categorySpecificData는 이미 null 처리된 데이터
-  //             categorySpecificData: subCategorySpecificData,
-  //         };
-  //         batch.set(subCategoryDocRef, subCategoryDocData, { merge: true });
-  //     });
-  // }
 
     try {
       await batch.commit();

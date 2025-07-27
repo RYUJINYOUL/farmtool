@@ -21,7 +21,7 @@ import {
   arrayUnion, 
   arrayRemove 
 } from "firebase/firestore";
-import app from '../firebase'; 
+import { db } from "@/firebase";
 import Image from "next/image";
 import ConUpload from '@/components/conUpload'
 
@@ -33,7 +33,6 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
   selectedRegions, 
   selectedSubRegions
 }) => {
-  const db2 = getFirestore(app);
   const [messages, setMessages] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,12 +42,11 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const loader = useRef(null);
   const timeFromNow = timestampObject => {
-  // timestampObject는 {seconds: ..., nanoseconds: ...} 형태라고 가정합니다.
+
+
   if (timestampObject && typeof timestampObject.seconds === 'number') {
-    // moment.unix()를 사용하여 초 단위 유닉스 타임스탬프를 파싱합니다.
     return moment.unix(timestampObject.seconds).format('YYYY.MM.DD');
   } else {
-    // 올바른 형식의 Timestamp 객체가 아닌 경우 처리
     console.error("Invalid timestamp object provided:", timestampObject);
     return '날짜 정보 없음';
   }
@@ -56,16 +54,16 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
 
   const toggleFavorite = useCallback(async (itemId, currentFavorites) => {
     if (!currentUser?.uid) {
-      // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
       router.push('/login');
       return;
     }
 
     const userId = currentUser.uid;
     const isCurrentlyFavorited = currentFavorites.includes(userId);
-    const itemCategory = 'conApply';
+    const top = 'conApply';
+    const category = "construction";
 
-    const wishlistItem = { itemId: itemId, category: itemCategory };
+    const wishlistItem = { itemId: itemId, category: category, top: top, middle: 'apply' };
 
     // Optimistic UI update: UI를 먼저 업데이트하여 사용자 경험 개선
     setMessages(prevMessages => 
@@ -82,8 +80,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     );
 
     try {
-      const constructionDocRef = doc(db2, 'conApply', itemId);
-      const userDocRef = doc(db2, "users", userId);
+      const constructionDocRef = doc(db, 'conApply', itemId);
+      const userDocRef = doc(db, "users", userId);
 
       if (isCurrentlyFavorited) {
         await updateDoc(constructionDocRef, {
@@ -118,7 +116,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
       );
       alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
-  }, [db2, currentUser, router]);
+  }, [db, currentUser, router]);
   
 
 
@@ -130,7 +128,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
 
     setLoading(true);
 
-    let baseQueryRef = collection(db2, "conApply");
+    let baseQueryRef = collection(db, "conApply");
     let queryConditions = [];
     
     if (selectedIndustries && selectedIndustries !== "전체") {
@@ -202,7 +200,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
       setLoading(false);
     }
   }, [
-    db2,
+    db,
     lastVisible,
     loading,
     hasMore,
@@ -258,7 +256,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
   }
 
   const onClickCard = ({ id }) => {
-    router.push(`/con/apply/${id}`);
+    router.push(`/construction/apply/${id}`);
   };
 
   return (

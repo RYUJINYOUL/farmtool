@@ -5,7 +5,7 @@ import { fetchCompanyData, CompanyItem } from '@/lib/ConsApi';
 import ClientCompanyList from '@/components/ClientCompanyList'; // New client component for displaying list
 
 interface ConstructionPageProps {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 const ITEMS_PER_PAGE = 25; // Change to 25 for this new behavior
@@ -13,12 +13,12 @@ const ITEMS_PER_PAGE = 25; // Change to 25 for this new behavior
 export default async function ConstructionPage({ searchParams }: ConstructionPageProps) {
   // searchParams가 undefined 또는 null일 경우를 대비하여 빈 객체로 초기화합니다.
   // 이렇게 하면 searchParams의 속성에 접근하기 전에 항상 유효한 객체임을 보장할 수 있습니다.
-  const params = await searchParams;
+  const params = searchParams || {};
 
-  const currentMainRegion = (params?.mainRegion as string) || '서울';
-  const currentSubRegion = (params?.subRegion as string) || '';
-  const currentItemName = (params?.itemName as string) || '';
-  const currentPageNo = parseInt((params?.pageNo as string) || '1', 10);
+  const currentMainRegion = (params.mainRegion as string) || '서울';
+  const currentSubRegion = (params.subRegion as string) || '';
+  const currentItemName = (params.itemName as string) || '';
+  const currentPageNo = parseInt((params.pageNo as string) || '1', 10);
 
   // Server Component에서 직접 API 호출 (첫 페이지 데이터만 로드)
   const { data: initialCompanies, totalCount, error } = await fetchCompanyData(

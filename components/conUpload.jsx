@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { Button } from "@/components/ui/button";
-import { doc, getDoc, writeBatch, collection, serverTimestamp, GeoPoint } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, collection, serverTimestamp, GeoPoint, arrayUnion } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
@@ -20,7 +20,7 @@ import UserApplyModal from '@/components/UserApplyModal';
 import AddressSearchModal from '@/components/AddressSearchModal';
 import imageCompression from 'browser-image-compression';
 import { uploadGrassImage } from '@/hooks/useUploadImage';
-import { KOREAN_TO_ENGLISH_APPLY, CATEGORY_APPLY_FIELDS } from '@/lib/constants';
+import { KOREAN_TO_ENGLISH_APPLY, CATEGORY_APPLY_FIELDS, CATEGORY_LINK } from '@/lib/constants';
 
 // 데이터 클리닝 함수 (변화 없음)
 const cleanAndConvertToNull = (data) => {
@@ -342,41 +342,25 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   }
 
 
-    // ★ 4. 'users/{userUid}/[englishCategoryName]/{subCategoryName}' 서브컬렉션에 소분류별 문서 추가 ★
-    const subCategoriesToSave = formState.SubCategories.filter(sub => sub !== '전체');
 
-  //   if (englishCategoryToSave && subCategoriesToSave.length > 0) {
-  //     subCategoriesToSave.forEach(subCategoryName => {
-  //         const subCategoryDocRef = doc(
-  //             collection(db, "users", userUid, dataToSave.TopCategories),
-  //             subCategoryName
-  //         );
+  const userDocRef = doc(db, "users", userUid);
+    const category = CATEGORY_LINK[englishCategoryToSave];
+  
+      const wishlistItem = { category: category, top: englishCategoryToSave, middle: 'apply' };
+      if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
+          batch.update(userDocRef, {
+              division: arrayUnion(
+                  englishCategoryToSave
+              ),
+              myList: arrayUnion(
+                  wishlistItem
+              ),
+          });
+      }
+  
 
-  //         // 해당 소분류 문서에 저장될 데이터 (이미 cleanAndConvertToNull이 적용된 dataToSave에서 추출)
-  //         const subCategorySpecificData = dataToSave.categorySpecificData[englishCategoryToSave] || {};
-  //         const subCategoryDocData = {
-  //             username: dataToSave.username,
-  //             address: dataToSave.address,
-  //             // certificate, career, phoneNumber는 subCategorySpecificData에 포함됨
-  //             userKey: userUid,
-  //             favorites: dataToSave.favorites,
-  //             fcmToken: dataToSave.fcmToken,
-  //             TopCategory: dataToSave.TopCategories,
-  //             SubCategory: subCategoryName,
-  //             geoFirePoint: dataToSave.geoFirePoint,
-  //             region: dataToSave.region,
-  //             subRegion: dataToSave.subRegion,
-  //             imageDownloadUrls: dataToSave.imageDownloadUrls,
-  //             badge: dataToSave.badge,
-  //             notice: dataToSave.notice,
-  //             pushTime: dataToSave.pushTime,
-  //             // categorySpecificData는 이미 null 처리된 데이터
-  //             categorySpecificData: subCategorySpecificData,
-  //         };
-  //         batch.set(subCategoryDocRef, subCategoryDocData, { merge: true });
-  //     });
-  // }
 
+    
     try {
       await batch.commit();
       onClose();

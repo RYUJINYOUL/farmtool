@@ -20,9 +20,10 @@ import {
   arrayUnion, 
   arrayRemove 
 } from "firebase/firestore";
-import app from '../firebase'; 
+import { db } from "@/firebase";
 import Image from "next/image";
 import CategoryUpload from '@/components/categoryUpload'
+import { category } from '@/lib/constants';
 
 
 const ITEMS_PER_PAGE = 12;
@@ -33,7 +34,6 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
   selectedRegions, 
   selectedSubRegions
 }) => {
-  const db2 = getFirestore(app);
   const [messages, setMessages] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -54,9 +54,10 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
 
     const userId = currentUser.uid;
     const isCurrentlyFavorited = currentFavorites.includes(userId);
-    const itemCategory = 'construction';
+    const top = 'construction';
+    const category = "construction";
 
-    const wishlistItem = { itemId: itemId, category: itemCategory };
+    const wishlistItem = { itemId: itemId, category: category, top: top, middle: 'registration' };
 
     setMessages(prevMessages => 
       prevMessages.map(msg => 
@@ -72,9 +73,9 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
     );
 
     try {
-      const constructionDocRef = doc(db2, 'construction', itemId);
+      const constructionDocRef = doc(db, 'construction', itemId);
       
-      const userDocRef = doc(db2, "users", userId);
+      const userDocRef = doc(db, "users", userId);
 
       if (isCurrentlyFavorited) {
         await updateDoc(constructionDocRef, {
@@ -91,7 +92,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
         await updateDoc(userDocRef, {
           wishList: arrayUnion(wishlistItem)
         });
-        console.log(`찜 설정: Item ${itemId} (Category: ${itemCategory}) by user ${userId}`);
+        console.log(`찜 설정: Item ${itemId} (Category: ${category}) by user ${userId}`);
       }
     } catch (error) {
       console.error("Error toggling favorite: ", error);
@@ -110,7 +111,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
       );
       alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
-  }, [db2, currentUser, router]);
+  }, [db, currentUser, router]);
 
  
 
@@ -123,7 +124,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
 
     setLoading(true);
 
-    let baseQueryRef = collection(db2, "construction");
+    let baseQueryRef = collection(db, "construction");
     let queryConditions = [];
     
     if (selectedIndustries && selectedIndustries !== "전체") {
@@ -171,7 +172,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
           imageDownloadUrls: data.imageDownloadUrls || [],
           createdDate: data.createdDate,
           SubCategories: data.SubCategories,
-          companyName: data.construction_companyName,
+          companyName: data.construction_name || data.construction_companyName || '',
           favorites: data.favorites || [],
           phoneNumber: data.construction_phoneNumber
         };
@@ -194,7 +195,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
       setLoading(false);
     }
   }, [
-    db2,
+    db,
     lastVisible,
     loading,
     hasMore,
@@ -250,7 +251,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
   }
 
   const onClickCard = ({ id }) => {
-     router.push(`/con/registration/${id}`);
+     router.push(`/construction/registration/${id}`);
   };
 
   return (

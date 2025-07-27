@@ -30,15 +30,15 @@ export default function Menu(props) {
   const homeCategoryList = [
     {
       label: "건설업",
-      src: "/con",
+      src: "/construction",
     },
     {
       label: "건설장비",
-      src: "/jang",
+      src: "/equipment",
     },
     {
       label: "공사자재",
-      src: "/mat",
+      src: "/materials",
     },
     {
       label: "인허가",
@@ -54,7 +54,11 @@ export default function Menu(props) {
     },
     {
       label: "전문인력",
-      src: "/saram",
+      src: "/professionals",
+    },
+     {
+      label: "내정보",
+      src: "/myinfo",
     },
   ];
 
