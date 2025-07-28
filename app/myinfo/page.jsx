@@ -14,7 +14,7 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
-  deleteDoc, // deleteDoc 추가
+  deleteDoc,
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import {
@@ -99,9 +99,9 @@ export default function MyPage() {
     }
 
     const userId = uid;
-    // 나라장터 항목의 고유 ID (예: bidwinnrBizno + fnlSucsfDate 조합)
     const naraDocId = `${item.bidwinnrBizno || 'unknown'}-${item.fnlSucsfDate || 'unknown'}`;
-    const naraDocRef = doc(db, "users", userId, "nara", naraDocId);
+    const userDocRef = doc(db, "users", userId); // users/{uid} 문서 참조
+    const naraDocRef = doc(collection(userDocRef, "nara"), naraDocId); // users/{uid}/nara/{id} 서브컬렉션 문서 참조
 
     try {
       // UI 옵티미스틱 업데이트: 목록에서 제거
@@ -113,9 +113,14 @@ export default function MyPage() {
       );
       setWishListCount(prev => ({ ...prev, nara: prev.nara - 1 }));
 
-      // Firestore에서 문서 삭제
+      // Firestore에서 문서 삭제 (서브컬렉션)
       await deleteDoc(naraDocRef);
-      console.log(`나라장터 찜 항목 ${naraDocId} 제거 성공`);
+      // Firestore에서 users/{uid} 문서의 'nara' 배열 필드에서도 ID 제거
+      await updateDoc(userDocRef, {
+        nara: arrayRemove(naraDocId)
+      });
+
+      console.log(`나라장터 찜 항목 ${naraDocId} 제거 성공 (서브컬렉션 및 users 문서 배열)`);
 
     } catch (error) {
       console.error("나라장터 찜 해제 중 오류 발생:", error);
@@ -134,9 +139,9 @@ export default function MyPage() {
     }
 
     const userId = uid;
-    // 인허가 항목의 고유 ID (예: platPlc)
     const permitDocId = item.platPlc;
-    const permitDocRef = doc(db, "users", userId, "permits", permitDocId);
+    const userDocRef = doc(db, "users", userId); // users/{uid} 문서 참조
+    const permitDocRef = doc(collection(userDocRef, "permits"), permitDocId); // users/{uid}/permits/{id} 서브컬렉션 문서 참조
 
     try {
       // UI 옵티미스틱 업데이트: 목록에서 제거
@@ -145,9 +150,14 @@ export default function MyPage() {
       );
       setWishListCount(prev => ({ ...prev, permit: prev.permit - 1 }));
 
-      // Firestore에서 문서 삭제
+      // Firestore에서 문서 삭제 (서브컬렉션)
       await deleteDoc(permitDocRef);
-      console.log(`인허가 찜 항목 ${permitDocId} 제거 성공`);
+      // Firestore에서 users/{uid} 문서의 'permit' 배열 필드에서도 ID 제거
+      await updateDoc(userDocRef, {
+        permit: arrayRemove(permitDocId)
+      });
+
+      console.log(`인허가 찜 항목 ${permitDocId} 제거 성공 (서브컬렉션 및 users 문서 배열)`);
 
     } catch (error) {
       console.error("인허가 찜 해제 중 오류 발생:", error);
@@ -169,12 +179,12 @@ export default function MyPage() {
         const userDoc = await getDoc(doc(db, "users", uid));
         const generalWishList = userDoc.data()?.wishList || [];
 
-        // 2. 나라장터 찜 목록
+        // 2. 나라장터 찜 목록 (서브컬렉션 개수)
         const naraCollectionRef = collection(db, "users", uid, "nara");
         const naraSnapshot = await getDocs(naraCollectionRef);
         const naraWishListCount = naraSnapshot.size;
 
-        // 3. 인허가 찜 목록
+        // 3. 인허가 찜 목록 (서브컬렉션 개수)
         const permitsCollectionRef = collection(db, "users", uid, "permits");
         const permitsSnapshot = await getDocs(permitsCollectionRef);
         const permitWishListCount = permitsSnapshot.size;
@@ -550,8 +560,6 @@ export default function MyPage() {
                     {naraWishListDetails.map((item, index) => {
                        // 나라장터 아이템의 고유 ID를 다시 생성하여 일치 여부 확인
                        const naraItemId = `${item.bidwinnrBizno || 'unknown'}-${item.fnlSucsfDate || 'unknown'}`;
-                       // userData.naraPermit 상태가 없으므로 직접 확인
-                       // 이 부분은 해당 아이템이 Firestore 서브컬렉션에 존재하는지를 통해 '찜 상태'로 간주합니다.
                        const isFavorited = true; // 목록에 있다는 것은 찜되어 있다는 의미
                       return (
                            <div key={naraItemId} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
@@ -593,7 +601,7 @@ export default function MyPage() {
                                             </div>
                                             <div className="flex justify-between">
                                               <span className="text-gray-500">낙찰일자:</span>
-                                              <span className="font-medium">{item.fnlSucsfDate || '-'}</span>
+                                              <span className="font-medium">{item.fnlSucsfDate ? String(item.fnlSucsfDate).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}</span>
                                             </div>
                                             {item.bidwinnrAdrs && (
                                               <div className="pt-2 border-t border-gray-100">
@@ -636,7 +644,7 @@ export default function MyPage() {
                                                             <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  togglePermitFavorite(item);
+                                  togglePermitFavorite(permit);
                                 }}
                                 className="rounded-full"
                               >
@@ -647,10 +655,6 @@ export default function MyPage() {
                                 )}
                               </button>
                                                             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">허가</span>
-                                                            {/* 좋아요 수 표시 (favorites 배열의 길이) */}
-                                                            {/* <span className="text-red-600 text-[18px] rounded-full font-medium">
-                                                              {favorites.length}
-                                                            </span> */}
                                                             </div>
                                         </div>
                                         <div className="space-y-3 text-sm text-gray-600">
@@ -692,18 +696,6 @@ export default function MyPage() {
                                             <span className="text-gray-500">건폐율:</span>
                                             <span className="font-medium">{permit.bcRat || '-'}</span>
                                           </div>
-                                          {/* {item.bidwinnrAdrs && (
-                                            <div className="pt-2 border-t border-gray-100">
-                                              <div className="text-gray-500 text-xs mb-1">주소:</div>
-                                              <div className="text-xs text-gray-600 line-clamp-2">{item.bidwinnrAdrs}</div>
-                                            </div>
-                                          )}
-                                          {item.bidwinnrTelNo && (
-                                            <div className="pt-2 border-t border-gray-100">
-                                              <div className="text-gray-500 text-xs mb-1">전화번호:</div>
-                                              <div className="text-xs text-gray-600">{item.bidwinnrTelNo}</div>
-                                            </div>
-                                          )} */}
                                         </div>
                                       </div>
                       );
@@ -733,104 +725,58 @@ export default function MyPage() {
                       // 로컬 상태도 갱신
                       setUserInfo((prev) => ({ ...prev, displayName: newName }));
                       closeDialog();
-                    } catch (err) {
-                      console.error("회원정보 수정 오류:", err);
+                    } catch (error) {
+                      console.error("회원정보 수정 오류:", error);
                       alert("회원정보 수정 중 오류가 발생했습니다.");
                     }
                   }}
-                  className="space-y-3"
                 >
-                  <input
-                    type="text"
-                    name="displayName"
-                    placeholder="이름"
-                    defaultValue={userInfo.displayName}
-                    className="w-full border p-2 rounded-lg"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white p-2 rounded-lg"
-                  >
-                    수정 완료
-                  </button>
+                  <div className="mb-4">
+                    <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">
+                      이름
+                    </label>
+                    <input
+                      type="text"
+                      id="displayName"
+                      name="displayName"
+                      defaultValue={userInfo?.displayName || ""}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      저장
+                    </button>
+                  </div>
                 </form>
               </div>
             )}
 
-             {/* Dialog Content */}
-            {openDialog === "myText" && (
-              <div>
-                <Dialog.Title className="text-xl font-bold mb-4">등록글과 신청글</Dialog.Title>
-                {myListDetails.length === 0 ? (
-                  <p className="text-gray-500">글이 없습니다.</p>
-                ) : (
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {myListDetails.map((item) => {
-                    return (
-                      <div
-                        key={uid}
-                        className="border p-3 rounded-lg hover:bg-gray-50 transition"
-                      >
-                        <Link
-                          href={`/${item.category}/${item.middle}/${uid}`}
-                          className="block"
-                        >
-                          <div className="flex flex-row items-center justify-between">
-                            <div>
-                              <div className="font-semibold text-gray-800">
-                                {item.companyName}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {item.topCategory}
-                              </div>
-                            </div>
-                            <div>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </div>
-                )}
-              </div>
-            )}
-
-            {openDialog === "register" && (
-                 <div>
-                  <CategoryUpload
-                    isOpen={true} // 무조건 열기
-                    onClose={() => setOpenDialog(null)} // Dialog 닫기와 동일하게 처리
-                  />
-                </div>
-              )}
-
-            {openDialog === "apply" && (
-                <div>
-                  <ConUpload
-                    isOpen={true} // 무조건 열기
-                    onClose={() => setOpenDialog(null)} // Dialog 닫기와 동일하게 처리
-                  />
-                </div>
-              )}
-
             {openDialog === "notifications" && (
               <div>
                 <Dialog.Title className="text-xl font-bold mb-4">알림 설정</Dialog.Title>
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-700">알림</span>
-                  <button
-                    onClick={toggleNotice}
-                    className={`w-12 h-6 flex items-center rounded-full p-1 ${
-                      noticeEnabled ? "bg-green-500" : "bg-gray-300"
-                    }`}
-                  >
-                    <div
-                      className={`bg-white w-4 h-4 rounded-full shadow-md transform ${
-                        noticeEnabled ? "translate-x-6" : "translate-x-0"
-                      }`}
-                    ></div>
-                  </button>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-800">알림 받기</span>
+                  <label htmlFor="toggle-notice" className="flex items-center cursor-pointer">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        id="toggle-notice"
+                        className="sr-only"
+                        checked={noticeEnabled}
+                        onChange={toggleNotice}
+                      />
+                      <div className="block bg-gray-300 w-14 h-8 rounded-full"></div>
+                      <div
+                        className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${
+                          noticeEnabled ? "translate-x-full bg-blue-600" : ""
+                        }`}
+                      ></div>
+                    </div>
+                  </label>
                 </div>
               </div>
             )}
@@ -838,20 +784,57 @@ export default function MyPage() {
             {openDialog === "help" && (
               <div>
                 <Dialog.Title className="text-xl font-bold mb-4">고객센터</Dialog.Title>
-                <div className="space-y-3">
-                  <button
-                    className="flex items-center justify-center w-full bg-blue-600 text-white p-2 rounded-lg"
-                    onClick={() => window.location.href = "tel:123456789"}
-                  >
-                    <Phone className="mr-2" /> 전화하기
-                  </button>
-                  <button
-                    className="flex items-center justify-center w-full bg-gray-800 text-white p-2 rounded-lg"
-                    onClick={() => alert("1:1 문의하기로 이동")}
-                  >
-                    <MessageSquare className="mr-2" /> 1:1 문의하기
-                  </button>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <Phone className="w-5 h-5" />
+                    <span>전화 문의: 02-1234-5678</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <MessageSquare className="w-5 h-5" />
+                    <span>이메일 문의: support@example.com</span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-4">
+                    궁금한 점이 있으시면 언제든지 문의해주세요.
+                  </p>
                 </div>
+              </div>
+            )}
+
+            {openDialog === "register" && (
+              <CategoryUpload closeDialog={closeDialog} />
+            )}
+
+            {openDialog === "apply" && (
+              <ConUpload closeDialog={closeDialog} />
+            )}
+
+            {openDialog === "myText" && (
+              <div>
+                <Dialog.Title className="text-xl font-bold mb-4">등록글과 신청글</Dialog.Title>
+                {myListDetails.length === 0 ? (
+                  <p className="text-gray-500">등록/신청하신 글이 없습니다.</p>
+                ) : (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {myListDetails.map((item) => (
+                      <div
+                        key={item.itemId}
+                        className="border p-3 rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <Link
+                          href={`/${item.category}/${item.middle}/${item.itemId}`}
+                          className="block"
+                        >
+                          <div className="font-semibold text-gray-800">
+                            {item.companyName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {item.topCategory}
+                          </div>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </Dialog.Panel>
