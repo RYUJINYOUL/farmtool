@@ -12,8 +12,9 @@ import {
   getDoc,
   getDocs,
   updateDoc,
-  arrayUnion, 
-  arrayRemove 
+  arrayUnion,
+  arrayRemove,
+  deleteDoc, // deleteDoc 추가
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import {
@@ -26,7 +27,9 @@ import {
   Phone,
   MessageSquare,
   Dock,
-  FileUser
+  FileUser,
+  LayoutGrid, // 새로운 아이콘 추가 (나라장터)
+  Stamp,      // 새로운 아이콘 추가 (인허가)
 } from "lucide-react";
 import Link from "next/link";
 import CategoryUpload from '@/components/categoryUpload';
@@ -34,66 +37,163 @@ import ConUpload from '@/components/conUpload';
 
 export default function MyPage() {
   const [openDialog, setOpenDialog] = useState(null);
-  const [wishList, setWishList] = useState([]);
+  const [wishListCount, setWishListCount] = useState({
+    general: 0, // 일반 찜 목록 (업체/콘텐츠)
+    nara: 0,    // 나라장터 찜 목록
+    permit: 0   // 인허가 찜 목록
+  });
   const [userInfo, setUserInfo] = useState({});
   const [noticeEnabled, setNoticeEnabled] = useState(false);
-  const [wishListDetails, setWishListDetails] = useState([]);
+  const [wishListDetails, setWishListDetails] = useState([]); // 일반 찜 목록
+  const [naraWishListDetails, setNaraWishListDetails] = useState([]); // 나라장터 찜 목록
+  const [permitWishListDetails, setPermitWishListDetails] = useState([]); // 인허가 찜 목록
   const [myListDetails, setMyListDetails] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
   const uid = currentUser?.uid;
-  const router = useRouter(); 
+  const router = useRouter();
 
   const closeDialog = () => setOpenDialog(null);
 
-
-   const toggleFavorite = useCallback(async (itemId, middle, category, top) => {
-      if (!currentUser?.uid) {
-        router.push('/login');
-        return;
-      }
-  
-      const userId = uid;
-      const wishlistItem = { itemId: itemId, category: category, top: top, middle: middle };
-
-  
-      try {
-        const constructionDocRef = doc(db, top, itemId);
-        const userDocRef = doc(db, "users", userId);
-          await updateDoc(constructionDocRef, {
-            favorites: arrayRemove(userId)
-          });
-          await updateDoc(userDocRef, {
-            wishList: arrayRemove(wishlistItem)
-          });
-          setWishListDetails((prevDetails) =>
-            prevDetails.filter((msg) => msg.itemId !== itemId)
-          );
-          setWishList((prev) =>
-            prev.filter((item) => item.itemId !== itemId)
-          );
-      } catch (error) {
-        alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
-      }
-    }, [db, currentUser, router]);
-
-
-  useEffect(() => {
-  if (!uid) return;
-
-  const fetchWishListCount = async () => {
-    try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      const wishList = userDoc.data()?.wishList || [];
-      setWishList(wishList); // ✅ 버튼 표시용
-    } catch (err) {
-      console.error("찜목록 카운트 로드 오류:", err);
+  // 찜하기/찜 해제 (일반 찜 목록 - 업체, 콘텐츠)
+  const toggleFavorite = useCallback(async (itemId, middle, category, top) => {
+    if (!currentUser?.uid) {
+      router.push('/login');
+      return;
     }
-  };
 
-  fetchWishListCount();
-}, [uid]);
+    const userId = uid;
+    const wishlistItem = { itemId: itemId, category: category, top: top, middle: middle };
 
-  // 🟢 찜목록 가져오기
+    try {
+      // UI를 먼저 업데이트하여 사용자에게 즉각적인 피드백 제공
+      setWishListDetails((prevDetails) =>
+        prevDetails.filter((msg) => msg.itemId !== itemId)
+      );
+      setWishListCount(prev => ({ ...prev, general: prev.general - 1 }));
+
+      const constructionDocRef = doc(db, top, itemId);
+      const userDocRef = doc(db, "users", userId);
+
+      await updateDoc(constructionDocRef, {
+        favorites: arrayRemove(userId)
+      });
+      await updateDoc(userDocRef, {
+        wishList: arrayRemove(wishlistItem)
+      });
+    } catch (error) {
+      console.error("일반 찜하기/찜 해제 중 오류 발생:", error);
+      alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      // 오류 발생 시 UI 롤백 (이 경우, 제거된 항목을 다시 추가)
+      // 정확한 롤백을 위해서는 원래 상태를 저장해두어야 하지만, 여기서는 간단히 처리
+      setWishListDetails((prevDetails) => [...prevDetails, { itemId, middle, category, top, companyName: "복구됨", topCategory: "" }]);
+      setWishListCount(prev => ({ ...prev, general: prev.general + 1 }));
+    }
+  }, [uid, currentUser, router]);
+
+
+  // 나라장터 찜하기/찜 해제
+  const toggleNaraFavorite = useCallback(async (item) => {
+    if (!currentUser?.uid) {
+      router.push('/login');
+      return;
+    }
+
+    const userId = uid;
+    // 나라장터 항목의 고유 ID (예: bidwinnrBizno + fnlSucsfDate 조합)
+    const naraDocId = `${item.bidwinnrBizno || 'unknown'}-${item.fnlSucsfDate || 'unknown'}`;
+    const naraDocRef = doc(db, "users", userId, "nara", naraDocId);
+
+    try {
+      // UI 옵티미스틱 업데이트: 목록에서 제거
+      setNaraWishListDetails((prevDetails) =>
+        prevDetails.filter((detail) => {
+            const detailId = `${detail.bidwinnrBizno || 'unknown'}-${detail.fnlSucsfDate || 'unknown'}`;
+            return detailId !== naraDocId;
+        })
+      );
+      setWishListCount(prev => ({ ...prev, nara: prev.nara - 1 }));
+
+      // Firestore에서 문서 삭제
+      await deleteDoc(naraDocRef);
+      console.log(`나라장터 찜 항목 ${naraDocId} 제거 성공`);
+
+    } catch (error) {
+      console.error("나라장터 찜 해제 중 오류 발생:", error);
+      alert("나라장터 찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      // 오류 발생 시 UI 롤백 (원래 항목을 다시 추가)
+      setNaraWishListDetails((prevDetails) => [...prevDetails, item]);
+      setWishListCount(prev => ({ ...prev, nara: prev.nara + 1 }));
+    }
+  }, [uid, currentUser, router]);
+
+  // 인허가 찜하기/찜 해제
+  const togglePermitFavorite = useCallback(async (item) => {
+    if (!currentUser?.uid) {
+      router.push('/login');
+      return;
+    }
+
+    const userId = uid;
+    // 인허가 항목의 고유 ID (예: platPlc)
+    const permitDocId = item.platPlc;
+    const permitDocRef = doc(db, "users", userId, "permits", permitDocId);
+
+    try {
+      // UI 옵티미스틱 업데이트: 목록에서 제거
+      setPermitWishListDetails((prevDetails) =>
+        prevDetails.filter((detail) => detail.platPlc !== permitDocId)
+      );
+      setWishListCount(prev => ({ ...prev, permit: prev.permit - 1 }));
+
+      // Firestore에서 문서 삭제
+      await deleteDoc(permitDocRef);
+      console.log(`인허가 찜 항목 ${permitDocId} 제거 성공`);
+
+    } catch (error) {
+      console.error("인허가 찜 해제 중 오류 발생:", error);
+      alert("인허가 찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      // 오류 발생 시 UI 롤백 (원래 항목을 다시 추가)
+      setPermitWishListDetails((prevDetails) => [...prevDetails, item]);
+      setWishListCount(prev => ({ ...prev, permit: prev.permit + 1 }));
+    }
+  }, [uid, currentUser, router]);
+
+
+  // 🟢 각 찜목록의 개수 가져오기 (초기 로딩 시)
+  useEffect(() => {
+    if (!uid) return;
+
+    const fetchAllWishListCounts = async () => {
+      try {
+        // 1. 일반 찜 목록
+        const userDoc = await getDoc(doc(db, "users", uid));
+        const generalWishList = userDoc.data()?.wishList || [];
+
+        // 2. 나라장터 찜 목록
+        const naraCollectionRef = collection(db, "users", uid, "nara");
+        const naraSnapshot = await getDocs(naraCollectionRef);
+        const naraWishListCount = naraSnapshot.size;
+
+        // 3. 인허가 찜 목록
+        const permitsCollectionRef = collection(db, "users", uid, "permits");
+        const permitsSnapshot = await getDocs(permitsCollectionRef);
+        const permitWishListCount = permitsSnapshot.size;
+
+        setWishListCount({
+          general: generalWishList.length,
+          nara: naraWishListCount,
+          permit: permitWishListCount
+        });
+      } catch (err) {
+        console.error("찜목록 카운트 로드 오류:", err);
+      }
+    };
+
+    fetchAllWishListCounts();
+  }, [uid]);
+
+
+  // 🟢 일반 찜목록 세부 정보 가져오기
   useEffect(() => {
     if (!uid || openDialog !== "favorites") return;
 
@@ -113,13 +213,14 @@ export default function MyPage() {
               ...item,
               companyName: data[`${item.top}_name`] || '알수없음',
               topCategory: data.TopCategories || "카테고리 없음",
-              favorites: data.favorites || []
+              favorites: data.favorites || [] // 해당 항목의 favorites 배열도 가져옴
             };
           } else {
             return {
               ...item,
               companyName: "삭제된 항목",
               topCategory: "-",
+              favorites: []
             };
           }
         });
@@ -149,8 +250,6 @@ export default function MyPage() {
           const itemRef = doc(db, item.top, uid);
           const itemDoc = await getDoc(itemRef);
 
-          console.log(itemDoc)
-
           if (itemDoc.exists()) {
             const data = itemDoc.data();
             return {
@@ -179,6 +278,39 @@ export default function MyPage() {
   }, [uid, openDialog]);
 
 
+  // 🟢 나라장터 찜 목록 세부 정보 가져오기
+  useEffect(() => {
+    if (!uid || openDialog !== "naraFavorites") return;
+
+    const fetchNaraWishListDetails = async () => {
+      try {
+        const naraCollectionRef = collection(db, "users", uid, "nara");
+        const querySnapshot = await getDocs(naraCollectionRef);
+        const details = querySnapshot.docs.map(doc => doc.data());
+        setNaraWishListDetails(details);
+      } catch (err) {
+        console.error("나라장터 찜 목록 세부정보 로드 오류:", err);
+      }
+    };
+    fetchNaraWishListDetails();
+  }, [uid, openDialog]);
+
+  // 🟢 인허가 찜 목록 세부 정보 가져오기
+  useEffect(() => {
+    if (!uid || openDialog !== "permitFavorites") return;
+
+    const fetchPermitWishListDetails = async () => {
+      try {
+        const permitsCollectionRef = collection(db, "users", uid, "permits");
+        const querySnapshot = await getDocs(permitsCollectionRef);
+        const details = querySnapshot.docs.map(doc => doc.data());
+        setPermitWishListDetails(details);
+      } catch (err) {
+        console.error("인허가 찜 목록 세부정보 로드 오류:", err);
+      }
+    };
+    fetchPermitWishListDetails();
+  }, [uid, openDialog]);
 
   // 🟢 회원정보 가져오기
   useEffect(() => {
@@ -229,17 +361,42 @@ export default function MyPage() {
 
         {/* 메뉴 리스트 */}
         <div className="mt-6 space-y-3">
-          {/* 찜 목록 */}
+          {/* 일반 찜 목록 */}
           <button
             onClick={() => setOpenDialog("favorites")}
             className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
           >
             <div className="flex items-center gap-3">
               <Heart className="w-5 h-5 text-pink-500" />
-              <span className="font-medium text-gray-800">찜 목록</span>
+              <span className="font-medium text-gray-800">일반 찜 목록</span>
             </div>
-            <span className="text-gray-400 text-sm">{wishList.length}개</span>
+            <span className="text-gray-400 text-sm">{wishListCount.general}개</span>
           </button>
+
+          {/* 나라장터 찜 목록 */}
+          <button
+            onClick={() => setOpenDialog("naraFavorites")}
+            className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
+          >
+            <div className="flex items-center gap-3">
+              <LayoutGrid className="w-5 h-5 text-orange-500" />
+              <span className="font-medium text-gray-800">나라장터 찜 목록</span>
+            </div>
+            <span className="text-gray-400 text-sm">{wishListCount.nara}개</span>
+          </button>
+
+          {/* 인허가 찜 목록 */}
+          <button
+            onClick={() => setOpenDialog("permitFavorites")}
+            className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
+          >
+            <div className="flex items-center gap-3">
+              <Stamp className="w-5 h-5 text-blue-400" />
+              <span className="font-medium text-gray-800">인허가 찜 목록</span>
+            </div>
+            <span className="text-gray-400 text-sm">{wishListCount.permit}개</span>
+          </button>
+
 
           {/* 회원정보 수정 */}
           <button
@@ -324,63 +481,238 @@ export default function MyPage() {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Dialog Content */}
+            {/* Dialog Content: 일반 찜 목록 */}
             {openDialog === "favorites" && (
               <div>
-                <Dialog.Title className="text-xl font-bold mb-4">찜 목록</Dialog.Title>
+                <Dialog.Title className="text-xl font-bold mb-4">일반 찜 목록</Dialog.Title>
                 {wishListDetails.length === 0 ? (
                   <p className="text-gray-500">찜한 항목이 없습니다.</p>
                 ) : (
-                  <div className="space-y-3">
-                  {wishListDetails.map((item) => {
-                    const isWishListed =
-                      Array.isArray(item.favorites) && uid
-                        ? item.favorites.includes(uid)
-                        : false;
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {wishListDetails.map((item) => {
+                      const isWishListed =
+                        Array.isArray(item.favorites) && uid
+                          ? item.favorites.includes(uid)
+                          : false;
 
-                    return ( // ✅ 반드시 return 추가
-                      <div
-                        key={item.itemId}
-                        className="border p-3 rounded-lg hover:bg-gray-50 transition"
-                      >
-                        <Link
-                          href={`/${item.category}/${item.middle}/${item.itemId}`}
-                          className="block"
+                      return (
+                        <div
+                          key={item.itemId}
+                          className="border p-3 rounded-lg hover:bg-gray-50 transition"
                         >
-                          <div className="flex flex-row items-center justify-between">
-                            <div>
-                              <div className="font-semibold text-gray-800">
-                                {item.companyName}
+                          <Link
+                            href={`/${item.category}/${item.middle}/${item.itemId}`}
+                            className="block"
+                          >
+                            <div className="flex flex-row items-center justify-between">
+                              <div>
+                                <div className="font-semibold text-gray-800">
+                                  {item.companyName}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {item.topCategory}
+                                </div>
                               </div>
-                              <div className="text-sm text-gray-500">
-                                {item.topCategory}
+                              <div>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    toggleFavorite(item.itemId, item.middle, item.category, item.top);
+                                  }}
+                                  className="rounded-full"
+                                >
+                                  {isWishListed ? (
+                                    <IoIosHeart color="red" size={20} />
+                                  ) : (
+                                    <IoMdHeartEmpty size={20} />
+                                  )}
+                                </button>
                               </div>
                             </div>
-                            <div>
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault(); // ✅ Link 클릭 막기
-                                  e.stopPropagation(); // ✅ 카드 클릭 막기
-                                  toggleFavorite(item.itemId, item.middle, item.category, item.top); // 🟢 item 정보 넘기기
-                                }}
-                                className="rounded-full"
-                              >
-                                {isWishListed ? (
+                          </Link>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Dialog Content: 나라장터 찜 목록 */}
+            {openDialog === "naraFavorites" && (
+              <div>
+                <Dialog.Title className="text-xl font-bold mb-4">나라장터 찜 목록</Dialog.Title>
+                {naraWishListDetails.length === 0 ? (
+                  <p className="text-gray-500">찜한 나라장터 항목이 없습니다.</p>
+                ) : (
+                  <div className="space-y-3 max-h-1/2 overflow-y-auto">
+                    {naraWishListDetails.map((item, index) => {
+                       // 나라장터 아이템의 고유 ID를 다시 생성하여 일치 여부 확인
+                       const naraItemId = `${item.bidwinnrBizno || 'unknown'}-${item.fnlSucsfDate || 'unknown'}`;
+                       // userData.naraPermit 상태가 없으므로 직접 확인
+                       // 이 부분은 해당 아이템이 Firestore 서브컬렉션에 존재하는지를 통해 '찜 상태'로 간주합니다.
+                       const isFavorited = true; // 목록에 있다는 것은 찜되어 있다는 의미
+                      return (
+                           <div key={naraItemId} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+                               <div className="flex justify-between items-start mb-4">
+                                  <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+                                    {item.bidwinnrNm || '낙찰자명 없음'}
+                                  </h3>
+                                <div className='flex flex-row gap-2'>
+                                <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleNaraFavorite(item);
+                                    }}
+                                    className="rounded-full"
+                                  >
+                                {isFavorited ? (
                                   <IoIosHeart color="red" size={20} />
                                 ) : (
                                   <IoMdHeartEmpty size={20} />
                                 )}
                               </button>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </div>
+                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">낙찰</span>
+                                        </div>
+                                          </div>
+                                          <div className="space-y-3 text-sm text-gray-600">
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">사업자번호:</span>
+                                              <span className="font-medium">{item.bidwinnrBizno || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">대표자:</span>
+                                              <span className="font-medium">{item.bidwinnrCeoNm || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">낙찰금액:</span>
+                                              <span className="font-semibold text-green-600">
+                                                {item.sucsfbidAmt ? Number(item.sucsfbidAmt).toLocaleString() + '원' : '-'}
+                                              </span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">낙찰일자:</span>
+                                              <span className="font-medium">{item.fnlSucsfDate || '-'}</span>
+                                            </div>
+                                            {item.bidwinnrAdrs && (
+                                              <div className="pt-2 border-t border-gray-100">
+                                                <div className="text-gray-500 text-xs mb-1">주소:</div>
+                                                <div className="text-xs text-gray-600 line-clamp-2">{item.bidwinnrAdrs}</div>
+                                              </div>
+                                            )}
+                                            {item.bidwinnrTelNo && (
+                                              <div className="pt-2 border-t border-gray-100">
+                                                <div className="text-gray-500 text-xs mb-1">전화번호:</div>
+                                                <div className="text-xs text-gray-600">{item.bidwinnrTelNo}</div>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             )}
+
+            {/* Dialog Content: 인허가 찜 목록 */}
+            {openDialog === "permitFavorites" && (
+              <div>
+                <Dialog.Title className="text-xl font-bold mb-4">인허가 찜 목록</Dialog.Title>
+                {permitWishListDetails.length === 0 ? (
+                  <p className="text-gray-500">찜한 인허가 항목이 없습니다.</p>
+                ) : (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {permitWishListDetails.map((permit, index) => {
+                      const isFavorited = true; // 목록에 있다는 것은 찜되어 있다는 의미
+                      return (
+                        <div key={permit.platPlc} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+                                        <div className="flex justify-between items-start mb-4">
+                                          <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+                                            {permit.bldNm || '건물명 정보 없음'}
+                                          </h3>
+                                          <div className='flex flex-row gap-2'>
+                                                            <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  togglePermitFavorite(item);
+                                }}
+                                className="rounded-full"
+                              >
+                                {isFavorited ? (
+                                  <IoIosHeart color="red" size={20} />
+                                ) : (
+                                  <IoMdHeartEmpty size={20} />
+                                )}
+                              </button>
+                                                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">허가</span>
+                                                            {/* 좋아요 수 표시 (favorites 배열의 길이) */}
+                                                            {/* <span className="text-red-600 text-[18px] rounded-full font-medium">
+                                                              {favorites.length}
+                                                            </span> */}
+                                                            </div>
+                                        </div>
+                                        <div className="space-y-3 text-sm text-gray-600">
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">대지위치:</span>
+                                            <span className="font-medium">{permit.platPlc || '-'}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">허가일:</span>
+                                            <span className="font-medium">{permit.archPmsDay ? String(permit.archPmsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">착공일:</span>
+                                            <span className="font-semibold text-green-600">
+                                              {permit.realStcnsDay ? String(permit.realStcnsDay).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}
+                                            </span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">건축구분:</span>
+                                            <span className="font-medium">{permit.mainPurpsCdNm || '-'}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">대지면적:</span>
+                                            <span className="font-medium">{permit.platArea || '-'}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">연면적:</span>
+                                            <span className="font-medium">{permit.totArea || '-'}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">건축면적:</span>
+                                            <span className="font-medium">{permit.archArea || '-'}</span>
+                                          </div>
+                                           <div className="flex justify-between">
+                                            <span className="text-gray-500">용적률:</span>
+                                            <span className="font-medium">{permit.vlRat || '-'}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-500">건폐율:</span>
+                                            <span className="font-medium">{permit.bcRat || '-'}</span>
+                                          </div>
+                                          {/* {item.bidwinnrAdrs && (
+                                            <div className="pt-2 border-t border-gray-100">
+                                              <div className="text-gray-500 text-xs mb-1">주소:</div>
+                                              <div className="text-xs text-gray-600 line-clamp-2">{item.bidwinnrAdrs}</div>
+                                            </div>
+                                          )}
+                                          {item.bidwinnrTelNo && (
+                                            <div className="pt-2 border-t border-gray-100">
+                                              <div className="text-gray-500 text-xs mb-1">전화번호:</div>
+                                              <div className="text-xs text-gray-600">{item.bidwinnrTelNo}</div>
+                                            </div>
+                                          )} */}
+                                        </div>
+                                      </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
 
             {openDialog === "profile" && (
               <div>
@@ -410,7 +742,7 @@ export default function MyPage() {
                 >
                   <input
                     type="text"
-                    name="displayName" // 🟢 폼 데이터 키
+                    name="displayName"
                     placeholder="이름"
                     defaultValue={userInfo.displayName}
                     className="w-full border p-2 rounded-lg"
@@ -432,9 +764,9 @@ export default function MyPage() {
                 {myListDetails.length === 0 ? (
                   <p className="text-gray-500">글이 없습니다.</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                   {myListDetails.map((item) => {
-                    return ( // ✅ 반드시 return 추가
+                    return (
                       <div
                         key={uid}
                         className="border p-3 rounded-lg hover:bg-gray-50 transition"

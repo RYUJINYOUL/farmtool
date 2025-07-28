@@ -321,7 +321,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                       <span className="font-medium">{constructionExperience || '-'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">필요서류</span>
+                      <span className="text-gray-500">필요서류:</span>
                       <span className="font-medium">{document || '-'}</span>
                     </div>
                     <div className="flex justify-between">

@@ -28,21 +28,15 @@ const cleanAndConvertToNull = (data) => {
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
-
-      // GeoPoint 인스턴스인 경우, 그대로 반환하여 변환을 피합니다.
-      // GeoPoint 클래스를 정확히 참조하려면 Firestore SDK에서 임포트해야 합니다.
       if (value instanceof GeoPoint) { // <-- 이 조건 추가
         cleanedData[key] = value;
       }
-      // 문자열이 비어있으면 null로, 아니면 원래 값 사용
       else if (typeof value === 'string' && value.trim() === '') {
         cleanedData[key] = null;
       }
-      // 객체인 경우 (GeoPoint가 아니며, null이 아니고, 배열이 아닌 경우) 재귀적으로 처리
       else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         cleanedData[key] = cleanAndConvertToNull(value);
       }
-      // 그 외의 경우 (숫자, boolean, 배열 등)는 원래 값 사용
       else {
         cleanedData[key] = value;
       }
@@ -140,34 +134,21 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
           const fetchedUserData = userSnap.data();
           console.log(fetchedUserData);
           setUserData(fetchedUserData);
-
-          // fetchedUserData에서 categorySpecificData를 기반으로 formState 업데이트
-          // 기존 certificate, career, phoneNumber는 categorySpecificData 내부에 있을 것으로 가정
           setFormState(prev => ({
             ...prev,
             username: fetchedUserData.username || '',
             TopCategories: fetchedUserData.TopCategories || '전체',
             SubCategories: fetchedUserData.SubCategories || ['전체'],
             address: fetchedUserData.address || '',
-            // 이제 이 필드들은 categorySpecificData에서 가져오거나,
-            // CATEGORY_APPLY_FIELDS 설정을 보고 동적으로 로드해야 합니다.
-            // 일단 'professionals' 카테고리에 속한다고 가정하고 예시를 듭니다.
-            // 만약 모든 카테고리에서 공통으로 사용되는 동적 필드라면 해당 로직을 수정해야 합니다.
-            // certificate: fetchedUserData.categorySpecificData?.professionals?.certificate || '',
-            // career: fetchedUserData.categorySpecificData?.professionals?.career || '',
-            // phoneNumber: fetchedUserData.categorySpecificData?.professionals?.phoneNumber || '',
             geoFirePoint: fetchedUserData.geoFirePoint || null,
             region: fetchedUserData.region || '',
             subRegion: fetchedUserData.subRegion || '',
-            // 이미지 URL은 fetchedUserData에 직접 저장되어 있을 가능성이 높으므로 이대로 유지
             imageDownloadUrls: fetchedUserData.imageDownloadUrls || [],
             categorySpecificData: {
               professionals: fetchedUserData.categorySpecificData?.professionals || {},
               construction: fetchedUserData.categorySpecificData?.construction || {},
               equipment: fetchedUserData.categorySpecificData?.equipment || {},
               materials: fetchedUserData.categorySpecificData?.materials || {},
-              // 필요한 모든 영어 카테고리 이름에 대해 로드 로직 추가
-              // fetch된 categorySpecificData 객체 자체를 초기값으로 사용하여 깊은 병합을 방지
               ...(fetchedUserData.categorySpecificData || {}),
             }
           }));
@@ -184,7 +165,6 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
 
   // 최종 저장 핸들러
   const handleSaveUsernameAndProfile = async () => {
-    // 1. 공통 필수 필드 유효성 검사
     if (!formState.address || !formState.geoFirePoint) {
       setError('주소 검색을 통해 정확한 위치를 설정하고 입력해주세요.');
       return;
@@ -198,7 +178,6 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       return;
     }
 
-    // ★ 카테고리별 필수 필드 유효성 검사 ★ (변화 없음)
     const currentEnglishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
     const fieldsForCurrentCategory = CATEGORY_APPLY_FIELDS[currentEnglishCategory] || [];
 
@@ -244,20 +223,18 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
     }
 
-    // --- 여기부터 dataToSave 생성 로직 변경 ---
+ 
     const initialDataToSave = {
       username: formState.username,
       TopCategories: formState.TopCategories,
       SubCategories: formState.SubCategories,
       address: formState.address,
-      // certificate, career, phoneNumber는 categorySpecificData 내부에 있으므로 여기서 제거
       geoFirePoint: formState.geoFirePoint,
       favorites: [],
       fcmToken: fcmToken,
       region: formState.region,
       subRegion: formState.subRegion,
       imageDownloadUrls: imageUrls,
-      // categorySpecificData는 cleanAndConvertToNull이 마지막에 한 번만 적용될 것이므로 원본 그대로
       categorySpecificData: formState.categorySpecificData,
       badge: 0,
       notice: false,
@@ -265,31 +242,17 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       createdDate: new Date()
     };
 
-    // 모든 데이터를 한 번에 클리닝하여 최종 dataToSave 생성
     const dataToSave = cleanAndConvertToNull(initialDataToSave);
-
-    // 이제 dataToSave.certificate, dataToSave.career, dataToSave.phoneNumber 같은 개별 변환은 필요 없음
-    // 왜냐하면 해당 필드들이 categorySpecificData 내부에 있다면,
-    // cleanAndConvertToNull 함수가 initialDataToSave를 처리할 때 재귀적으로 찾아 들어가서 변환하기 때문입니다.
-
-
-    // ★ 3. 선택된 한글 카테고리를 영어 이름으로 변환하여 해당 컬렉션에 문서 생성 ★
     const selectedKoreanCategory = formState.TopCategories;
     const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
 
     if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
       const categoryUserDocRef = doc(db, englishCategoryToSave, userUid);
-
-      // 해당 카테고리에 맞는 동적 필드 데이터만 가져와서 병합 (이미 cleanAndConvertToNull이 적용된 dataToSave에서 추출)
-      // dataToSave.categorySpecificData가 이미 cleanAndConvertToNull이 적용된 상태이므로
-      // 여기서 또 cleanAndConvertToNull을 호출하는 것은 불필요합니다.
-      // (dataToSave.categorySpecificData[englishCategoryToSave] || {})는 이미 cleanedData입니다.
       const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
       const categoryCollectionData = {
           username: dataToSave.username, // dataToSave에서 가져옴
           address: dataToSave.address,   // dataToSave에서 가져옴
-          // certificate, career, phoneNumber는 specificCategoryDataForCategoryCollection에 포함됨
           userKey: userUid,
           favorites: dataToSave.favorites,
           TopCategories: dataToSave.TopCategories,
@@ -312,16 +275,11 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
 
    if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
       const categoryUserDocRef = doc(db, "users", userUid, englishCategoryToSave, englishCategoryToSave)
-      // 해당 카테고리에 맞는 동적 필드 데이터만 가져와서 병합 (이미 cleanAndConvertToNull이 적용된 dataToSave에서 추출)
-      // dataToSave.categorySpecificData가 이미 cleanAndConvertToNull이 적용된 상태이므로
-      // 여기서 또 cleanAndConvertToNull을 호출하는 것은 불필요합니다.
-      // (dataToSave.categorySpecificData[englishCategoryToSave] || {})는 이미 cleanedData입니다.
       const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
       const categoryCollectionData = {
           username: dataToSave.username, // dataToSave에서 가져옴
           address: dataToSave.address,   // dataToSave에서 가져옴
-          // certificate, career, phoneNumber는 specificCategoryDataForCategoryCollection에 포함됨
           userKey: userUid,
           favorites: dataToSave.favorites,
           TopCategories: dataToSave.TopCategories,

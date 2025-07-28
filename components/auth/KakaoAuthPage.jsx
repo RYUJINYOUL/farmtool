@@ -55,21 +55,39 @@ const KakaoAuthPage = () => {
             }
     
      
-            // const kakaoNickname = searchParams.get('uid'); 
-            // 사용자 문서가 존재하지 않으면 생성
-           await setDoc(doc(db, "users", user.uid), {
-              email: user.email,
-              createdAt: serverTimestamp(),
-              displayName: user.displayName || null, // displayName도 저장
-              photoURL: user.photoURL || null,   
-              fcmToken: fcmToken,
-              badge: 0,
-              notice: false,
-              pushTime: serverTimestamp(),
-              userKey: user.uid,
-              wishList: []
-            });
-          // --- Firestore에 사용자 저장/업데이트 로직 끝 ---
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                // 문서가 이미 존재하면 업데이트
+                await updateDoc(userDocRef, {
+                    email: user.email, // email, displayName, photoURL은 변경될 수 있으므로 업데이트.
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null,
+                    fcmToken: fcmToken, // 토큰은 로그인 시마다 업데이트하는 것이 좋음
+                    pushTime: serverTimestamp(), // 로그인 시간도 업데이트
+                    // wishList, permit, nara, job 등은 사용자가 직접 조작하는 데이터이므로 여기서 덮어쓰지 않음
+                    // badge, notice 등은 초기값으로 설정하거나, 앱 로직에 따라 결정
+                });
+                console.log("기존 사용자 문서 업데이트 완료.");
+            } else {
+                // 문서가 존재하지 않으면 새로 생성 (초기값 설정)
+                await setDoc(userDocRef, {
+                    email: user.email,
+                    createdAt: serverTimestamp(), // 최초 생성 시에만 설정
+                    displayName: user.displayName || null,
+                    photoURL: user.photoURL || null,
+                    fcmToken: fcmToken,
+                    badge: 0,
+                    notice: false,
+                    pushTime: serverTimestamp(),
+                    userKey: user.uid,
+                    wishList: [],
+                    permit: [],
+                    nara: [],
+                    job: []
+                });
+            }
     
           router.push('/');
         })
