@@ -50,15 +50,6 @@ const KakaoAuthPage = () => {
           // FCM 토큰 처리
           let fcmToken = null;
           try {
-            // Service Worker가 준비될 때까지 기다립니다.
-            if ("serviceWorker" in navigator) {
-                console.log("서비스 워커 준비 대기 중...");
-                await navigator.serviceWorker.ready; // <<-- 이 부분이 중요!
-                console.log("서비스 워커 준비 완료. FCM 토큰 요청.");
-            } else {
-                console.warn("Service Worker를 지원하지 않는 브라우저입니다.");
-            }
-            
             fcmToken = await saveFcmToken(user.uid);
           } catch (err) {
             console.error("⚠️ FCM 토큰 저장 실패:", err);
