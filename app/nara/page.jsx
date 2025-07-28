@@ -843,7 +843,7 @@ export default function NaraBidList() {
                 <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
-                      {item.prdctNm || '사업명 정보 없음'}
+                      {item.bidwinnrNm || '사업명 정보 없음'}
                     </h3>
                     <div className='flex flex-row gap-2'>
                       <button
@@ -859,33 +859,37 @@ export default function NaraBidList() {
                     </div>
                   </div>
                   <div className="space-y-3 text-sm text-gray-600">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">낙찰자명:</span>
-                      <span className="font-medium">{item.bidwinnrNm || '-'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">낙찰일자:</span>
-                      <span className="font-medium">{item.fnlSucsfDate ? String(item.fnlSucsfDate).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">낙찰금액:</span>
-                      <span className="font-semibold text-green-600">
-                        {item.sucsfbidAmt ? Number(item.sucsfbidAmt).toLocaleString() + '원' : 'N/A'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">개찰일시:</span>
-                      <span className="font-medium">{item.opengDt && item.opengTm ? `${String(item.opengDt).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')} ${String(item.opengTm).replace(/(\d{2})(\d{2})/, '$1:$2')}` : 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">참여제한지역:</span>
-                      <span className="font-medium">{item.prtcptLmtRgnNm || '-'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">업종명:</span>
-                      <span className="font-medium">{item.indstrytyNm || '-'}</span>
-                    </div>
-                  </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">사업자번호:</span>
+                                              <span className="font-medium">{item.bidwinnrBizno || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">대표자:</span>
+                                              <span className="font-medium">{item.bidwinnrCeoNm || '-'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">낙찰금액:</span>
+                                              <span className="font-semibold text-green-600">
+                                                {item.sucsfbidAmt ? Number(item.sucsfbidAmt).toLocaleString() + '원' : '-'}
+                                              </span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <span className="text-gray-500">낙찰일자:</span>
+                                              <span className="font-medium">{item.fnlSucsfDate ? String(item.fnlSucsfDate).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : 'N/A'}</span>
+                                            </div>
+                                            {item.bidwinnrAdrs && (
+                                              <div className="pt-2 border-t border-gray-100">
+                                                <div className="text-gray-500 text-xs mb-1">주소:</div>
+                                                <div className="text-xs text-gray-600 line-clamp-2">{item.bidwinnrAdrs}</div>
+                                              </div>
+                                            )}
+                                            {item.bidwinnrTelNo && (
+                                              <div className="pt-2 border-t border-gray-100">
+                                                <div className="text-gray-500 text-xs mb-1">전화번호:</div>
+                                                <div className="text-xs text-gray-600">{item.bidwinnrTelNo}</div>
+                                              </div>
+                                            )}
+                                          </div>
                 </div>
               );
             })}
