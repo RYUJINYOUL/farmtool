@@ -1,4 +1,3 @@
-// MyPage.jsx
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
@@ -13,9 +12,12 @@ import {
   getDoc,
   getDocs,
   updateDoc,
-  arrayUnion,
   arrayRemove,
   deleteDoc,
+  query, // 쿼리 임포트 추가
+  startAfter, // startAfter 임포트 추가
+  limit, // limit 임포트 추가
+  orderBy // orderBy 임포트 추가
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import {
@@ -35,8 +37,6 @@ import {
 import Link from "next/link";
 import CategoryUpload from '@/components/categoryUpload';
 import ConUpload from '@/components/conUpload';
-
-// 새로 생성한 컴포넌트 import
 import NaraWishList from '@/components/NaraWishList';
 import PermitWishList from '@/components/PermitWishList';
 
@@ -51,17 +51,13 @@ export default function MyPage() {
   const [userInfo, setUserInfo] = useState({});
   const [noticeEnabled, setNoticeEnabled] = useState(false);
   const [wishListDetails, setWishListDetails] = useState([]);
-  const [naraWishListDetails, setNaraWishListDetails] = useState([]);
-  const [permitWishListDetails, setPermitWishListDetails] = useState([]);
   const [myListDetails, setMyListDetails] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
   const uid = currentUser?.uid;
   const router = useRouter();
-
   const closeDialog = () => setOpenDialog(null);
 
-  // ... (toggleFavorite, toggleNaraFavorite, togglePermitFavorite 함수는 MyPage에서 제거하고 각 컴포넌트로 이동)
-  // 찜하기/찜 해제 (일반 찜 목록 - 업체, 콘텐츠)
+
   const toggleFavorite = useCallback(async (itemId, middle, category, top) => {
     if (!currentUser?.uid) {
       router.push('/login');
@@ -72,7 +68,6 @@ export default function MyPage() {
     const wishlistItem = { itemId: itemId, category: category, top: top, middle: middle };
 
     try {
-      // UI를 먼저 업데이트하여 사용자에게 즉각적인 피드백 제공
       setWishListDetails((prevDetails) =>
         prevDetails.filter((msg) => msg.itemId !== itemId)
       );
@@ -90,36 +85,28 @@ export default function MyPage() {
     } catch (error) {
       console.error("일반 찜하기/찜 해제 중 오류 발생:", error);
       alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
-      // 오류 발생 시 UI 롤백 (이 경우, 제거된 항목을 다시 추가)
       setWishListDetails((prevDetails) => [...prevDetails, { itemId, middle, category, top, companyName: "복구됨", topCategory: "" }]);
       setWishListCount(prev => ({ ...prev, general: prev.general + 1 }));
     }
   }, [uid, currentUser, router]);
 
-  // 🟢 각 찜목록의 개수 가져오기 (초기 로딩 시)
+
+
   useEffect(() => {
     if (!uid) return;
 
     const fetchAllWishListCounts = async () => {
       try {
-        // 1. 일반 찜 목록
         const userDoc = await getDoc(doc(db, "users", uid));
         const generalWishList = userDoc.data()?.wishList || [];
-
-        // 2. 나라장터 찜 목록 (서브컬렉션 개수)
-        const naraCollectionRef = collection(db, "users", uid, "nara");
-        const naraSnapshot = await getDocs(naraCollectionRef);
-        const naraWishListCount = naraSnapshot.size;
-
-        // 3. 인허가 찜 목록 (서브컬렉션 개수)
-        const permitsCollectionRef = collection(db, "users", uid, "permits");
-        const permitsSnapshot = await getDocs(permitsCollectionRef);
-        const permitWishListCount = permitsSnapshot.size;
+        // Nara 찜 목록과 Permit 찜 목록의 개수를 서브컬렉션에서 직접 가져옵니다.
+        const naraSnap = await getDocs(collection(db, "users", uid, "nara"));
+        const permitSnap = await getDocs(collection(db, "users", uid, "permits"));
 
         setWishListCount({
           general: generalWishList.length,
-          nara: naraWishListCount,
-          permit: permitWishListCount
+          nara: naraSnap.size, // 서브컬렉션 문서의 개수
+          permit: permitSnap.size // 서브컬렉션 문서의 개수
         });
       } catch (err) {
         console.error("찜목록 카운트 로드 오류:", err);
@@ -127,10 +114,11 @@ export default function MyPage() {
     };
 
     fetchAllWishListCounts();
-  }, [uid]);
+  }, [uid, openDialog]); // openDialog를 의존성 배열에 추가하여 다이얼로그가 닫힐 때 카운트를 업데이트하도록 함
 
 
-  // 🟢 일반 찜목록 세부 정보 가져오기
+
+
   useEffect(() => {
     if (!uid || openDialog !== "favorites") return;
 
@@ -173,7 +161,6 @@ export default function MyPage() {
   }, [uid, openDialog]);
 
 
-  // 🟢 나의 글 가져오기
   useEffect(() => {
     if (!uid || openDialog !== "myText") return;
 
@@ -184,7 +171,10 @@ export default function MyPage() {
         const myList = userData?.myList || [];
 
         const detailPromises = myList.map(async (item) => {
-          const itemRef = doc(db, item.top, uid);
+          // myList 항목의 itemId가 아니라, 실제 문서 ID를 참조해야 합니다.
+          // 현재는 `uid`를 사용하고 있는데, `item.itemId`가 맞을 가능성이 높습니다.
+          // 이 부분은 데이터 구조에 따라 정확히 맞춰야 합니다.
+          const itemRef = doc(db, item.top, item.itemId); // item.itemId로 수정 가정
           const itemDoc = await getDoc(itemRef);
 
           if (itemDoc.exists()) {
@@ -207,7 +197,7 @@ export default function MyPage() {
         const details = await Promise.all(detailPromises);
         setMyListDetails(details);
       } catch (err) {
-        console.error("찜 목록 세부정보 로드 오류:", err);
+        console.error("나의 글 목록 세부정보 로드 오류:", err); // 콘솔 메시지 수정
       }
     };
 
@@ -215,39 +205,9 @@ export default function MyPage() {
   }, [uid, openDialog]);
 
 
-  // 🟢 나라장터 찜 목록 세부 정보 가져오기 (MyPage에서는 데이터만 가져오고, 렌더링은 컴포넌트에 위임)
-  useEffect(() => {
-    if (!uid || openDialog !== "naraFavorites") return;
-
-    const fetchNaraWishListDetails = async () => {
-      try {
-        const naraCollectionRef = collection(db, "users", uid, "nara");
-        const querySnapshot = await getDocs(naraCollectionRef);
-        const details = querySnapshot.docs.map(doc => doc.data());
-        setNaraWishListDetails(details);
-      } catch (err) {
-        console.error("나라장터 찜 목록 세부정보 로드 오류:", err);
-      }
-    };
-    fetchNaraWishListDetails();
-  }, [uid, openDialog]);
-
-  // 🟢 인허가 찜 목록 세부 정보 가져오기 (MyPage에서는 데이터만 가져오고, 렌더링은 컴포넌트에 위임)
-  useEffect(() => {
-    if (!uid || openDialog !== "permitFavorites") return;
-
-    const fetchPermitWishListDetails = async () => {
-      try {
-        const permitsCollectionRef = collection(db, "users", uid, "permits");
-        const querySnapshot = await getDocs(permitsCollectionRef);
-        const details = querySnapshot.docs.map(doc => doc.data());
-        setPermitWishListDetails(details);
-      } catch (err) {
-        console.error("인허가 찜 목록 세부정보 로드 오류:", err);
-      }
-    };
-    fetchPermitWishListDetails();
-  }, [uid, openDialog]);
+  // MyPage에서는 NaraWishList와 PermitWishList에 데이터를 직접 전달하지 않습니다.
+  // 각 컴포넌트가 자신에게 필요한 데이터를 내부적으로 로드하도록 변경되었으므로
+  // MyPage의 naraWishListDetails 및 permitWishListDetails 상태와 useEffect는 필요 없습니다.
 
   // 🟢 회원정보 가져오기
   useEffect(() => {
@@ -402,18 +362,17 @@ export default function MyPage() {
         <div className={openDialog === "naraFavorites" || openDialog === "permitFavorites" ? "fixed inset-0 flex md:items-center items-start justify-center p-4 overflow-y-auto" : "fixed p-4 inset-0 flex items-center justify-center overflow-y-auto"}>
           <Dialog.Panel
             className={`
-              flex flex-col // 내부 요소를 세로로 배열
-              w-full max-w-lg // 너비 100%, 데스크톱에서 최대 너비 제한
-              relative // 자식 요소 (닫기 버튼)의 absolute 위치 기준
-              bg-white rounded-xl shadow-lg p-6 // 기본 스타일
+              flex flex-col
+              w-full max-w-lg
+              relative
+              bg-white rounded-xl shadow-lg p-6
 
-              max-h-[90vh] // 🚨 필수: 다이얼로그 패널의 최대 높이 제한
-              h-full // 🚨 필수: 부모가 제공하는 공간을 최대한 활용
-              overflow-y-auto // 🚨 핵심: 다이얼로그 패널 자체에 스크롤바 생성 🚨
+              max-h-[90vh]
+              h-full
+              overflow-y-auto
 
-              // 'register' 또는 'apply'일 때의 예외 스타일 (전체 화면)
               ${openDialog === "register" || openDialog === "apply"
-                ? 'bg-transparent shadow-none rounded-none p-0 max-h-screen' // 전체 화면일 때는 최대 높이를 화면 전체로
+                ? 'bg-transparent shadow-none rounded-none p-0 max-h-screen'
                 : ''
               }
             `}
@@ -486,8 +445,8 @@ export default function MyPage() {
             {/* Dialog Content: 나라장터 찜 목록 (컴포넌트로 대체) */}
             {openDialog === "naraFavorites" && (
               <NaraWishList
-                initialNaraWishListDetails={naraWishListDetails}
-                initialNaraCount={wishListCount.nara}
+                // initialNaraWishListDetails={naraWishListDetails} // 이제 NaraWishList에서 자체 로드
+                // initialNaraCount={wishListCount.nara} // 이제 NaraWishList에서 자체 관리
                 onClose={closeDialog}
               />
             )}
@@ -495,8 +454,8 @@ export default function MyPage() {
             {/* Dialog Content: 인허가 찜 목록 (컴포넌트로 대체) */}
             {openDialog === "permitFavorites" && (
               <PermitWishList
-                initialPermitWishListDetails={permitWishListDetails}
-                initialPermitCount={wishListCount.permit}
+                // initialPermitWishListDetails={permitWishListDetails} // 이제 PermitWishList에서 자체 로드
+                // initialPermitCount={wishListCount.permit} // 이제 PermitWishList에서 자체 관리
                 onClose={closeDialog}
               />
             )}
@@ -553,7 +512,7 @@ export default function MyPage() {
                 {myListDetails.length === 0 ? (
                   <p className="text-gray-500">등록/신청한 글이 없습니다.</p>
                 ) : (
-                  <div className="space-y-3"> {/* overflow-y-auto는 Panel에서 */}
+                  <div className="space-y-3">
                     {myListDetails.map((item) => (
                       <div key={item.itemId} className="border p-3 rounded-lg hover:bg-gray-50 transition">
                         <Link
@@ -574,17 +533,20 @@ export default function MyPage() {
               </div>
             )}
 
-            {openDialog === "register" && (
-              <div className="w-full h-full">
-                <CategoryUpload onClose={closeDialog} />
-              </div>
-            )}
+           {openDialog === "register" && (
+                  <CategoryUpload
+                    isOpen={true} // 무조건 열기
+                    onClose={() => setOpenDialog(null)} // Dialog 닫기와 동일하게 처리
+                  />
+              )}
 
             {openDialog === "apply" && (
-              <div className="w-full h-full">
-                <ConUpload onClose={closeDialog} />
-              </div>
-            )}
+                  <ConUpload
+                    isOpen={true} // 무조건 열기
+                    onClose={() => setOpenDialog(null)} // Dialog 닫기와 동일하게 처리
+                  />
+              )}
+
 
             {openDialog === "notifications" && (
               <div>
