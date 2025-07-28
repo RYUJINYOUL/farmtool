@@ -5,7 +5,7 @@ import Header2 from '@/components/ui/Header2'
 const layout = ({ children }) => {
   return (
   
-      <div className="w-full min-h-screen bg-white">
+      <div className="w-full min-h-screen bg-gray-50">
         <div>
        {/* <LoginOutButton /> */}
          <Header2 />
