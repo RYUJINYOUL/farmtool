@@ -2,19 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { auth } from '../../firebase';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
 import { signInWithCustomToken } from 'firebase/auth';
-import { useDispatch, useSelector } from 'react-redux';
-import app, { db } from "../../firebase"; // 클라이언트 SDK 초기화
+import { useDispatch } from 'react-redux';
+import { auth, db } from '@/firebase';
 import { setUser } from "@/store/userSlice";
 import {
-    doc,
-    setDoc,
-    getDoc,
-    serverTimestamp,
-  } from "firebase/firestore";
-import { saveFcmToken } from "@/lib/fcm";  
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "firebase/firestore";
+import { saveFcmToken } from "@/lib/fcm";
 
 const KakaoAuthPage = () => {
   const dispatch = useDispatch();
@@ -28,105 +27,114 @@ const KakaoAuthPage = () => {
     const errorParam = searchParams.get('error');
 
     if (errorParam) {
-        setLoadingMessage(`로그인 실패: ${errorParam}`);
-        router.push(`/login?error=${errorParam}`);
-        return;
+      setLoadingMessage(`로그인 실패: ${errorParam}`);
+      router.push(`/login?error=${errorParam}`);
+      return;
     }
 
     if (customToken) {
       setLoadingMessage("건설톡 로그인 중...");
+
       signInWithCustomToken(auth, customToken)
-        .then( async (userCredential) => {
-          const user = userCredential.user;  
+        .then(async (userCredential) => {
+          const user = userCredential.user;
+
+          // Redux에 사용자 정보 저장
           dispatch(setUser({
             uid: user.uid,
-            displayName: user.displayName, // 커스텀 토큰 클레임에 displayName이 포함될 수 있음
-            photoURL: user.photoURL,     // 커스텀 토큰 클레임에 photoURL이 포함될 수 있음
-            email: user.email,           // 커스텀 토큰 클레임에 email이 포함될 수 있음
+            displayName: user.displayName ?? "",
+            photoURL: user.photoURL ?? "",
+            email: user.email ?? "",
           }));
-    
-     
-           const userDocRef = doc(db, "users", user.uid);
-           const userDocSnap = await getDoc(userDocRef);
 
+          // FCM 토큰 처리
           let fcmToken = null;
-            try {
-              fcmToken = await saveFcmToken(user.uid);
-            } catch (error) {
-              console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
-            }
-    
-    
+          try {
+            fcmToken = await saveFcmToken(user.uid);
+          } catch (err) {
+            console.error("⚠️ FCM 토큰 저장 실패:", err);
+          }
 
-            if (userDocSnap.exists()) {
-                // 문서가 이미 존재하면 업데이트
-                await updateDoc(userDocRef, {
-                    email: user.email, // email, displayName, photoURL은 변경될 수 있으므로 업데이트.
-                    displayName: user.displayName || null,
-                    photoURL: user.photoURL || null,
-                    // fcmToken: fcmToken, // 토큰은 로그인 시마다 업데이트하는 것이 좋음
-                    pushTime: serverTimestamp(), // 로그인 시간도 업데이트
-                    // wishList, permit, nara, job 등은 사용자가 직접 조작하는 데이터이므로 여기서 덮어쓰지 않음
-                    // badge, notice 등은 초기값으로 설정하거나, 앱 로직에 따라 결정
-                });
-                console.log("기존 사용자 문서 업데이트 완료.");
-            } else {
-                // 문서가 존재하지 않으면 새로 생성 (초기값 설정)
-                await setDoc(userDocRef, {
-                    email: user.email,
-                    createdAt: serverTimestamp(), // 최초 생성 시에만 설정
-                    displayName: user.displayName || null,
-                    photoURL: user.photoURL || null,
-                    fcmToken: fcmToken,
-                    badge: 0,
-                    notice: false,
-                    pushTime: serverTimestamp(),
-                    userKey: user.uid,
-                    wishList: [],
-                    permit: [],
-                    nara: [],
-                    job: []
-                });
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            try {
+              await updateDoc(userRef, {
+                email: user.email ?? null,
+                displayName: user.displayName ?? null,
+                photoURL: user.photoURL ?? null,
+                fcmToken: fcmToken,
+                pushTime: serverTimestamp(),
+              });
+              console.log("✅ 기존 사용자 문서 업데이트 완료.");
+            } catch (err) {
+              console.error("🔥 사용자 문서 업데이트 실패:", err);
             }
-    
+          } else {
+            try {
+              await setDoc(userRef, {
+                email: user.email ?? null,
+                displayName: user.displayName ?? null,
+                photoURL: user.photoURL ?? null,
+                fcmToken: fcmToken,
+                createdAt: serverTimestamp(),
+                pushTime: serverTimestamp(),
+                badge: 0,
+                notice: false,
+                userKey: user.uid,
+                wishList: [],
+                permit: [],
+                nara: [],
+                job: [],
+              });
+              console.log("✅ 신규 사용자 문서 생성 완료.");
+            } catch (err) {
+              console.error("🔥 사용자 문서 생성 실패:", err);
+            }
+          }
+
           router.push('/');
         })
         .catch((error) => {
+          console.error("❌ Firebase 인증 실패:", error);
           setLoadingMessage("건설톡 로그인 실패!");
           router.push('/login?error=firebase_auth_failed');
         });
+
     } else if (code) {
       setLoadingMessage("인증 코드 처리 중...");
-      const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_PROD; // `.env.local`에서 정의된 값 사용
-      
 
+      const functionsUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL_PROD;
       if (!functionsUrl) {
-          setLoadingMessage("환경 설정 오류: 함수 URL 없음.");
-          router.push('/login?error=config_error');
-          return;
+        setLoadingMessage("환경 설정 오류: 함수 URL 없음.");
+        router.push('/login?error=config_error');
+        return;
       }
 
       fetch(`${functionsUrl}?code=${code}`)
-        .then(response => {
-          if (!response.ok && !response.redirected) {
-             return response.text().then(text => {
-                 throw new Error(`Backend call failed: ${response.status} - ${text}`);
-             });
+        .then(async (response) => {
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Backend call failed: ${response.status} - ${text}`);
           }
+          // 백엔드에서 redirect 처리된 경우 이 코드가 실행되지 않을 수 있음
         })
-        .catch(error => {
+        .catch((error) => {
+          console.error("❌ 백엔드 처리 오류:", error);
           setLoadingMessage("백엔드 처리 중 오류 발생!");
           router.push(`/login?error=backend_call_failed&details=${error.message}`);
         });
+
     } else {
       setLoadingMessage("잘못된 접근입니다.");
       router.push('/login?error=invalid_access');
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, dispatch]);
 
   return (
-    <div>
-      <p>{loadingMessage}</p>
+    <div className="p-8 text-center">
+      <p className="text-gray-700">{loadingMessage}</p>
     </div>
   );
 };
