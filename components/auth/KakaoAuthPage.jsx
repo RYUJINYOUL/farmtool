@@ -77,7 +77,7 @@ const KakaoAuthPage = () => {
                 email: user.email ?? null,
                 displayName: user.displayName ?? null,
                 photoURL: user.photoURL ?? null,
-                fcmToken: fcmToken,
+                fcmToken: fcmToken || null,
                 createdAt: serverTimestamp(),
                 pushTime: serverTimestamp(),
                 badge: 0,
