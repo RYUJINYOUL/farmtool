@@ -101,7 +101,7 @@ const Header2 = ({children}) => {
         {/* ▼ 아래로 내려간 카테고리 메뉴 */}
         {/* {(homeCategory === '건설업' ||
           homeCategory === '건설장비' ||
-          homeCategory === '공사자재' ||
+          homeCategory === '건설자재' ||
           homeCategory === '인허가' ||
           homeCategory === '나라장터' ||
           homeCategory === '구인구직' ||

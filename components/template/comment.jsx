@@ -54,7 +54,7 @@ const Comment = ({ id, col, path, urls }) => {
         const data = doc.data();
         return {
           id: doc.id,
-          name: data.name ?? "익명",
+          name: data.name ?? "",
           description: data.description,
           createdDate: data.createdDate,
           uid: data.uid, // 댓글 작성자 UID도 가져옴 (필요시 삭제 버튼 노출에 사용)
@@ -95,7 +95,7 @@ const Comment = ({ id, col, path, urls }) => {
     }
     try {
       await addDoc(collection(db, col, id, "comments"), {
-        "name": currentUser?.name ?? "익명",
+        "name": currentUser?.displayName ?? "알수없음",
         "description": data.description,
         "createdDate": new Date(),
         "uid": currentUser.uid, // 댓글 작성자 UID 저장

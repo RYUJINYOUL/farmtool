@@ -37,7 +37,7 @@ export default function Menu(props) {
       src: "/equipment",
     },
     {
-      label: "공사자재",
+      label: "건설자재",
       src: "/materials",
     },
     {

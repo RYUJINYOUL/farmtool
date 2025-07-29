@@ -198,7 +198,7 @@ const RegisterPage = () => {
         <div className="w-full max-w-md bg-white/10 rounded-2xl shadow-lg p-10 flex flex-col items-center">
           <h1 className="text-3xl font-bold text-white mb-4">회원가입</h1>
           <p className="text-white/80 mb-8">건설톡에 오신 것을 환영합니다!</p>
-                            <button
+                            {/* <button
             className="w-full flex items-center justify-center gap-2 py-3 mb-6 rounded-xl bg-white text-black font-semibold shadow hover:bg-gray-100 transition"
                                 onClick={handleGoogleSign}
                                 >
@@ -217,7 +217,7 @@ const RegisterPage = () => {
                 <path d="M16 11c-1.375 0-2.5 1.125-2.5 2.5s1.125 2.5 2.5 2.5 2.5-1.125 2.5-2.5-1.125-2.5-2.5-2.5zM22 11c-1.375 0-2.5 1.125-2.5 2.5s1.125 2.5 2.5 2.5 2.5-1.125 2.5-2.5-1.125-2.5-2.5-2.5z" fill="#000000"/>
               </svg>
               <span>카카오로 회원가입</span>
-            </button>               
+            </button>                */}
 
 
           <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -252,7 +252,7 @@ const RegisterPage = () => {
               className="w-full px-4 py-3 rounded-lg bg-white/80 border border-gray-300 placeholder-gray-500 text-sm focus:outline-none focus:border-blue-400 focus:bg-white"
                                 name='passwordConfirm'
                                 type='password'
-                                placeholder="passwordConfirm"
+                                placeholder="비밀번호 확인"
                                 {...register("passwordConfirm", { required: '비밀번호 확인은 필수입니다.', 
                                 validate: (value) => 
                                     value === watch('password') || '비밀번호가 일치하지 않습니다'

@@ -1,20 +1,16 @@
+
 import React from 'react'
-import LoginOutButton from '@/components/ui/LoginOutButton'
+
 import Header2 from '@/components/ui/Header2'
 
 const layout = ({ children }) => {
+
   return (
-  
-      <div className="w-full min-h-screen bg-gray-50">
-        <div>
-       {/* <LoginOutButton /> */}
-         <Header2 />
-       </div>
-        <div className="px-4 py-8">
-          {children}
-        </div>
-      </div>
-    
+    <div className="w-full h-full bg-gray-50">
+     <Header2>
+      {children}
+    </Header2>   
+    </div>
   )
 }
 
