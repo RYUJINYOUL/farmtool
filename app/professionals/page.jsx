@@ -12,7 +12,7 @@ import ConOffer from "@/components/middle/professionals/ConOffer"
 import { saram, regions, hierarchicalRegions } from '@/lib/constants';
 
 
-const Page = () => {
+const Page = ({ searchParams }) => {
   // 상태 변수들을 직접 관리
   const [showIndustryList, setShowIndustryList] = useState(false);
   const [showRegionList, setShowRegionList] = useState(false);
@@ -20,6 +20,8 @@ const Page = () => {
   const [selectedIndustries, setSelectedIndustries] = useState("전체");
   const [selectedRegions, setSelectedRegions] = useState('전국');
   const [selectedSubRegions, setSelectedSubRegions] = useState('');
+  const initialTabFromUrl = searchParams.tab || "account";
+  const [pag, setPag] = useState(initialTabFromUrl)
 
   
   const hselectedRegion = hierarchicalRegions.find(region => region.name === selectedRegions) || { subRegions: [] };
@@ -44,7 +46,7 @@ const Page = () => {
     <div className='relative md:top-10 bg-gray-50 top-10'>
       <section className='flex justify-center items-center m-4'>
       <div className="md:w-[1100px] w-full lg:mt-10 pt-3.5">
-        <Tabs defaultValue="account" className="w-full">
+        <Tabs value={pag} onValueChange={setPag} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="account">전문인력 구직</TabsTrigger>
           <TabsTrigger value="upload">전문인력 구인</TabsTrigger>

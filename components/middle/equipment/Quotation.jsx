@@ -198,7 +198,9 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
             <div className='flex flex-row items-center gap-3'>
               <button
                 className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
-                onClick={() => push(listBasePath)}
+                onClick={() => {
+                   push(`${listBasePath}?tab=upload`);
+                }}
               >목록</button>
               {currentUser?.uid === postAuthorUid && (
                 <>
