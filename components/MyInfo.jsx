@@ -78,9 +78,14 @@ export default function MyInfo() {
       const constructionDocRef = doc(db, top, itemId);
       const userDocRef = doc(db, "users", userId);
 
-      await updateDoc(constructionDocRef, {
-        favorites: arrayRemove(userId)
-      });
+     const constructionDocSnap = await getDoc(constructionDocRef);
+
+      if (constructionDocSnap.exists()) {
+        await updateDoc(constructionDocRef, {
+          favorites: arrayRemove(userId)
+        });
+      }
+
       await updateDoc(userDocRef, {
         wishList: arrayRemove(wishlistItem)
       });
@@ -446,7 +451,7 @@ export default function MyInfo() {
                   <p className="text-gray-500">찜한 항목이 없습니다.</p>
                 ) : (
                   <div className="space-y-3">
-                    {wishListDetails.map((item) => {
+                    {wishListDetails.map((item, idx) => {
                       const isWishListed =
                         Array.isArray(item.favorites) && uid
                           ? item.favorites.includes(uid)
@@ -454,7 +459,7 @@ export default function MyInfo() {
 
                       return (
                         <div
-                          key={item.itemId}
+                          key={idx}
                           className="border p-3 rounded-lg hover:bg-gray-50 transition"
                         >
                           <Link
