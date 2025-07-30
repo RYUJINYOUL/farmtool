@@ -69,7 +69,7 @@ export default async function ArchitecturalPermitsPage({ searchParams }: Archite
 
 
   return (
-    <div className='min-h-screen bg-gray-50 pt-15'>
+    <div className='min-h-screen bg-gray-50 md:pt-10 pt-5'>
     <main style={{ maxWidth: '1100px', margin: '40px auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
 
       {/* 검색 컨트롤 컴포넌트 */}

@@ -35,15 +35,10 @@ import {
   LayoutGrid,
   Stamp,
 } from "lucide-react";
-import Link from "next/link";
-import CategoryUpload from '@/components/middle/construction/categoryUpload';
-import ConUpload from '@/components/middle/construction/conUpload';
-import NaraWishList from '@/components/NaraWishList';
-import JobWishList from '@/components/JobWishList';
-import PermitWishList from '@/components/PermitWishList';
 
 
-export default function MyInfo() {
+
+export default function MainMenu() {
   const [openDialog, setOpenDialog] = useState(null);
   const [wishListCount, setWishListCount] = useState({
     general: 0,
@@ -57,7 +52,7 @@ export default function MyInfo() {
   const { currentUser } = useSelector((state) => state.user);
   const uid = currentUser?.uid;
   const router = useRouter();
-  const closeDialog = () => setOpenDialog(null);
+  const { push } = useRouter();
 
 
   const toggleFavorite = useCallback(async (itemId, middle, category, top) => {
@@ -274,27 +269,27 @@ export default function MyInfo() {
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
               <button
-                onClick={() => checkLoginAndOpenDialog("favorites")}
+                onClick={() => push("/construction")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <Heart className="w-5 h-5 text-pink-500" />
-                  <span className="font-medium text-gray-800">일반 찜 목록</span>
+                  <span className="font-medium text-gray-800">건설업</span>
                 </div>
-                <span className="text-gray-400 text-sm">{wishListCount.general}개</span>
+              
               </button>
             </div>
 
             <div className="w-full md:w-1/2">
               <button
-                onClick={() => checkLoginAndOpenDialog("naraFavorites")}
+                onClick={() => push("/equipment")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <LayoutGrid className="w-5 h-5 text-orange-500" />
-                  <span className="font-medium text-gray-800">나라장터 찜 목록</span>
+                  <span className="font-medium text-gray-800">건설장비</span>
                 </div>
-                <span className="text-gray-400 text-sm">{wishListCount.nara}개</span>
+              
               </button>
             </div>
           </div>
@@ -303,27 +298,27 @@ export default function MyInfo() {
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
               <button
-                onClick={() => checkLoginAndOpenDialog("permitFavorites")}
+                onClick={() => push("/materials")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <Stamp className="w-5 h-5 text-blue-400" />
-                  <span className="font-medium text-gray-800">인허가 찜 목록</span>
+                  <span className="font-medium text-gray-800">건설자재</span>
                 </div>
-                <span className="text-gray-400 text-sm">{wishListCount.permit}개</span>
+              
               </button>
             </div>
 
             <div className="w-full md:w-1/2">
               <button
-                onClick={() => checkLoginAndOpenDialog("job")}
+                onClick={() => push("/permit")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <UserPen className="w-5 h-5 text-blue-500" />
-                  <span className="font-medium text-gray-800">구인구직 찜 목록</span>
+                  <span className="font-medium text-gray-800">인허가</span>
                 </div>
-                 <span className="text-gray-400 text-sm">{wishListCount.job}개</span>
+                
               </button>
             </div>
           </div>
@@ -332,26 +327,26 @@ export default function MyInfo() {
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
               <button
-                onClick={() => checkLoginAndOpenDialog("profile")}
+                onClick={() => push("nara")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <UserCog className="w-5 h-5 text-red-400" />
-                  <span className="font-medium text-gray-800">회원정보 수정</span>
+                  <span className="font-medium text-gray-800">나라장터낙찰</span>
                 </div>
               </button>
             </div>
 
             <div className="w-full md:w-1/2">
                <button
-                onClick={() => checkLoginAndOpenDialog("myText")}
+                onClick={() => push("/job")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <FileUser className="w-5 h-5 text-red-500" />
-                  <span className="font-medium text-gray-800">등록글과 신청글</span>
+                  <span className="font-medium text-gray-800">구인구직</span>
                 </div>
-                <span className="text-gray-400 text-sm">{wishListCount.myList}개</span>
+                
               </button>
             </div>
           </div>
@@ -360,34 +355,34 @@ export default function MyInfo() {
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
                <button
-                onClick={() => checkLoginAndOpenDialog("register")}
+                onClick={() => push("/professionals")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <Building2 className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-gray-800">업체 등록</span>
+                  <span className="font-medium text-gray-800">전문인력</span>
                 </div>
               </button>
             </div>
 
             <div className="w-full md:w-1/2">
               <button
-                onClick={() => checkLoginAndOpenDialog("apply")}
+                onClick={() => push("/myinfo")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
                   <Dock className="w-5 h-5 text-amber-500" />
-                  <span className="font-medium text-gray-800">주문 신청</span>
+                  <span className="font-medium text-gray-800">내정보</span>
                 </div>
               </button>
             </div>
           </div>
 
           {/* 다섯 번째 줄: 고객센터 (단일 버튼) */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2"> {/* md:w-1/2를 유지하여 다른 버튼과 너비 통일 */}
+          {/* <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
+            <div className="w-full md:w-1/2"> 
               <button
-                onClick={() => checkLoginAndOpenDialog("notifications")}
+                onClick={() => push("/login")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
@@ -399,10 +394,10 @@ export default function MyInfo() {
                 </span>
               </button>
             </div>
-            {/* 여기에 필요한 경우 두 번째 컬럼을 위한 빈 div 또는 다른 요소를 추가할 수 있습니다. */}
+            
             <div className="hidden md:block w-full md:w-1/2">
             <button
-                onClick={() => checkLoginAndOpenDialog("help")}
+                onClick={() => push("/login")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
@@ -410,246 +405,12 @@ export default function MyInfo() {
                   <span className="font-medium text-gray-800">고객센터</span>
                 </div>
               </button>
-            </div> {/* 데스크톱에서 공간 유지를 위한 빈 div */}
-          </div>
+            </div> 
+          </div> */}
         </div>
       </div>
 
-      {/* Dialog UI */}
-      <Dialog open={!!openDialog} onClose={closeDialog} className="relative z-50">
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        <div className={openDialog === "naraFavorites" || openDialog === "permitFavorites" ? "fixed inset-0 flex md:items-center items-start justify-center p-4 overflow-y-auto" : "fixed p-4 inset-0 flex items-center justify-center overflow-y-auto"}>
-          <Dialog.Panel
-            className={`
-              flex flex-col
-              w-full max-w-lg
-              relative
-              bg-white rounded-xl shadow-lg p-6
-
-              max-h-[90vh]
-              h-full
-              overflow-y-auto
-
-              ${openDialog === "register" || openDialog === "apply"
-                ? 'bg-transparent shadow-none rounded-none p-0 max-h-screen'
-                : ''
-              }
-              ${(openDialog === "naraFavorites" || openDialog === "permitFavorites") ? "md:w-[1100px]" : ""}
-            `}
-          >
-            <button
-              onClick={closeDialog}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 z-10"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Dialog Content: 일반 찜 목록 */}
-            {openDialog === "favorites" && (
-              <div className="flex-shrink-0">
-                <Dialog.Title className="text-xl font-bold mb-4">일반 찜 목록</Dialog.Title>
-                {wishListDetails.length === 0 ? (
-                  <p className="text-gray-500">찜한 항목이 없습니다.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {wishListDetails.map((item, idx) => {
-                      const isWishListed =
-                        Array.isArray(item.favorites) && uid
-                          ? item.favorites.includes(uid)
-                          : false;
-
-                      return (
-                        <div
-                          key={idx}
-                          className="border p-3 rounded-lg hover:bg-gray-50 transition"
-                        >
-                          <Link
-                            href={`/${item.category}/${item.middle}/${item.itemId}`}
-                            className="block"
-                          >
-                            <div className="flex flex-row items-center justify-between">
-                              <div>
-                                <div className="font-semibold text-gray-800">
-                                  {item.companyName}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {item.topCategory}
-                                </div>
-                              </div>
-                              <div>
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    toggleFavorite(item.itemId, item.middle, item.category, item.top);
-                                  }}
-                                  className="rounded-full"
-                                >
-                                  {isWishListed ? (
-                                    <IoIosHeart color="red" size={20} />
-                                  ) : (
-                                    <IoMdHeartEmpty size={20} />
-                                  )}
-                                </button>
-                              </div>
-                            </div>
-                          </Link>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Dialog Content: 구인구직 찜 목록 (컴포넌트로 대체) */}
-            {openDialog === "job" && (
-              <JobWishList
-                onClose={closeDialog}
-              />
-            )}
-
-            {/* Dialog Content: 나라장터 찜 목록 (컴포넌트로 대체) */}
-            {openDialog === "naraFavorites" && (
-              <NaraWishList
-                onClose={closeDialog}
-              />
-            )}
-
-            {/* Dialog Content: 인허가 찜 목록 (컴포넌트로 대체) */}
-            {openDialog === "permitFavorites" && (
-              <PermitWishList
-                onClose={closeDialog}
-              />
-            )}
-
-            {openDialog === "profile" && (
-              <div>
-                <Dialog.Title className="text-xl font-bold mb-4">회원정보 수정</Dialog.Title>
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target);
-                    const newName = formData.get("displayName");
-
-                    try {
-                      await updateDoc(doc(db, "users", uid), {
-                        displayName: newName,
-                      });
-                      alert("회원정보 수정 완료!");
-                      setUserInfo((prev) => ({ ...prev, displayName: newName }));
-                      closeDialog();
-                    } catch (error) {
-                      console.error("회원정보 수정 오류:", error);
-                      alert("회원정보 수정 중 오류가 발생했습니다.");
-                    }
-                  }}
-                >
-                  <div className="mb-4">
-                    <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">
-                      이름
-                    </label>
-                    <input
-                      type="text"
-                      id="displayName"
-                      name="displayName"
-                      defaultValue={userInfo?.displayName || ""}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                    >
-                      저장
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {openDialog === "myText" && (
-              <div>
-                <Dialog.Title className="text-xl font-bold mb-4">등록글과 신청글</Dialog.Title>
-                {wishListCount.myList.length === 0 ? (
-                  <p className="text-gray-500">등록/신청한 글이 없습니다.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {myListDetails.map((item) => (
-                      <div key={item.itemId || uid } className="border p-3 rounded-lg hover:bg-gray-50 transition">
-                        <Link
-                          href={`/${item.category}/${item.middle}/${item.id || uid}`}
-                          className="block"
-                        >
-                          <div className="font-semibold text-gray-800">
-                            {item.companyName}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {item.topCategory}
-                          </div>
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-           {openDialog === "register" && (
-                  <CategoryUpload
-                    isOpen={true}
-                    onClose={() => setOpenDialog(null)}
-                  />
-              )}
-
-            {openDialog === "apply" && (
-                  <ConUpload
-                    isOpen={true}
-                    onClose={() => setOpenDialog(null)}
-                  />
-              )}
-
-
-            {openDialog === "notifications" && (
-              <div>
-                <Dialog.Title className="text-xl font-bold mb-4">알림 설정</Dialog.Title>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">앱 알림 활성화</span>
-                  <button
-                    onClick={toggleNotice}
-                    className={`px-4 py-2 rounded-md ${
-                      noticeEnabled ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    {noticeEnabled ? "ON" : "OFF"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {openDialog === "help" && (
-              <div>
-                <Dialog.Title className="text-xl font-bold mb-4">고객센터</Dialog.Title>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
-                    <Phone className="w-5 h-5 text-gray-600" />
-                    <a href="tel:010-1234-5678" className="text-gray-800 font-medium">
-                      전화 문의: 010-1234-5678
-                    </a>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
-                    <MessageSquare className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-800 font-medium">
-                      카카오톡 문의: @채널명
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Dialog.Panel>
-        </div>
-      </Dialog>
+     
     </div>
 
   );

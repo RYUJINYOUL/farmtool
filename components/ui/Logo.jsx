@@ -27,7 +27,7 @@ function Logo(props) {
         </div> */}
         <div className='cursor-pointer flex flex-row items-center' onClick={onClickLogo} >
            
-            <div className={cn('font-semibold md:text-[20px] text-[18px] text-black cursor-pointer whitespace-nowrap pl-4', 
+            <div className={cn('font-semibold md:text-[20px] text-[20px] text-black cursor-pointer whitespace-nowrap pl-4', 
             total.total&&"text-black",
             // pathname!=="/"&&"text-black",
           )}

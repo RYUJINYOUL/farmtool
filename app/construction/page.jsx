@@ -21,7 +21,8 @@ const Page = ({ searchParams }) => {
   const [selectedIndustries, setSelectedIndustries] = useState("전체");
   const [selectedRegions, setSelectedRegions] = useState('전국');
   const [selectedSubRegions, setSelectedSubRegions] = useState('');
-  const initialTabFromUrl = searchParams.tab || "account";
+  const resolvedSearchParams = React.use(searchParams);
+  const initialTabFromUrl = resolvedSearchParams.tab || "account";
   const [pag, setPag] = useState(initialTabFromUrl)
 
   

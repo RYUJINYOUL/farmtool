@@ -1,49 +1,53 @@
 "use client"
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
-import React, { useMemo } from 'react'
-import { FaHeart } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import React from 'react'
+import { useSelector } from 'react-redux';
 import useUIState from "@/hooks/useUIState";
 import { cn } from "@/lib/utils"
 import { getAuth, signOut } from 'firebase/auth';
 import app from '../../firebase';
-import { useSelector } from 'react-redux';
-import { useDispatch } from "react-redux";
-import { AiTwotoneNotification } from "react-icons/ai";
-import { BsChatText } from "react-icons/bs";
 
 function Navigator() {
     const { push } = useRouter();
-    const pathname = usePathname()
     const dispatch = useDispatch();
     const auth = getAuth(app);
     const { currentUser, clearUser } = useSelector(state => state.user)
     const { homeCategory, setHomeCategory, setHeaderImageSrc } = useUIState();
     const homeCategoryList = [
-         {
-          label: "홈",
-          src: "/",
-        },
-        {
-          label: "안내",
-          src: "/si",
-        },
-        {
-          label: "오시는길",
-          src: "/map",
-        },
-        {
-          label: "교육일정",
-          src: "/cal",
-        },
-          {
-          label: "게시판",
-          src: "/ta",
-        },
+     {
+      label: "건설업",
+      src: "/construction",
+    },
+    {
+      label: "건설장비",
+      src: "/equipment",
+    },
+    {
+      label: "건설자재",
+      src: "/materials",
+    },
+    {
+      label: "인허가",
+      src: "/permit",
+    },
+    {
+      label: "나라장터낙찰",
+      src: "/nara",
+    },
+    {
+      label: "구인구직",
+      src: "/job",
+    },
+    {
+      label: "전문인력",
+      src: "/professionals",
+    },
+     {
+      label: "내정보",
+      src: "/myinfo",
+    },
     ];
-
-
     const onClickCategory = (item) => {
       if (homeCategory === item.label) {
         setHeaderImageSrc("");
@@ -51,6 +55,7 @@ function Navigator() {
       } else {
         setHeaderImageSrc(item.src);
         setHomeCategory(item.label);
+        console.log(item.label)
       }
     };
 
@@ -69,7 +74,7 @@ function Navigator() {
   return (
     <div>
       <section className='flex flex-row pl-7 pt-4 pb-4 gap-5'>
-        <div className='text-[14px] text-white items-center hover:text-[#f9f9f8]'
+        <div className='text-[14px] text-black items-center hover:text-[#f9f9f8]'
         onClick={
           (currentUser.uid === undefined) 
           ? handleLogin
@@ -77,8 +82,8 @@ function Navigator() {
           handleLogout
         }
         >{(currentUser.uid === undefined) ? "로그인" : "로그아웃"}</div>
-        <div className='text-[14px] text-white items-center'>|</div>
-        <div className='text-[14px] text-white items-center hover:text-[#f9f9f8]'
+        <div className='text-[14px] text-black items-center'>|</div>
+        <div className='text-[14px] text-black items-center hover:text-[#f9f9f8]'
         onClick={() => {push("/register", {scroll: false})}}
         >회원가입</div>
       </section>
@@ -89,7 +94,7 @@ function Navigator() {
                  onClick={() => onClickCategory(item)}
                  key={item.label}
                  className={cn(
-                   "h-[38px] text-white min-w-fit px-2 flex justify-start items-center border border-transparent rounded-lg hover:bg-gray-200",
+                   "h-[38px] text-black min-w-fit px-2 flex justify-start items-center border border-transparent rounded-lg hover:bg-gray-200",
                    item.label === homeCategory &&
                      "underline underline-offset-8"
                  )}

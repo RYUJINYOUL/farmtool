@@ -24,10 +24,10 @@ import { cn } from "@/lib/utils";
 const HeaderDrawer = ({ children }) => {
   return (<Drawer direction='left'>
   <DrawerTrigger>{children}</DrawerTrigger>
-  <DrawerContent className='w-[320px] h-full'>
-  <nav className='w-[320px] h-full border-r-[1px] border-neutral-600 '>
-        <div className='p-[24px]'><Logo total={true}/></div>
-        <div className='bg-[#7f88e8] h-full'><Navigator /></div>
+  <DrawerContent className='w-[240px] h-full'>
+  <nav className='w-[240px] h-full border-r-[1px] border-neutral-600 '>
+        <div className='p-[24px] bg-gray-50'><Logo total={true}/></div>
+        <div className='bg-gray-50 h-full'><Navigator /></div>
       </nav>
   </DrawerContent>
 </Drawer>
@@ -73,15 +73,14 @@ const Header2 = ({children}) => {
 
        <PagePadding>  
    <section className={cn('absolute w-full top-0 left-0 flex md:h-[62px] h-[55px] z-10 items-start md:justify-center sm:justify-between', 
-    isScrolled&&"md:bg-white bg-[#4a5937]", 
-    )}>
+    isScrolled&&"md:bg-white bg-gray-50")}>
       
    <div className='flex flex-col'>
-      <div className='md:absolute sm:absolute lg:relative lg:w-[1100px] w-full flex items-center justify-between'>
+      <div className='md:absolute sm:absolute lg:relative lg:w-[1100px] w-full flex items-center justify-between sm:justify-between'>
           <section
         className={cn(
           'absolute w-full top-0 left-0 z-10',
-          isScrolled && 'md:bg-white bg-[#4a5937]',
+          isScrolled && 'md:bg-white bg-bg-gray-50',
         )}
       >
         {/* 헤더: 좌중앙우 */}
@@ -92,10 +91,17 @@ const Header2 = ({children}) => {
           </div>
           
 
-          {/* 우측: 메뉴 */}
-          <div>
-            <Menu total={isScrolled} />
-          </div>
+          <section className='flex items-center'>
+              <article className='hidden lg:block'>
+              <Menu total={isScrolled} />
+              </article>
+
+              <HeaderDrawer>
+              <article className='lg:hidden pr-5'>
+              <GiHamburgerMenu className={cn("text-black", isScrolled&&"text-black")} size={30} />
+              </article>
+              </HeaderDrawer>
+            </section>
         </div>
 
         {/* ▼ 아래로 내려간 카테고리 메뉴 */}
