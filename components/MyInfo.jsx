@@ -176,7 +176,7 @@ export default function MyInfo() {
         const myList = userData?.myList || [];
 
         const detailPromises = myList.map(async (item) => {
-          const itemRef = doc(db, item.top, uid);
+          const itemRef = doc(db, item.top, item.id);
           const itemDoc = await getDoc(itemRef);
 
           if (itemDoc.exists()) {

@@ -177,6 +177,18 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
           await deleteAssociatedImages(postImageUrls);
         }
 
+         const itemToRemove = {
+                      category: "equipment", 
+                      top : 'equipApply',
+                      middle: "apply",  
+                      id: id, 
+                    };
+        
+                  const userDocRef = doc(db, "users", currentUser?.uid);
+                  await updateDoc(userDocRef, {
+                    myList: arrayRemove(itemToRemove),
+                  });
+
         await deleteDoc(doc(db, col, id));
         alert("게시물이 삭제되었습니다.");
         push(listBasePath);

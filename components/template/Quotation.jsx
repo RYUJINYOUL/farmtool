@@ -3,12 +3,11 @@
   import React, { useEffect, useState } from 'react';
   import moment from 'moment';
   import { useForm } from 'react-hook-form';
-  import { collection, addDoc, onSnapshot, arrayRemove, query, orderBy, doc, deleteDoc, updateDoc, getDocs } from "firebase/firestore";
-  import { storage } from '../../firebase';
+  import { collection, addDoc, onSnapshot, getDoc, arrayRemove, query, orderBy, doc, deleteDoc, updateDoc, getDocs } from "firebase/firestore";
+  import { storage, db } from '../../firebase';
   import { useSelector } from 'react-redux';
   import { useRouter } from "next/navigation";
   import { ref as strRef, deleteObject } from "firebase/storage"; // 이미지 삭제
-  import { db } from '../../firebase';
   import Link from "next/link";
   import EditUpload from "@/components/middle/construction/EditUpload"
 
@@ -24,7 +23,7 @@
     const getUserDivision = async (uid) => {
       try {
         const userDocRef = doc(db, "users", uid);
-        const userDocSnap = await userDocRef.get(); // get() 메서드 사용
+        const userDocSnap = await getDoc(userDocRef); // get() 메서드 사용
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           return userData.division || null;
@@ -180,6 +179,7 @@
 
           const itemToRemove = {
               category: "construction", 
+              top : 'conApply',
               middle: "apply",  
               id: id, 
             };

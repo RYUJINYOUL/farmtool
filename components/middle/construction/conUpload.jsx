@@ -306,7 +306,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   const userDocRef = doc(db, "users", userUid);
     const category = CATEGORY_LINK[englishCategoryToSave];
   
-      const wishlistItem = { category: category, id: id, middle: 'apply' };  //top 삭제 id로 저장
+      const wishlistItem = { category: category, id: id, middle: 'apply', top: englishCategoryToSave };  //top 삭제 id로 저장
       if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
           batch.update(userDocRef, {
               division: arrayUnion(
