@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, getDoc } from "firebase/firestore"; // getDoc 추가
-import { storage } from '../../firebase'; // storage만 가져옴
+import { updateDoc, arrayRemove, collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, getDoc } from "firebase/firestore"; // getDoc 추가
+import { storage } from '../../../firebase'; // storage만 가져옴
 import { useSelector } from 'react-redux';
 import { useRouter } from "next/navigation";
 import { ref as strRef, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import useUIState from "@/hooks/useUIState";
-import { db } from '../../firebase'; // Firestore db 인스턴스를 직접 가져오도록 변경
-
+import { db } from '../../../firebase'; // Firestore db 인스턴스를 직접 가져오도록 변경
+ import EditUpload from "@/components/middle/materials/EditUpload2"
 
 const Comment = ({ id, col, path, urls }) => {
   const { register, reset, handleSubmit, formState: { errors } } = useForm();
@@ -18,7 +18,7 @@ const Comment = ({ id, col, path, urls }) => {
   const [postAuthorUid, setPostAuthorUid] = useState(null); // 게시물 작성자 UID 상태
   const { currentUser } = useSelector(state => state.user);
   const { push } = useRouter();
-  const { homeCategory, setHomeCategory, setHeaderImageSrc } = useUIState();
+  const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
 
   // 현재 게시물 작성자 UID를 가져오는 useEffect (한 번만 실행)
   useEffect(() => {
@@ -29,7 +29,7 @@ const Comment = ({ id, col, path, urls }) => {
         const postSnap = await getDoc(postRef);
         if (postSnap.exists()) {
           const data = postSnap.data();
-          setPostAuthorUid(data.uid); // 게시물 데이터에서 UID 필드를 가져와 저장
+          setPostAuthorUid(data.userKey); // 게시물 데이터에서 UID 필드를 가져와 저장
         }
       } catch (error) {
         console.error("Error fetching post author UID:", error);
@@ -154,6 +154,17 @@ const Comment = ({ id, col, path, urls }) => {
           await deleteAssociatedImages(urls);
         }
 
+         const itemToRemove = {
+                              category: col, 
+                              top : col,
+                              middle: "registration",  
+                            };
+                
+                          const userDocRef = doc(db, "users", currentUser?.uid);
+                          await updateDoc(userDocRef, {
+                            myList: arrayRemove(itemToRemove),
+                          });
+
         await deleteDoc(doc(db, col, mainDocId));
 
         alert("게시물과 모든 관련 데이터가 성공적으로 삭제되었습니다.");
@@ -168,6 +179,16 @@ const Comment = ({ id, col, path, urls }) => {
       alert("게시물 삭제를 취소합니다.");
     }
   };
+
+
+  function openCategory () {
+      if (currentUser?.uid) {
+        setIsUserProfileModalOpen(true)
+      } else {
+        push('/login') // router.push 대신 props로 받은 push 사용 또는 useRouter()로 가져오기
+      }
+    }
+
 
   return (
     <div>
@@ -189,6 +210,12 @@ const Comment = ({ id, col, path, urls }) => {
                   className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
                   onClick={() => { deleteMainDocumentAndComments(id) }}
                 >게시물 삭제</button>
+              )}
+              {currentUser?.uid === postAuthorUid && (
+                <button
+                      className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
+                      onClick={() => openCategory()}
+                    >게시물 수정</button>
               )}
             </div>
           </div>
@@ -260,6 +287,13 @@ const Comment = ({ id, col, path, urls }) => {
           )}
         </div>
       </section>
+
+      <EditUpload
+                isOpen={isUserProfileModalOpen}
+                onClose={() => setIsUserProfileModalOpen(false)}
+                col={col}
+                id={id}
+              />
     </div>
   );
 };

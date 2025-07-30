@@ -176,7 +176,7 @@ export default function MyInfo() {
         const myList = userData?.myList || [];
 
         const detailPromises = myList.map(async (item) => {
-          const itemRef = doc(db, item.top, item.id);
+          const itemRef = doc(db, item.top, item.id || uid);
           const itemDoc = await getDoc(itemRef);
 
           if (itemDoc.exists()) {
@@ -571,9 +571,9 @@ export default function MyInfo() {
                 ) : (
                   <div className="space-y-3">
                     {myListDetails.map((item) => (
-                      <div key={item.itemId} className="border p-3 rounded-lg hover:bg-gray-50 transition">
+                      <div key={item.itemId || uid } className="border p-3 rounded-lg hover:bg-gray-50 transition">
                         <Link
-                          href={`/${item.category}/${item.middle}/${item.id}`}
+                          href={`/${item.category}/${item.middle}/${item.id || uid}`}
                           className="block"
                         >
                           <div className="font-semibold text-gray-800">

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import moment from 'moment';
-import Comment from '@/components/template/comment';
+import Comment from '@/components/middle/materials/comment';
 import { doc, getDoc } from "firebase/firestore";
 import PlayListCarousel4 from '@/components/PlayListCarousel4';
 import { db } from '@/firebase'; // @/firebase에서 db 가져오기

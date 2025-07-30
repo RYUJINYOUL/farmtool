@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import moment from 'moment';
-import Comment from '@/components/template/comment';
+import Comment from '@/components/middle/construction/comment';
 import { doc, getDoc } from "firebase/firestore";
 import PlayListCarousel4 from '@/components/PlayListCarousel4';
 import { db } from '@/firebase'; // @/firebase에서 db 가져오기
@@ -38,16 +38,17 @@ const Page = (props) => {
           const formattedMessage = {
             id: docSnap.id, // 문서 ID
             address: data.address || '', // 필드가 없을 경우를 대비해 기본값 설정
+
+            companyName: data.construction_name || data.construction_companyName || '',
             businessLicense: data.construction_businessLicense || '',
             constructionExperience: data.construction_constructionExperience || '',
+            phoneNumber: data.construction_phoneNumber || '',
             contactPerson: data.construction_contactPerson || '',
+
             imageDownloadUrls: data.imageDownloadUrls || [], // 배열이 아닐 경우 빈 배열
             createdDate: data.createdDate ? data.createdDate.toDate() : null, // Timestamp 변환
             SubCategories: data.SubCategories || [], // 배열이 아닐 경우 빈 배열
-            companyName: data.construction_name || data.construction_companyName || '',
             favorites: data.favorites || [], // 배열이 아닐 경우 빈 배열
-            phoneNumber: data.construction_phoneNumber || '',
-            // JSX에서 사용하던 필드 이름도 추가 (예: title, description, name)
             title: data.title || '', // Firebase 문서에 title 필드가 있다면
             description: data.description || '', // Firebase 문서에 description 필드가 있다면
             name: data.name || '', // Firebase 문서에 name 필드가 있다면
