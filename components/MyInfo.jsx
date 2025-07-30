@@ -105,12 +105,14 @@ export default function MyInfo() {
         const naraSnap = await userDoc.data()?.nara || [];
         const permitSnap = await userDoc.data()?.permit || [];
         const jobSnap = await userDoc.data()?.job || [];
+        const myListSnap = await userDoc.data()?.myList || []
 
         setWishListCount({
           general: generalWishList.length,
           nara: naraSnap.length, // 서브컬렉션 문서의 개수
           permit: permitSnap.length, // 서브컬렉션 문서의 개수
-          job: jobSnap.length
+          job: jobSnap.length,
+          myList: myListSnap.length
 
         });
       } catch (err) {
@@ -174,7 +176,7 @@ export default function MyInfo() {
         const myList = userData?.myList || [];
 
         const detailPromises = myList.map(async (item) => {
-          const itemRef = doc(db, item.top, item.itemId);
+          const itemRef = doc(db, item.top, uid);
           const itemDoc = await getDoc(itemRef);
 
           if (itemDoc.exists()) {
@@ -343,6 +345,7 @@ export default function MyInfo() {
                   <FileUser className="w-5 h-5 text-red-500" />
                   <span className="font-medium text-gray-800">등록글과 신청글</span>
                 </div>
+                <span className="text-gray-400 text-sm">{wishListCount.myList}개</span>
               </button>
             </div>
           </div>
@@ -563,14 +566,14 @@ export default function MyInfo() {
             {openDialog === "myText" && (
               <div>
                 <Dialog.Title className="text-xl font-bold mb-4">등록글과 신청글</Dialog.Title>
-                {myListDetails.length === 0 ? (
+                {wishListCount.myList.length === 0 ? (
                   <p className="text-gray-500">등록/신청한 글이 없습니다.</p>
                 ) : (
                   <div className="space-y-3">
                     {myListDetails.map((item) => (
                       <div key={item.itemId} className="border p-3 rounded-lg hover:bg-gray-50 transition">
                         <Link
-                          href={`/${item.category}/${item.middle}/${item.itemId}`}
+                          href={`/${item.category}/${item.middle}/${item.id}`}
                           className="block"
                         >
                           <div className="font-semibold text-gray-800">

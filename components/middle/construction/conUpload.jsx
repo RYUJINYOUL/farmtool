@@ -54,6 +54,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { push } = useRouter();
+  const timestamp = Date.now();
 
   // 폼 데이터 관리용 통합 상태
   const [formState, setFormState] = useState({
@@ -196,6 +197,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     let imageUrls = [];
     const batch = writeBatch(db);
     const userUid = currentUser.uid;
+    const id = `${userUid}-${timestamp}`;
 
     try {
       if (imageFiles.length > 0) {
@@ -247,7 +249,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
 
     if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
-      const categoryUserDocRef = doc(db, englishCategoryToSave, userUid);
+      const categoryUserDocRef = doc(db, englishCategoryToSave, id);   
       const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
       const categoryCollectionData = {
@@ -274,7 +276,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
 
 
    if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
-      const categoryUserDocRef = doc(db, "users", userUid, englishCategoryToSave, englishCategoryToSave)
+      const categoryUserDocRef = doc(db, "users", userUid, englishCategoryToSave, id)   //id
       const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
       const categoryCollectionData = {
@@ -304,7 +306,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   const userDocRef = doc(db, "users", userUid);
     const category = CATEGORY_LINK[englishCategoryToSave];
   
-      const wishlistItem = { category: category, top: englishCategoryToSave, middle: 'apply' };
+      const wishlistItem = { category: category, id: id, middle: 'apply' };  //top 삭제 id로 저장
       if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
           batch.update(userDocRef, {
               division: arrayUnion(

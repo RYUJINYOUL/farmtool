@@ -3,7 +3,7 @@
   import React, { useEffect, useState } from 'react';
   import moment from 'moment';
   import { useForm } from 'react-hook-form';
-  import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDoc, getDocs } from "firebase/firestore";
+  import { collection, addDoc, onSnapshot, arrayRemove, query, orderBy, doc, deleteDoc, updateDoc, getDocs } from "firebase/firestore";
   import { storage } from '../../firebase';
   import { useSelector } from 'react-redux';
   import { useRouter } from "next/navigation";
@@ -177,6 +177,17 @@
           if (postImageUrls && postImageUrls.length > 0) {
             await deleteAssociatedImages(postImageUrls);
           }
+
+          const itemToRemove = {
+              category: "construction", 
+              middle: "apply",  
+              id: id, 
+            };
+
+          const userDocRef = doc(db, "users", currentUser?.uid);
+          await updateDoc(userDocRef, {
+            myList: arrayRemove(itemToRemove),
+          });
 
           await deleteDoc(doc(db, col, id));
           alert("게시물이 삭제되었습니다.");
