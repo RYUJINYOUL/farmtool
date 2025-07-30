@@ -48,7 +48,9 @@ export default function MyInfo() {
   const [wishListCount, setWishListCount] = useState({
     general: 0,
     nara: 0,
-    permit: 0
+    permit: 0,
+    job: 0,
+    myList: 0
   });
   const [userInfo, setUserInfo] = useState({});
   const [noticeEnabled, setNoticeEnabled] = useState(false);
