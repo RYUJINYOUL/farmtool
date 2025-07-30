@@ -21,16 +21,17 @@ import {
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import {
-  Bell,
-  Heart,
-  UserCog,
-  Building2,
-  HelpCircle,
+  Copyright,
+  Tractor,
+  LaptopMinimalCheck,
+  Fence,
+  BrickWallFire,
   X,
   Phone,
   MessageSquare,
   Dock,
   UserPen,
+  Hammer,
   FileUser,
   LayoutGrid,
   Stamp,
@@ -273,7 +274,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <Heart className="w-5 h-5 text-pink-500" />
+                  <BrickWallFire className="w-5 h-5 text-pink-500" />
                   <span className="font-medium text-gray-800">건설업</span>
                 </div>
               
@@ -286,7 +287,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <LayoutGrid className="w-5 h-5 text-orange-500" />
+                  <Tractor className="w-5 h-5 text-orange-500" />
                   <span className="font-medium text-gray-800">건설장비</span>
                 </div>
               
@@ -302,7 +303,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <Stamp className="w-5 h-5 text-blue-400" />
+                  <Fence className="w-5 h-5 text-blue-400" />
                   <span className="font-medium text-gray-800">건설자재</span>
                 </div>
               
@@ -315,7 +316,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <UserPen className="w-5 h-5 text-blue-500" />
+                  <Copyright className="w-5 h-5 text-blue-500" />
                   <span className="font-medium text-gray-800">인허가</span>
                 </div>
                 
@@ -331,7 +332,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <UserCog className="w-5 h-5 text-red-400" />
+                  <LaptopMinimalCheck className="w-5 h-5 text-red-400" />
                   <span className="font-medium text-gray-800">나라장터낙찰</span>
                 </div>
               </button>
@@ -343,7 +344,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <FileUser className="w-5 h-5 text-red-500" />
+                  <UserPen className="w-5 h-5 text-red-500" />
                   <span className="font-medium text-gray-800">구인구직</span>
                 </div>
                 
@@ -359,7 +360,7 @@ export default function MainMenu() {
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
                 <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-green-500" />
+                  <Hammer className="w-5 h-5 text-green-500" />
                   <span className="font-medium text-gray-800">전문인력</span>
                 </div>
               </button>
