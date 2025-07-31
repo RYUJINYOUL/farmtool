@@ -21,7 +21,7 @@ exports.kakaoCallback = onRequest(
       const kakaoKey = KAKAO_KEY.value();
       const redirectUriProd = KAKAO_REDIRECT_URI_PROD.value();
 
-      const frontendFinalRedirectUri = "https://farmtool.vercel.app/kakao";
+      const frontendFinalRedirectUri = "https://www.cstalk.kr/kakao";
       const kakaoRedirectUriForKakaoAPI = redirectUriProd;
 
 
@@ -73,7 +73,7 @@ exports.kakaoCallback = onRequest(
       return res.redirect(`${frontendFinalRedirectUri}?token=${customToken}`);
 
     } catch (e) {
-      const frontendFinalRedirectUri = "https://farmtool.vercel.app/kakao";
+      const frontendFinalRedirectUri = "https://www.cstalk.kr/kakao";
       return res.status(500).redirect(`${frontendFinalRedirectUri}?error=auth_failed_unhandled&details=${e.message}`);
     }
   }
