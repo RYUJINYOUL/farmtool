@@ -555,6 +555,7 @@ export default function NaraBidList() {
       const url = `${API_URL}?${params.join('&')}`;
       const res = await fetch(url);
       const contentType = res.headers.get('content-type');
+      console.log(url)
       let data;
       if (contentType && contentType.includes('application/json')) {
         data = await res.json();
