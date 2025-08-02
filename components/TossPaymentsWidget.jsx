@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { loadPaymentWidget, ANONYMOUS } from '@tosspayments/payment-widget-sdk';
+import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk"
 
 const TossPaymentsWidget = ({
   orderId,
@@ -16,18 +16,23 @@ const TossPaymentsWidget = ({
   widgetSelector = '#payment-widget',
   agreementSelector = '#agreement-widget',
 }) => {
+  // 환경 변수 (NEXT_PUBLIC_ 접두사 필수)
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
   const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
   const failUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_FAIL_URL;
-
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  // Ref를 사용하여 위젯 객체 참조
   const paymentWidgetRef = useRef(null);
-  const paymentMethodsWidgetRef = useRef(null); // 이 ref는 필요에 따라 계속 사용
+  const widgetRef = useRef(null);
+  const paymentMethodsWidgetRef = useRef(null);
   const agreementWidgetRef = useRef(null);
 
+  // 로딩 및 에러 상태 관리
   const [isLoadingWidget, setIsLoadingWidget] = useState(true);
   const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
+    // 환경 변수 유효성 검사
     if (!clientKey) {
       console.error("Error: NEXT_PUBLIC_TOSS_CLIENT_KEY is not defined.");
       setLoadError("결제 위젯을 로드할 수 없습니다: 클라이언트 키 누락.");
@@ -37,34 +42,38 @@ const TossPaymentsWidget = ({
 
     const initializeWidget = async () => {
       try {
-        const paymentWidget = await loadPaymentWidget(clientKey, ANONYMOUS);
+        const paymentWidget = await loadTossPayments(clientKey);
         paymentWidgetRef.current = paymentWidget;
 
-        if (variant === 'default') {
-          // ⭐️ paymentWidget.renderPaymentMethods()의 반환값을 바로 사용
-          const methodsWidget = paymentWidget.renderPaymentMethods(
-            widgetSelector,
-            { value: amount },
-            { variant: 'default' }
-          );
-          paymentMethodsWidgetRef.current = methodsWidget; 
+
+        const widgets = paymentWidget.widgets({ customerKey: ANONYMOUS });
+        widgetRef.current = widgets;
+
+        widgets.setAmount({
+          currency: 'KRW',
+          value: amount,
+        });
+
+        const widgetElement = document.querySelector(widgetSelector);
+        const agreementElement = document.querySelector(agreementSelector);
+
+        if (!widgetElement || !agreementElement) {
+          // 요소가 없으면 에러를 기록하고 함수를 종료
+          console.error("Error: Payment widget or agreement element not found in the DOM.");
+          setLoadError("결제 위젯을 렌더링할 요소를 찾을 수 없습니다.");
+          setIsLoadingWidget(false);
+          return;
         }
 
-        agreementWidgetRef.current = paymentWidget.renderAgreement(
-          agreementSelector,
-          { variant: isAgreementOnly ? 'agreement' : 'default' }
-        );
+        await widgets.renderPaymentMethods({
+          selector: widgetSelector,
+          variantKey: "default"
+        });
 
-        // ✅ paymentWidget (상위 객체)에는 updateOptions가 없을 수 있으므로 이 부분은 제거
-        // paymentWidget.updateOptions({
-        //   amount,
-        //   orderName,
-        //   customerName,
-        // });
-
+        //  paymentMethodsWidgetRef.current = paymentMethodWidget;
+        
         setIsLoadingWidget(false);
         console.log("Toss Payments Widget loaded and rendered successfully.");
-
       } catch (error) {
         console.error("Error loading Toss Payments widget:", error);
         setLoadError(`결제 위젯 로딩 중 오류 발생: ${error.message}`);
@@ -78,60 +87,45 @@ const TossPaymentsWidget = ({
        if (paymentWidgetRef.current) {
          paymentWidgetRef.current.destroy();
        }
-     };
-  }, [amount, orderName, customerName, variant, isAgreementOnly, widgetSelector, agreementSelector, clientKey]);
+    };
+  }, [amount, clientKey, widgetSelector, agreementSelector]);
 
   const requestPayment = useCallback(async () => {
-    if (isLoadingWidget) {
-      console.warn("Payment widget is still loading. Please wait.");
-      return;
-    }
-    if (loadError) {
-      console.error("Cannot request payment due to a widget loading error.");
-      alert(`결제 위젯 오류: ${loadError}`);
-      return;
-    }
-    if (!paymentWidgetRef.current) {
-      console.error("Payment widget reference is null after loading check.");
-      return;
-    }
-    if (!confirmUrl || !failUrl) {
-      console.error("Firebase Functions URLs are not defined in .env.local.");
-      alert("결제 처리 URL이 설정되지 않았습니다. 개발자에게 문의하세요.");
-      return;
+    // const paymentMethodsWidget = paymentMethodsWidgetRef.current;
+    // const paymentWidget = paymentWidgetRef.current;
+    const widgets = widgetRef.current;
+    if (!widgets) {
+        console.error("Payment methods widget is not initialized.");
+        alert("결제 위젯이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.");
+        return;
     }
 
     try {
-      const paymentResult = await paymentWidgetRef.current.requestPayment({
-        orderId,
-        orderName,
-        successUrl: confirmUrl,
-        failUrl: failUrl,
-        customerName,
-        amount,
-      });
-
-      console.log('Payment request initiated:', paymentResult);
-      if (onSuccess) {
-        onSuccess(paymentResult.paymentKey, orderId, amount);
-      }
-
-    } catch (error) {
-      console.error("Error during payment request:", error);
-      if (onFail) {
-        onFail(error.code, error.message, orderId);
-      } else {
-        alert(`결제 요청 실패: ${error.message} (코드: ${error.code || 'UNKNOWN'})`);
-      }
+        // const paymentMethod = await paymentMethodsWidget.getSelectedPaymentMethod();
+        await widgets.requestPayment({
+          orderId,
+          orderName: "토스 티셔츠 외 2건",
+          successUrl: confirmUrl,
+          failUrl: failUrl,
+          customerEmail: "ryussi0925@gmail.com",
+          customerName: "유씨",
+        })
+        console.log("Payment request initiated.");
+        // console.log("Selected payment method:", paymentMethod);
+     } catch (error) {
+        console.error("Error getting selected payment method:", error);
+        alert(`결제 방법 선택 중 오류 발생: ${error.message}`);
     }
-  }, [isLoadingWidget, loadError, orderId, orderName, customerName, amount, confirmUrl, failUrl, onSuccess, onFail]);
+}, [isLoadingWidget, loadError, orderId, orderName, customerName, amount, confirmUrl, failUrl, onSuccess, onFail]);
 
 
   return (
     <div>
+      {/* 위젯이 렌더링될 영역 */}
       <div id="payment-widget" style={{ width: '100%', minHeight: '200px' }} />
       <div id="agreement-widget" style={{ width: '100%', minHeight: '100px', marginTop: '20px' }} />
 
+      {/* 로딩 및 에러 메시지 */}
       {isLoadingWidget && (
         <div style={{ textAlign: 'center', padding: '50px' }}>결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
       )}
@@ -141,7 +135,8 @@ const TossPaymentsWidget = ({
         </div>
       )}
 
-      {!isLoadingWidget && !loadError && ( // 이 조건부 렌더링은 여전히 유효
+      {/* 결제 버튼 (위젯 로딩 성공 시에만 표시) */}
+      {!isLoadingWidget && !loadError && (
         <button
           onClick={requestPayment}
           disabled={isLoadingWidget || !!loadError}
