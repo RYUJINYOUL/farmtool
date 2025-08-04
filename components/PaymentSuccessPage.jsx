@@ -18,7 +18,7 @@ const PaymentSuccessPage = () => {
   const [status, setStatus] = useState("결제 승인 중...");
   const [isError, setIsError] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     const auth = getAuth(app);
     let isMounted = true;
 
@@ -41,11 +41,30 @@ const PaymentSuccessPage = () => {
         finalConfirmUrl.searchParams.append("collectionName", collectionName);
         finalConfirmUrl.searchParams.append("subscriptionPeriodInMonths", subscriptionPeriodInMonths);
 
-        // ✅ 직접 리다이렉트
-        window.location.href = finalConfirmUrl.toString();
+        const response = await fetch(finalConfirmUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${idToken}`,
+            'Content-Type': 'application/json', // JSON 응답을 기대한다는 헤더 추가
+          },
+        });
+
+        const result = await response.json(); // 응답을 JSON으로 파싱
+
+        if (!response.ok) {
+          // 서버에서 보낸 에러 응답 처리
+          throw new Error(result.message || '결제 승인 중 알 수 없는 오류 발생');
+        }
+
+        // 서버에서 보낸 성공 응답 처리
+        setStatus("✅ 결제가 성공적으로 처리되었습니다.");
+        setIsError(false);
+
+        // TODO: 결제 성공 후 사용자에게 보여줄 정보를 result 객체에서 가져와 사용
+
       } catch (err) {
         console.error("결제 승인 중 오류 발생:", err);
-        setStatus("⚠️ 결제 승인 중 예기치 못한 오류가 발생했습니다.");
+        setStatus(`⚠️ 결제 승인 중 예기치 못한 오류가 발생했습니다: ${err.message}`);
         setIsError(true);
       }
     });
@@ -54,7 +73,8 @@ const PaymentSuccessPage = () => {
       isMounted = false;
       unsubscribe();
     };
-  }, [confirmUrl, paymentKey, orderId, amount, collectionName, subscriptionPeriodInMonths]);
+}, [confirmUrl, paymentKey, orderId, amount, collectionName, subscriptionPeriodInMonths]);
+
 
   return (
     <div style={{ textAlign: "center", padding: "50px" }}>
