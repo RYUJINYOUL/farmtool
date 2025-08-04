@@ -35,7 +35,7 @@ export default function UserProfileModal({
         moveImage,
         handleFileSelect,
         setImageFiles,
-        setDragActive
+        setDragActive,
 }) {
 
   // 현재 선택된 서브 카테고리 데이터 (Page.js에서 이동)

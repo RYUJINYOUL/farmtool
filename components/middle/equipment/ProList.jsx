@@ -142,6 +142,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
     let currentQuery = query(
       baseQueryRef,
       ...queryConditions,
+      // orderBy("expirationDate", "asc"),
       orderBy("createdDate", "desc")
     );
 

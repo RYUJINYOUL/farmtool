@@ -7,7 +7,8 @@ const cors = require('cors')({ origin: true }); // CORS 미들웨어 추가
 const db = admin.firestore();
 
 const TOSS_SECRET_KEY = defineSecret('TOSS_SECRET_KEY');
-// TOSS_SUCCESS_FRONTEND_URL, TOSS_FAIL_FRONTEND_URL은 이제 사용하지 않습니다.
+const TOSS_SUCCESS_FRONTEND_URL = defineSecret('TOSS_SUCCESS_FRONTEND_URL');
+const TOSS_FAIL_FRONTEND_URL = defineSecret('TOSS_FAIL_FRONTEND_URL');
 
 /**
  * 결제 성공 후 토스페이먼츠로부터 콜백을 받아 결제를 최종 승인합니다.

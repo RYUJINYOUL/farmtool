@@ -133,6 +133,8 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const fetchedUserData = userSnap.data();
+          const expirationDate = fetchedUserData.expirationDate?.toDate() || null;
+          console.log(expirationDate)
           setUserData(fetchedUserData);
           setFormState(prev => ({
             ...prev,
@@ -154,22 +156,17 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
             // amount: fetchedUserData.amount || 0,
             // method: fetchedUserData.method || '',
             // approvedAt: fetchedUserData.approvedAt || '',
-            expirationDate: fetchedUserData.expirationDate || '',
             }
           }));
 
-            // ★ expirationDate 확인 로직 추가 ★
-          const expirationDate = fetchedUserData.expirationDate?.toDate();
+        
+          const expirationDateValue = fetchedUserData.expirationDate?.toDate() || null;
           const now = new Date();
-          if (!expirationDate || expirationDate < now) {
+          if (!expirationDateValue || expirationDateValue < now) {
             setIsExpired(true);
           } else {
             setIsExpired(false);
-          }
-        } else {
-          // 사용자 문서가 없을 경우, 만료로 간주하여 결제 페이지로 이동하도록 설정
-          setIsExpired(true);
-        }
+          }}
       } catch (e) {
         console.error("사용자 데이터 로딩 중 에러:", e);
         setIsExpired(true); // 에러 발생 시 만료로 간주
@@ -184,6 +181,9 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
   // 최종 저장 핸들러
   const handleSaveUsernameAndProfile = async () => {
     // 1. 공통 필수 필드 유효성 검사
+    if (loading || isExpired) {
+      return;
+    }
     if (!formState.address || !formState.geoFirePoint) {
       setError('주소 검색을 통해 정확한 위치를 설정하고 입력해주세요.');
       return;
@@ -262,8 +262,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
       badge: 0,
       notice: false,
       pushTime: serverTimestamp(),
-      createdDate: new Date(),
-      expirationDate: formState.expirationDate
+      createdDate: new Date()
     };
 
     // 모든 데이터를 한 번에 클리닝하여 최종 dataToSave 생성
@@ -280,7 +279,10 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
 
     if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
       const categoryUserDocRef = doc(db, englishCategoryToSave, userUid);
-
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.data();
+      const expirationDate = userData.expirationDate?.toDate() || null;
       // 해당 카테고리에 맞는 동적 필드 데이터만 가져와서 병합 (이미 cleanAndConvertToNull이 적용된 dataToSave에서 추출)
       // dataToSave.categorySpecificData가 이미 cleanAndConvertToNull이 적용된 상태이므로
       // 여기서 또 cleanAndConvertToNull을 호출하는 것은 불필요합니다.
@@ -305,7 +307,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
           notice: dataToSave.notice,
           pushTime: dataToSave.pushTime,
           createdDate: new Date(),
-          expirationDate: dataToSave.expirationDate
+          expirationDate: expirationDate
       };
       batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
   }
@@ -389,6 +391,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
         isOpen={isOpen}
         onClose={onClose}
         formState={formState}
+        
         setFormState={setFormState}
         handleInputChange={handleInputChange}
         error={error}
