@@ -3,8 +3,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require('firebase-functions/params');
 const admin = require('firebase-admin');
 
-// Firestore DB 인스턴스 (필요에 따라 admin.initializeApp() 이전에 초기화)
-// admin.initializeApp(); // 이미 index.js 등에서 초기화되어 있다면 생략
+
 const db = admin.firestore();
 
 const TOSS_SECRET_KEY = defineSecret('TOSS_SECRET_KEY');
@@ -25,6 +24,23 @@ exports.confirmPayment = onRequest(
     const secretKey = TOSS_SECRET_KEY.value();
     const successUrl = TOSS_SUCCESS_FRONTEND_URL.value();
     const failUrl = TOSS_FAIL_FRONTEND_URL.value();
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+        console.error('Authorization header is missing or malformed.');
+        return res.redirect(`${TOSS_FAIL_FRONTEND_URL.value()}?message=${encodeURIComponent('인증 오류')}`);
+    }
+    const idToken = authorizationHeader.split('Bearer ')[1];
+
+    let userId;
+    try {
+        // 2. ID 토큰 검증 및 uid 추출
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        userId = decodedToken.uid;
+    } catch (error) {
+        console.error('Error verifying ID token:', error);
+        return res.redirect(`${TOSS_FAIL_FRONTEND_URL.value()}?message=${encodeURIComponent('인증 토큰이 유효하지 않습니다.')}`);
+    }
+    
 
     // 필수 파라미터 확인에 collectionName 추가
     if (!paymentKey || !orderId || !amount || !collectionName || !subscriptionPeriodInMonths) {
@@ -71,18 +87,29 @@ exports.confirmPayment = onRequest(
       expirationDate.setMonth(approvedAt.getMonth() + Number(subscriptionPeriodInMonths));
 
       // 2. 결제 성공 시 Firestore에 저장
-      const paymentDocRef = db.collection(collectionName).doc(orderId);
-      await paymentDocRef.set({
-        paymentKey: approvalData.paymentKey,
-        amount: approvalData.totalAmount,
-        method: approvalData.method,
-        approvedAt: approvalData.approvedAt,
-        expirationDate: expirationDate,
-        // subscriptionPeriodInMonths: Number(subscriptionPeriodInMonths),
-        // 기타 필요한 정보 추가
-        // timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
-      console.log('Payment successfully confirmed and saved to Firestore:', orderId);
+      // const paymentDocRef = db.collection(collectionName).doc(userId);
+      const userDocRef = db.collection("users").doc(userId);
+     
+
+      // await Promise.all([
+      //   paymentDocRef.set({
+      //         paymentKey: approvalData.paymentKey,
+      //         amount: approvalData.totalAmount,
+      //         method: approvalData.method,
+      //         approvedAt: approvalData.approvedAt,
+      //         expirationDate: expirationDate,
+      //         // subscriptionPeriodInMonths: Number(subscriptionPeriodInMonths),
+      //         // 기타 필요한 정보 추가
+      //         // timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      //       }, { merge: true }),
+       await userDocRef.set({
+              paymentKey: approvalData.paymentKey,
+              amount: approvalData.totalAmount,
+              method: approvalData.method,
+              approvedAt: approvalData.approvedAt,
+              expirationDate: expirationDate,
+            }, { merge: true })
+      // ]);
 
       // 3. 결제 성공 페이지로 리디렉션
       return res.redirect(`${successUrl}?orderId=${orderId}&amount=${amount}`);

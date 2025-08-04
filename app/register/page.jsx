@@ -109,7 +109,8 @@ const RegisterPage = () => {
             wishList: [],
             permit: [],
             nara: [],
-            job: []
+            job: [],
+            expirationDate: ''
         });
 
         dispatch(

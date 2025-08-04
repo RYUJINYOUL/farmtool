@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { db } from '../../../firebase';
 import { doc, getDoc, writeBatch, arrayUnion, GeoPoint, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ import AddressSearchModal from '@/components/AddressSearchModal';
 import imageCompression from 'browser-image-compression';
 import { uploadGrassImage } from '@/hooks/useUploadImage';
 import { KOREAN_TO_ENGLISH_CATEGORIES, CATEGORY_SPECIFIC_FIELDS } from '@/lib/constants';
+import CheckoutPage from "@/app/payments/checkout/page"
 
 // 데이터 클리닝 함수 (변화 없음)
 const cleanAndConvertToNull = (data) => {
@@ -53,6 +54,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { push } = useRouter();
+  const [isExpired, setIsExpired] = useState(false);
 
   // 폼 데이터 관리용 통합 상태
   const [formState, setFormState] = useState({
@@ -132,40 +134,45 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
         if (userSnap.exists()) {
           const fetchedUserData = userSnap.data();
           setUserData(fetchedUserData);
-
-          // fetchedUserData에서 categorySpecificData를 기반으로 formState 업데이트
-          // 기존 certificate, career, phoneNumber는 categorySpecificData 내부에 있을 것으로 가정
           setFormState(prev => ({
             ...prev,
             username: fetchedUserData.username || '',
             TopCategories: fetchedUserData.TopCategories || '전체',
             SubCategories: fetchedUserData.SubCategories || ['전체'],
             address: fetchedUserData.address || '',
-            // 이제 이 필드들은 categorySpecificData에서 가져오거나,
-            // CATEGORY_SPECIFIC_FIELDS 설정을 보고 동적으로 로드해야 합니다.
-            // 일단 'professionals' 카테고리에 속한다고 가정하고 예시를 듭니다.
-            // 만약 모든 카테고리에서 공통으로 사용되는 동적 필드라면 해당 로직을 수정해야 합니다.
-            // certificate: fetchedUserData.categorySpecificData?.professionals?.certificate || '',
-            // career: fetchedUserData.categorySpecificData?.professionals?.career || '',
-            // phoneNumber: fetchedUserData.categorySpecificData?.professionals?.phoneNumber || '',
             geoFirePoint: fetchedUserData.geoFirePoint || null,
             region: fetchedUserData.region || '',
             subRegion: fetchedUserData.subRegion || '',
-            // 이미지 URL은 fetchedUserData에 직접 저장되어 있을 가능성이 높으므로 이대로 유지
             imageDownloadUrls: fetchedUserData.imageDownloadUrls || [],
             categorySpecificData: {
               professionals: fetchedUserData.categorySpecificData?.professionals || {},
               construction: fetchedUserData.categorySpecificData?.construction || {},
               equipment: fetchedUserData.categorySpecificData?.equipment || {},
               materials: fetchedUserData.categorySpecificData?.materials || {},
-              // 필요한 모든 영어 카테고리 이름에 대해 로드 로직 추가
-              // fetch된 categorySpecificData 객체 자체를 초기값으로 사용하여 깊은 병합을 방지
               ...(fetchedUserData.categorySpecificData || {}),
+            // paymentKey: fetchedUserData.paymentKey || '',
+            // amount: fetchedUserData.amount || 0,
+            // method: fetchedUserData.method || '',
+            // approvedAt: fetchedUserData.approvedAt || '',
+            expirationDate: fetchedUserData.expirationDate || '',
             }
           }));
+
+            // ★ expirationDate 확인 로직 추가 ★
+          const expirationDate = fetchedUserData.expirationDate?.toDate();
+          const now = new Date();
+          if (!expirationDate || expirationDate < now) {
+            setIsExpired(true);
+          } else {
+            setIsExpired(false);
+          }
+        } else {
+          // 사용자 문서가 없을 경우, 만료로 간주하여 결제 페이지로 이동하도록 설정
+          setIsExpired(true);
         }
       } catch (e) {
         console.error("사용자 데이터 로딩 중 에러:", e);
+        setIsExpired(true); // 에러 발생 시 만료로 간주
       } finally {
         setLoading(false);
       }
@@ -235,6 +242,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
     } catch (error) {
       console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
     }
+    
 
     // --- 여기부터 dataToSave 생성 로직 변경 ---
     const initialDataToSave = {
@@ -254,7 +262,8 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
       badge: 0,
       notice: false,
       pushTime: serverTimestamp(),
-      createdDate: new Date()
+      createdDate: new Date(),
+      expirationDate: formState.expirationDate
     };
 
     // 모든 데이터를 한 번에 클리닝하여 최종 dataToSave 생성
@@ -296,6 +305,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
           notice: dataToSave.notice,
           pushTime: dataToSave.pushTime,
           createdDate: new Date(),
+          expirationDate: dataToSave.expirationDate
       };
       batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
   }
@@ -365,6 +375,12 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
         <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+
+   if (isExpired) {
+    // const userUid = currentUser.uid;
+    return <CheckoutPage />;
   }
 
   return (

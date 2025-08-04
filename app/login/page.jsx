@@ -157,7 +157,8 @@ const LoginPage = () => {
                     wishList: [],
                     permit: [],
                     nara: [],
-                    job: []
+                    job: [],
+                    expirationDate: ''
                 });
             }
       

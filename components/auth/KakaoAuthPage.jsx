@@ -87,6 +87,7 @@ const KakaoAuthPage = () => {
                 permit: [],
                 nara: [],
                 job: [],
+                expirationDate: ''
               });
               console.log("✅ 신규 사용자 문서 생성 완료.");
             } catch (err) {
