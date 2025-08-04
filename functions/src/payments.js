@@ -72,19 +72,16 @@ exports.confirmPayment = onRequest(
 
       // 2. 결제 성공 시 Firestore에 저장
       const paymentDocRef = db.collection(collectionName).doc(orderId);
-      await paymentDocRef.update({
+      await paymentDocRef.set({
         paymentKey: approvalData.paymentKey,
-        orderId: approvalData.orderId,
         amount: approvalData.totalAmount,
         method: approvalData.method,
-        status: approvalData.status, // 'DONE'
-        requestedAt: approvalData.requestedAt,
         approvedAt: approvalData.approvedAt,
         expirationDate: expirationDate,
-        subscriptionPeriodInMonths: Number(subscriptionPeriodInMonths),
+        // subscriptionPeriodInMonths: Number(subscriptionPeriodInMonths),
         // 기타 필요한 정보 추가
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      });
+        // timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
       console.log('Payment successfully confirmed and saved to Firestore:', orderId);
 
       // 3. 결제 성공 페이지로 리디렉션

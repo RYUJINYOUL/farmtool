@@ -52,9 +52,7 @@ const TossPaymentsWidget = ({
   // 두 번째 useEffect: 위젯 UI 렌더링 및 금액 설정
   useEffect(() => {
     async function renderPaymentWidgets() {
-      if (!widgets) {
-        return;
-      }
+      if (!widgets || ready) return;
       
       try {
         // 결제 금액이 0보다 큰 경우에만 setAmount 호출

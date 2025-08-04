@@ -2,20 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebase';
-import { Button } from "@/components/ui/button";
-import { doc, getDoc, writeBatch, collection, serverTimestamp, GeoPoint, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, arrayUnion, GeoPoint, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useSelector } from 'react-redux';
-import UseCaseCarousel from '@/components/UseCaseCarousel'; // 이 컴포넌트는 사용되지 않는 것 같지만, 코드에 있으므로 유지합니다.
 import { saveFcmToken } from "@/lib/fcm";
-
-// ★ 새로 만든 커스텀 훅 임포트 ★
 import { useAddressSearch } from '@/hooks/useAddressSearch';
 import { useCategorySelection } from '@/hooks/useCategorySelection';
 import useImageUpload from '@/hooks/useImageUpload';
-
-// 새로 만든 컴포넌트 임포트
 import UserProfileModal from '@/components/UserProfileModal';
 import AddressSearchModal from '@/components/AddressSearchModal';
 import imageCompression from 'browser-image-compression';
