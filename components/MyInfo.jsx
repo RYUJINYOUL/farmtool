@@ -41,6 +41,8 @@ import ConUpload from '@/components/middle/construction/conUpload';
 import NaraWishList from '@/components/NaraWishList';
 import JobWishList from '@/components/JobWishList';
 import PermitWishList from '@/components/PermitWishList';
+import CheckoutPage from "@/app/payments/checkout/page";
+import moment from "moment";
 
 
 export default function MyInfo() {
@@ -56,6 +58,7 @@ export default function MyInfo() {
   const [noticeEnabled, setNoticeEnabled] = useState(false);
   const [wishListDetails, setWishListDetails] = useState([]);
   const [myListDetails, setMyListDetails] = useState([]);
+  const [isExpired, setIsExpired] = useState(false); 
   const { currentUser } = useSelector((state) => state.user);
   const uid = currentUser?.uid;
   const router = useRouter();
@@ -192,19 +195,28 @@ export default function MyInfo() {
               ...item,
               companyName: data[`${item.top}_name`] || '알수없음',
               topCategory: data.TopCategories || "카테고리 없음",
-              favorites: data.favorites || []
+              favorites: data.favorites || [],
+              expirationDate: data.expirationDate || null, // ★ 추가: 만료일 가져오기
             };
           } else {
             return {
               ...item,
               companyName: "삭제된 항목",
               topCategory: "-",
+              expirationDate: null,
             };
           }
         });
 
         const details = await Promise.all(detailPromises);
         setMyListDetails(details);
+
+        // ★ 추가: 만료된 항목이 있는지 확인
+        const now = new Date();
+        const isAnyItemExpired = details.some(
+          (item) => item.expirationDate?.toDate() < now
+        );
+        setIsExpired(isAnyItemExpired);
       } catch (err) {
         console.error("나의 글 목록 세부정보 로드 오류:", err);
       }
@@ -243,9 +255,20 @@ export default function MyInfo() {
     if (!currentUser?.uid) {
       router.push('/login');
     } else {
-      setOpenDialog(dialogName);
+      if (dialogName === "myText" && isExpired) {
+        // 만료된 항목이 있을 경우 CheckoutPage를 띄우기 위해 CategoryUpload를 사용
+        setOpenDialog("register"); 
+        setIsExpired(true);
+      } else {
+        setOpenDialog(dialogName);
+      }
     }
   };
+
+  // 만약 isExpired가 true인 상태에서 "등록글과 신청글"을 클릭하면 CheckoutPage로 이동
+  if (isExpired && openDialog === "register") {
+    return <CheckoutPage onClose={() => setIsExpired(false)} />;
+  }
 
   return (
  
@@ -590,6 +613,11 @@ export default function MyInfo() {
                           <div className="text-sm text-gray-500">
                             {item.topCategory}
                           </div>
+                          {item.expirationDate && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              만료일: {moment(item.expirationDate.toDate()).format('YYYY.MM.DD')}
+                            </div>
+                          )}
                         </Link>
                       </div>
                     ))}
