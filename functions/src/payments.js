@@ -66,7 +66,7 @@ exports.confirmPayment = onRequest(
         status: approvalData.status, // 'DONE'
         requestedAt: approvalData.requestedAt,
         approvedAt: approvalData.approvedAt,
-        customerName: approvalData.customerName,
+        // customerName: approvalData.customerName,
         // 기타 필요한 정보 추가
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });
