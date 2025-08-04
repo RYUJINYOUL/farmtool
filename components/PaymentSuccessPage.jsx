@@ -2,13 +2,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app } from "@/firebase"; // firebase 인스턴스 경로에 맞게 조정
+import { app } from "@/firebase";
 
 const PaymentSuccessPage = () => {
   const searchParams = useSearchParams();
 
   const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
-  const failUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_FAIL_URL;
 
   const paymentKey = searchParams.get("paymentKey");
   const orderId = searchParams.get("orderId");
@@ -42,21 +41,8 @@ const PaymentSuccessPage = () => {
         finalConfirmUrl.searchParams.append("collectionName", collectionName);
         finalConfirmUrl.searchParams.append("subscriptionPeriodInMonths", subscriptionPeriodInMonths);
 
-        const response = await fetch(finalConfirmUrl.toString(), {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          setStatus(`⚠️ 결제 승인 실패: ${errorData.message || "알 수 없는 오류"}`);
-          setIsError(true);
-          return;
-        }
-
-        setStatus("✅ 결제가 성공적으로 완료되었습니다.");
+        // ✅ 직접 리다이렉트
+        window.location.href = finalConfirmUrl.toString();
       } catch (err) {
         console.error("결제 승인 중 오류 발생:", err);
         setStatus("⚠️ 결제 승인 중 예기치 못한 오류가 발생했습니다.");
