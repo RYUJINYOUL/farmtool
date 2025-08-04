@@ -10,7 +10,7 @@ const generateOrderId = () => `order_${Date.now()}_${Math.random().toString(36).
 
 const CheckoutPage = () => {
   const [orderId, setOrderId] = useState('');
-  const amount = 100; // 결제 금액
+  const amount = 200; // 결제 금액
   const orderName = "Next.js 앱 서비스 이용료";
   const customerName = "홍길동"; // 실제 사용자 이름
 
