@@ -21,14 +21,23 @@ exports.confirmPayment = onRequest(
     region: 'asia-northeast3', // 한국에서 가까운 리전 선택
   },
   async (req, res) => {
-    const { paymentKey, orderId, amount } = req.query; // 쿼리 파라미터로 정보 전달
+    const { paymentKey, orderId, amount, collectionName, subscriptionPeriodInMonths } = req.query; // 쿼리 파라미터로 정보 전달
     const secretKey = TOSS_SECRET_KEY.value();
     const successUrl = TOSS_SUCCESS_FRONTEND_URL.value();
     const failUrl = TOSS_FAIL_FRONTEND_URL.value();
 
-    if (!paymentKey || !orderId || !amount) {
+    // 필수 파라미터 확인에 collectionName 추가
+    if (!paymentKey || !orderId || !amount || !collectionName || !subscriptionPeriodInMonths) {
       console.error('Missing required query parameters for payment confirmation.');
       return res.redirect(`${failUrl}?message=결제%20정보%20누락`);
+    }
+
+
+    // 보안을 위해 허용된 컬렉션 이름만 사용하도록 검증하는 것이 좋습니다.
+    const allowedCollections = ['conApply', 'another_collection_name']; // 여기에 허용할 컬렉션 이름을 정의
+    if (!allowedCollections.includes(collectionName)) {
+      console.error('Invalid collection name provided:', collectionName);
+      return res.redirect(`${failUrl}?message=유효하지%20않은%20컬렉션%20이름`);
     }
 
     try {
@@ -56,9 +65,14 @@ exports.confirmPayment = onRequest(
         return res.redirect(`${failUrl}?code=${errorCode}&message=${errorMessage}&orderId=${orderId}`);
       }
 
+
+      const approvedAt = new Date(approvalData.approvedAt);
+      const expirationDate = new Date(approvedAt);
+      expirationDate.setMonth(approvedAt.getMonth() + Number(subscriptionPeriodInMonths));
+
       // 2. 결제 성공 시 Firestore에 저장
-      const paymentDocRef = db.collection('payments').doc(orderId);
-      await paymentDocRef.set({
+      const paymentDocRef = db.collection(collectionName).doc(orderId);
+      await paymentDocRef.update({
         paymentKey: approvalData.paymentKey,
         orderId: approvalData.orderId,
         amount: approvalData.totalAmount,
@@ -66,7 +80,8 @@ exports.confirmPayment = onRequest(
         status: approvalData.status, // 'DONE'
         requestedAt: approvalData.requestedAt,
         approvedAt: approvalData.approvedAt,
-        // customerName: approvalData.customerName,
+        expirationDate: expirationDate,
+        subscriptionPeriodInMonths: Number(subscriptionPeriodInMonths),
         // 기타 필요한 정보 추가
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });

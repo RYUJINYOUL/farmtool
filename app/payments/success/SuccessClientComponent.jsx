@@ -73,7 +73,7 @@ export default function SuccessClientComponent() {
         </>
       )}
       <p style={{ marginTop: '20px' }}>성공 페이지로 리디렉션되었습니다.</p>
-      <button onClick={() => window.location.href = '/'}>쇼핑 계속하기</button>
+      <button onClick={() => window.location.href = '/'}>메인으로 가기</button>
     </div>
   );
 }

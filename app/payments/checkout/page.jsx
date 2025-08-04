@@ -53,6 +53,8 @@ const CheckoutPage = () => {
         onSuccess={handlePaymentSuccess}
         onFail={handlePaymentFail}
         variant="default"
+        collectionName="conApply"
+        subscriptionPeriodInMonths= {1}
       />
     </div>
   );

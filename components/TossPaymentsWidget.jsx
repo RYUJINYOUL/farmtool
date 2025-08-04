@@ -15,6 +15,8 @@ const TossPaymentsWidget = ({
   isAgreementOnly = false,
   widgetSelector = '#payment-widget',
   agreementSelector = '#agreement-widget',
+  collectionName,
+  subscriptionPeriodInMonths,
 }) => {
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
   const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
@@ -112,20 +114,25 @@ const TossPaymentsWidget = ({
         value: amount,
       });
 
+
+      const finalSuccessUrl = `${confirmUrl}?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}`;
+      const finalFailUrl = `${failUrl}?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}`;
+
       await widgets.requestPayment({
         orderId,
         orderName: orderName || "토스 티셔츠 외 2건",
-        successUrl: confirmUrl,
-        failUrl: failUrl,
+        successUrl: finalSuccessUrl,
+        failUrl: finalFailUrl,
         customerEmail: "ryussi0925@gmail.com",
         customerName: customerName || "유씨",
+        // collectionName
       });
     } catch (error) {
       console.error("Error during payment request:", error);
       alert(`결제 요청 중 오류 발생: ${error.message} (코드: ${error.code || 'UNKNOWN'})`);
       setIsProcessingPayment(false);
     }
-  }, [isProcessingPayment, widgets, ready, amount, orderId, orderName, customerName, confirmUrl, failUrl]);
+  }, [isProcessingPayment, widgets, ready, amount, orderId, orderName, confirmUrl, failUrl]);
 
   
   
