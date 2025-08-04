@@ -124,7 +124,7 @@ const TossPaymentsWidget = ({
         successUrl: finalSuccessUrl,
         failUrl: finalFailUrl,
         customerEmail: "ryussi0925@gmail.com",
-        customerName: customerName || "유씨",
+        customerName: customerName || "문화류씨",
         // collectionName
       });
     } catch (error) {
