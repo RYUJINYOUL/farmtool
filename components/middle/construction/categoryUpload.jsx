@@ -133,7 +133,10 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const fetchedUserData = userSnap.data();
-          const expirationDate = fetchedUserData.expirationDate?.toDate() || null;
+          let expirationDate = null;
+          if (fetchedUserData.expirationDate && typeof fetchedUserData.expirationDate.toDate === 'function') {
+            expirationDate = fetchedUserData.expirationDate.toDate();
+          }
           console.log(expirationDate)
           setUserData(fetchedUserData);
           setFormState(prev => ({
