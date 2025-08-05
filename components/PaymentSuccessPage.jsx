@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/firebase";
 
 const PaymentSuccessPage = () => {
   const searchParams = useSearchParams();
-
+  const router = useRouter();
   const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
 
   const paymentKey = searchParams.get("paymentKey");
@@ -59,6 +59,11 @@ useEffect(() => {
         // 서버에서 보낸 성공 응답 처리
         setStatus("✅ 결제가 성공적으로 처리되었습니다.");
         setIsError(false);
+
+        setTimeout(() => {
+          router.push('/');
+        }, 3000);
+
 
         // TODO: 결제 성공 후 사용자에게 보여줄 정보를 result 객체에서 가져와 사용
 
