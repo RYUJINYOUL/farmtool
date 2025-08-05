@@ -1536,10 +1536,10 @@
     protobufjs "^7.2.5"
     yargs "^17.7.2"
 
-"@headlessui/react@^2.2.4":
-  version "2.2.4"
-  resolved "https://registry.npmjs.org/@headlessui/react/-/react-2.2.4.tgz"
-  integrity sha512-lz+OGcAH1dK93rgSMzXmm1qKOJkBUqZf1L4M8TWLNplftQD3IkoEDdUFNfAn4ylsN6WOTVtWaLmvmaHOUk1dTA==
+"@headlessui/react@^2.2.7":
+  version "2.2.7"
+  resolved "https://registry.npmjs.org/@headlessui/react/-/react-2.2.7.tgz"
+  integrity sha512-WKdTymY8Y49H8/gUc/lIyYK1M+/6dq0Iywh4zTZVAaiTDprRfioxSgD0wnXTQTBpjpGJuTL1NO/mqEvc//5SSg==
   dependencies:
     "@floating-ui/react" "^0.26.16"
     "@react-aria/focus" "^3.20.2"
@@ -2481,44 +2481,6 @@
   version "2.0.0"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
-
-"@tosspayments/brandpay-types@^0.2.6":
-  version "0.2.6"
-  resolved "https://registry.npmjs.org/@tosspayments/brandpay-types/-/brandpay-types-0.2.6.tgz"
-  integrity sha512-FY8aOm/2rqtXjYux9ZdNTL6GC5+VNIw8eOQ7TP01dS2uGWSzAtR6uuw9HVsgkmJtSyJgmo97tjmbio5oyeyFlg==
-
-"@tosspayments/payment__types@^1.68.0":
-  version "1.69.1"
-  resolved "https://registry.npmjs.org/@tosspayments/payment__types/-/payment__types-1.69.1.tgz"
-  integrity sha512-QX9WSPiIke9VPch1zA80VFBSu7yKNuv/UnKy1V9B+YkC6sPN+sBcq/sl2fhj5tadTvkuYXDv139iR5TFwU2ayw==
-  dependencies:
-    "@tosspayments/sdk-constants" "^1.2.2"
-
-"@tosspayments/payment-widget__types@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@tosspayments/payment-widget__types/-/payment-widget__types-1.1.0.tgz"
-  integrity sha512-1yVQIDNwgjzpm/n8ppsAk3Q0IKha+vOTuRIP6INzL9AkzCsrVjhHr5/eT0fe+tjyekSRL902Uq0TuRyG2sjsWw==
-  dependencies:
-    "@tosspayments/brandpay-types" "^0.2.6"
-    "@tosspayments/payment__types" "^1.68.0"
-    "@tosspayments/payment-widget-types" "^0.0.5"
-
-"@tosspayments/payment-widget-sdk@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.npmjs.org/@tosspayments/payment-widget-sdk/-/payment-widget-sdk-0.12.0.tgz"
-  integrity sha512-Ll3K2Zh9FdTOtINnO79FdVpeEWvJOfgMHdhUfzUs/QohdbOpT78mRXW9UwexMqBdEAJD/q4NJjOqGA7cFDjsjQ==
-  dependencies:
-    "@tosspayments/payment-widget__types" "1.1.0"
-
-"@tosspayments/payment-widget-types@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.npmjs.org/@tosspayments/payment-widget-types/-/payment-widget-types-0.0.5.tgz"
-  integrity sha512-Daaui9u7aRPzJhw4omJIUAbYBSmNAFNjWWkuUnX9uHxzE3gtjcJHIpGrjlzmCFm+j3ZH4rgyrgv4pkazVYH3OQ==
-
-"@tosspayments/sdk-constants@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@tosspayments/sdk-constants/-/sdk-constants-1.2.2.tgz"
-  integrity sha512-6WxRHaiycSfz8gY9R/+StdkX5bprHyJ/rf2ak+b8YgBorxUwns8Ev+oyViNBmsPoE77RusaVFNv1kuiJpSNoDA==
 
 "@tosspayments/tosspayments-sdk@^2.3.5":
   version "2.3.5"
@@ -7171,11 +7133,6 @@ typed-array-length@^1.0.7:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
     reflect.getprototypeof "^1.0.6"
-
-typescript@^4.1.0, typescript@^4.7.4:
-  version "4.9.5"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
-  integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
 typescript@^5:
   version "5.8.3"

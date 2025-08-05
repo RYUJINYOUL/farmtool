@@ -4,11 +4,13 @@ import { Dialog } from '@headlessui/react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
-// 기존 import 유지 및 KOREAN_TO_ENGLISH_CATEGORIES 추가
 import { category, subCategory, KOREAN_TO_ENGLISH_CATEGORIES } from '@/lib/constants';
-// import Professional from './topCategory/professional' // 이 줄은 제거합니다.
 import ImageUpload from '@/components/ImageUpload';
-import CategorySpecificFields from './CategorySpecificFields'; // 새로 만든 컴포넌트 임포트
+import CategorySpecificFields from './CategorySpecificFields';
+import { useRouter } from 'next/navigation'; // useRouter 추가
+import { useSelector } from 'react-redux';     // useSelector 추가
+import { db } from '@/firebase';               // db 추가
+import { doc, getDoc } from 'firebase/firestore'; // doc, getDoc 추가
 
 export default function UserProfileModal({
         isOpen,
@@ -23,7 +25,7 @@ export default function UserProfileModal({
         setShowRegionList,
         subShowRegionList,
         setSubShowRegionList,
-        handleRegionClick,
+        handleRegionClick, // 기존 함수를 직접 수정하는 대신, 아래에 새로운 함수를 정의합니다.
         handleRegionClick2,
         handleSubRegionRemove,
         handleDrag,
@@ -37,8 +39,51 @@ export default function UserProfileModal({
         setImageFiles,
         setDragActive,
 }) {
+  const router = useRouter();
+  const { currentUser } = useSelector(state => state.user);
+  const uid = currentUser?.uid;
 
-  // 현재 선택된 서브 카테고리 데이터 (Page.js에서 이동)
+  const handleTopCategoryClick = async (region) => {
+    // '전체' 카테고리는 등록 제한이 없으므로 바로 업데이트
+    if (region === '전체') {
+      setFormState(prev => ({
+        ...prev,
+        TopCategories: region,
+        SubCategories: ['전체']
+      }));
+      setShowRegionList(false);
+      return;
+    }
+
+    if (uid) {
+      const englishCategory = KOREAN_TO_ENGLISH_CATEGORIES[region];
+      const docRef = doc(db, englishCategory, uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        alert('하나의 계정에는 하나의 상품만 등록할 수 있습니다.');
+        onClose(); // 모달 닫기
+        router.push(`/${englishCategory}/registration/${uid}`);
+      } else {
+        setFormState(prev => ({
+          ...prev,
+          TopCategories: region,
+          SubCategories: ['전체']
+        }));
+        setShowRegionList(false);
+      }
+    } else {
+      // 로그인하지 않은 경우 처리
+      setFormState(prev => ({
+        ...prev,
+        TopCategories: region,
+        SubCategories: ['전체']
+      }));
+      setShowRegionList(false);
+    }
+  };
+
+
   const hselectedRegion = subCategory.find(region => region.name === formState.TopCategories) || { subRegions: [] };
 
   return (
@@ -95,7 +140,7 @@ export default function UserProfileModal({
                       <button
                         key={region}
                         type="button"
-                        onClick={() => handleRegionClick(region)}
+                        onClick={() => handleTopCategoryClick(region)} // 수정된 함수 사용
                         className={`px-4 py-1 rounded-md text-sm border transition-colors
                           ${formState.TopCategories === region
                             ? 'bg-green-500 text-white border-green-500'
@@ -179,23 +224,6 @@ export default function UserProfileModal({
                 </button>
               </div>
             )}
-             {/* 선택된 소분류 태그 표시 */}
-            {/* {formState.SubCategories.length > 0 && !(formState.SubCategories.length === 1 && formState.SubCategories[0] === "전체") && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formState.SubCategories.filter(name => name !== "전체").map(name => (
-                  <span key={name} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-[10px] flex items-center">
-                    {name}
-                    <button
-                      type="button"
-                      className="ml-2 text-blue-600 hover:text-red-500 transition-colors"
-                      onClick={() => handleSubRegionRemove(name)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )} */}
           </div>
 
           {/* 주소 검색 입력 필드 및 버튼 */}
@@ -205,44 +233,20 @@ export default function UserProfileModal({
                 value={formState.address}
                 onChange={handleInputChange}
                 onClick={() => {
-                  setFormState(prev => ({ ...prev, address: '' })); // formState.address 초기화
-                  setIsAddrModalOpen(true); // 주소 모달 열기
+                  setFormState(prev => ({ ...prev, address: '' }));
+                  setIsAddrModalOpen(true);
                 }}
                 placeholder="주소, 건물명 입력"
                 className="col-span-2"
               />
           </div>
 
-
-
-
-
-    {/*여기서 카테고리 별 변동 */}
-     {/*여기서 카테고리 별 변동 */}
-      {/*여기서 카테고리 별 변동 */}
-       {/*여기서 카테고리 별 변동 */}
-        {/*여기서 카테고리 별 변동 */}
-         {/* <Professional 
-          formState={formState}
-          handleInputChange={handleInputChange}
-          error={error} 
-          /> */}
-
-
-           {/* ★ 여기가 이제 동적으로 변경될 부분 ★ */}
-          {/* CategorySpecificFields 컴포넌트를 사용하여 선택된 대분류에 맞는 필드를 렌더링 */}
           <CategorySpecificFields
-            TopCategory={formState.TopCategories} // 선택된 한글 대분류 전달
+            TopCategory={formState.TopCategories}
             formState={formState}
             handleInputChange={handleInputChange}
             error={error}
           />
-
-
-
-
-
-
 
           {/* 저장 버튼 */}
           <Button

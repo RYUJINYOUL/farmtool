@@ -112,14 +112,15 @@ const TossPaymentsWidget = ({
   }, [isProcessingPayment, widgets, ready, amount, orderId, orderName, failUrl, collectionName, subscriptionPeriodInMonths, auth]);
 
   return (
-    <div>
-      <div id="payment-widget" style={{ width: '100%', minHeight: '200px' }} />
-      <div id="agreement-widget" style={{ width: '100%', minHeight: '100px', marginTop: '20px' }} />
+   <div>
+      {/* 위젯을 렌더링하는 div에 w-full을 직접 적용 */}
+      <div id="payment-widget" className="w-full" />
+      <div id="agreement-widget" className="w-full" />
       {(!ready && !loadError) && (
-        <div style={{ textAlign: 'center', padding: '50px' }}>결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
+        <div className="w-full text-center p-10">결제 위젯 로딩 중... 잠시만 기다려주세요.</div>
       )}
       {loadError && (
-        <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
+        <div className="w-full text-center p-10 text-red-500">
           오류: {loadError}
         </div>
       )}
@@ -127,18 +128,10 @@ const TossPaymentsWidget = ({
         <button
           onClick={requestPayment}
           disabled={isProcessingPayment}
-          style={{
-            marginTop: '20px',
-            padding: '10px 20px',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: isProcessingPayment ? 'not-allowed' : 'pointer',
-            opacity: isProcessingPayment ? 0.6 : 1,
-          }}
+          // 결제 버튼에 w-full과 Tailwind 클래스를 직접 적용
+          className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed mt-4"
         >
-          {isProcessingPayment ? '결제 진행 중...' : '결제하기'}
+          {isProcessingPayment ? '결제 진행 중...' : `${amount.toLocaleString()}원 결제하기`}
         </button>
       )}
     </div>

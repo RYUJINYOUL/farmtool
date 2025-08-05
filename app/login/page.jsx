@@ -62,21 +62,12 @@ const LoginPage = () => {
         email: user.email, // 이메일도 저장
       }));
 
-      let fcmToken = null;
-         try {
-                    // Service Worker가 준비될 때까지 기다립니다.
-                    if ("serviceWorker" in navigator) {
-                        console.log("서비스 워커 준비 대기 중...");
-                        await navigator.serviceWorker.ready; // <<-- 이 부분이 중요!
-                        console.log("서비스 워커 준비 완료. FCM 토큰 요청.");
-                    } else {
-                        console.warn("Service Worker를 지원하지 않는 브라우저입니다.");
-                    }
-                    
-                    fcmToken = await saveFcmToken(user.uid);
-        } catch (error) {
-          console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
-        }
+       let fcmToken = null;
+                      try {
+                        fcmToken = await saveFcmToken();
+                      } catch (error) {
+                        console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
+                      }
 
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
