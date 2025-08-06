@@ -3,6 +3,7 @@ import PermitSearchControls from './PermitSearchControls';
 import { fetchArchitecturalPermitData, ArchitecturalPermitItem } from '@/lib/ArchPmsApi'; // ArchitecturalPermitItem 임포트
 import ClientPermitList from './ClientPermitList';
 import { hierarchicalRegions } from '@/lib/constants'; // 지역명 매핑을 위해 임포트
+import Footer from '@/components/template/Footer';
 
 interface ArchitecturalPermitsPageProps {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -69,6 +70,7 @@ export default async function ArchitecturalPermitsPage({ searchParams }: Archite
 
 
   return (
+    <>
     <div className='min-h-screen bg-gray-50 md:pt-10 pt-5'>
     <main style={{ maxWidth: '1100px', margin: '40px auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
 
@@ -103,5 +105,7 @@ export default async function ArchitecturalPermitsPage({ searchParams }: Archite
       )}
     </main>
     </div>
+    <Footer />
+    </>
   );
 }

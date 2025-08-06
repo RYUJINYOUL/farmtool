@@ -425,7 +425,7 @@ export default function MyInfo() {
               </button>
             </div>
             {/* 여기에 필요한 경우 두 번째 컬럼을 위한 빈 div 또는 다른 요소를 추가할 수 있습니다. */}
-            <div className="hidden md:block w-full md:w-1/2">
+            <div className="w-full md:w-1/2">
             <button
                 onClick={() => checkLoginAndOpenDialog("help")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -664,16 +664,21 @@ export default function MyInfo() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
                     <Phone className="w-5 h-5 text-gray-600" />
-                    <a href="tel:010-1234-5678" className="text-gray-800 font-medium">
-                      전화 문의: 010-1234-5678
+                    <a href="tel:1899-1651" className="text-gray-800 font-medium">
+                      전화 문의: 1899-1651
                     </a>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
+                 <a
+                    href="http://pf.kakao.com/_zUZFG/chat"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                  >
                     <MessageSquare className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-800 font-medium">
-                      카카오톡 문의: @채널명
+                      건설톡 카카오톡 문의
                     </span>
-                  </div>
+                  </a>
                 </div>
               </div>
             )}

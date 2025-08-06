@@ -6,6 +6,7 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import { IoIosHeart } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { db } from "@/firebase";
+import dayjs from 'dayjs';
 import {
   collection,
   doc,
@@ -13,8 +14,8 @@ import {
   getDocs,
   updateDoc,
   arrayRemove,
-  deleteDoc,
-  query,
+  getAggregateFromServer,
+  count,
   startAfter,
   limit,
   orderBy
@@ -54,6 +55,110 @@ export default function MainMenu() {
   const uid = currentUser?.uid;
   const router = useRouter();
   const { push } = useRouter();
+  const [counts, setCounts] = useState({
+    construction: 0,
+    equipment: 0,
+    professionals: 0,
+    materials: 0,
+  });
+  const [startDate, setStartDate] = useState(dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
+  const [startTime, setStartTime] = useState('00:00');
+  const [endDate, setEndDate] = useState(dayjs().subtract(1, 'day').format('YYYY-MM-DD'));
+  const [endTime, setEndTime] = useState('23:59');
+  const SERVICE_KEY = process.env.NEXT_PUBLIC_API_SERVICE_KEY;
+  const API_URL = "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch";
+  const [totalCount, setTotalCount] = useState(0);
+
+
+  useEffect(() => {
+    if (!API_URL || !SERVICE_KEY) return;
+
+    const ac = new AbortController();
+    const signal = ac.signal;
+
+    const fetchTotal = async () => {
+      try {
+
+        const inqryBgnDt = startDate?.replace(/-/g, "") + (startTime?.replace(":", "") || "");
+        const inqryEndDt = endDate?.replace(/-/g, "") + (endTime?.replace(":", "") || "");
+
+        const params = [
+          `serviceKey=${SERVICE_KEY}`,
+          `inqryDiv=1`,
+          `type=json`,
+          `inqryBgnDt=${inqryBgnDt}`,
+          `inqryEndDt=${inqryEndDt}`
+        ];
+
+        const url = `${API_URL}?${params.join('&')}`;
+
+        const res = await fetch(url, { signal });
+        if (!res.ok) {
+          console.error("API error:", res.status, res.statusText);
+          if (setTotalCount) setTotalCount(0);
+          return;
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const json = await res.json();
+          const total = Number(json.response?.body?.totalCount) || 0;
+          if (setTotalCount) setTotalCount(total);
+        } else {
+          // JSON이 아닐 경우(간혹 문자열/XML 반환) 간단히 텍스트로 확인
+          const text = await res.text();
+          console.warn('응답이 JSON이 아닙니다. 응답 예시:', text.slice(0, 500));
+          if (setTotalCount) setTotalCount(0);
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          // 요청이 취소됨
+          return;
+        }
+        console.error("데이터 페치 중 오류:", err);
+        if (setTotalCount) setTotalCount(0);
+      } 
+    };
+
+    fetchTotal();
+
+    return () => {
+      ac.abort();
+    };
+    // 의존성: 파라미터가 바뀔 때마다 재요청
+  }, [
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    SERVICE_KEY,
+    API_URL,
+    setTotalCount,
+  ]);
+
+  
+
+  const fetchCounts = async () => {
+    const collections = ["construction", "equipment", "professionals", "materials"];
+
+    const results = await Promise.all(
+      collections.map(async (col) => {
+        const snapshot = await getAggregateFromServer(collection(db, col), {
+          total: count(),
+        });
+        return { [col]: snapshot.data().total };
+      })
+    );
+
+    // 배열 → 객체 병합
+    const mergedCounts = results.reduce((acc, cur) => ({ ...acc, ...cur }), {});
+    setCounts(mergedCounts);
+  };
+
+  useEffect(() => {
+    fetchCounts();
+  }, []);
+
 
 
   const toggleFavorite = useCallback(async (itemId, middle, category, top) => {
@@ -241,12 +346,37 @@ export default function MainMenu() {
     }
   };
 
+
+  function AnimatedCount({ target = 0, duration = 1000 }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const startTime = performance.now();
+
+    const updateCount = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1); // 0~1 사이
+      const current = Math.floor(progress * target);
+      setCount(current);
+
+      if (progress < 1) {
+        requestAnimationFrame(updateCount);
+      }
+    };
+
+    requestAnimationFrame(updateCount);
+  }, [target, duration]);
+
+  return <span>{count.toLocaleString()}</span>;
+}
+
   return (
  
     <div className="flex flex-col items-center md:justify-center bg-gray-50 pt-5 md:w-[1100px] md:mx-auto">
       {/* 프로필 카드 */}
-      <div className="w-full max-w-md md:max-w-full md:w-[1100px] bg-white shadow-md rounded-2xl p-6 text-center">
-        <div className="flex flex-col items-center gap-2">
+      <div className="w-full md:w-[1100px] bg-white shadow-md rounded-2xl p-6 text-center">
+        {/* <div className="flex flex-col items-center gap-2">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
             {userInfo?.photoURL ? (
               <img
@@ -261,10 +391,10 @@ export default function MainMenu() {
           </div>
           <h2 className="text-xl font-bold text-gray-800">{userInfo?.displayName}</h2>
           <p className="text-sm text-gray-500">{userInfo?.email}</p>
-        </div>
+        </div> */}
 
         {/* 메뉴 리스트 */}
-        <div className="mt-6 space-y-3">
+        <div className="space-y-3">
 
           {/* 첫 번째 줄: 일반 찜 목록, 나라장터 찜 목록 */}
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
@@ -277,7 +407,7 @@ export default function MainMenu() {
                   <BrickWallFire className="w-5 h-5 text-pink-500" />
                   <span className="font-medium text-gray-800">건설업</span>
                 </div>
-              
+               <span className="text-green-900 text-sm"><AnimatedCount target={counts.construction || 0} duration={1500} />개</span>
               </button>
             </div>
 
@@ -290,7 +420,7 @@ export default function MainMenu() {
                   <Tractor className="w-5 h-5 text-orange-500" />
                   <span className="font-medium text-gray-800">건설장비</span>
                 </div>
-              
+              <span className="text-gray-400 text-sm">{counts.equipment ? counts.equipment.toLocaleString() : 0}개</span>
               </button>
             </div>
           </div>
@@ -306,7 +436,7 @@ export default function MainMenu() {
                   <Fence className="w-5 h-5 text-blue-400" />
                   <span className="font-medium text-gray-800">건설자재</span>
                 </div>
-              
+              <span className="text-gray-400 text-sm">{counts.materials ? counts.materials.toLocaleString() : 0}개</span>
               </button>
             </div>
 
@@ -319,7 +449,7 @@ export default function MainMenu() {
                   <Copyright className="w-5 h-5 text-blue-500" />
                   <span className="font-medium text-gray-800">인허가</span>
                 </div>
-                
+                 <span className="text-gray-400 text-sm">12,358개(1달 기준)</span>
               </button>
             </div>
           </div>
@@ -335,6 +465,7 @@ export default function MainMenu() {
                   <LaptopMinimalCheck className="w-5 h-5 text-red-400" />
                   <span className="font-medium text-gray-800">나라장터낙찰</span>
                 </div>
+                <span className="text-gray-400 text-sm">{totalCount ? totalCount.toLocaleString() : 0}개</span>
               </button>
             </div>
 
@@ -363,6 +494,7 @@ export default function MainMenu() {
                   <Hammer className="w-5 h-5 text-green-500" />
                   <span className="font-medium text-gray-800">전문인력</span>
                 </div>
+                <span className="text-gray-400 text-sm">{counts.professionals ? counts.professionals.toLocaleString() : 0}개</span>
               </button>
             </div>
 

@@ -1,10 +1,11 @@
 import { createSlice, current } from "@reduxjs/toolkit";
+import { getSafeLocalStorage } from '../utils/localStorage';
 
 const initialState = {
     currentUser: {
-       uid: (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem('uid')) : '',
-       photoURL: (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem("photoURL")) : '',
-       displayName: (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem('displayName')) : '',
+        uid: getSafeLocalStorage('uid'),
+        photoURL: getSafeLocalStorage("photoURL"),
+        displayName: getSafeLocalStorage('displayName'),
     }
 }
 

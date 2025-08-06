@@ -7,17 +7,18 @@ import { useSelector } from 'react-redux';
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoIosHeart } from "react-icons/io";
 import {
-  collection,
-  where,
-  orderBy,
-  query,
-  getDocs,
-  limit,
+   getDoc, 
+  collection, 
+  where, 
+  orderBy, 
+  query, 
+  getDocs, 
+  limit, 
   startAfter,
-  doc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove
+  doc, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove 
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import Image from "next/image";
@@ -55,6 +56,7 @@ const ProList = ({ selectedIndustries, selectedRegions, selectedSubRegions }) =>
   const router = useRouter();
   const { currentUser } = useSelector(state => state.user);
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState("");
   const loader = useRef(null);
 
   const timeFromNow = timestamp => moment(timestamp).format('YYYY.MM.DD');
@@ -183,9 +185,36 @@ const ProList = ({ selectedIndustries, selectedRegions, selectedSubRegions }) =>
     return () => loader.current && observer.unobserve(loader.current);
   }, [fetchMessages, hasMore, loading]);
 
-  const openCategory = () => {
-    currentUser?.uid ? setIsUserProfileModalOpen(true) : router.push('/login');
-  };
+  const openCategory = async () => {
+      // currentUser가 없으면 로그인 페이지로 이동
+      if (!currentUser?.uid) {
+          router.push('/login');
+          return;
+      }
+  
+      try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+  
+          if (userSnap.exists()) {
+              const fetchedUserData = userSnap.data();
+              const expirationDate = fetchedUserData.expirationDate?.toDate();
+              const now = new Date();
+  
+              if (!expirationDate || expirationDate < now) {
+                  alert("업체등록은 결제 후에 이용하실 수 있습니다.");
+                  router.push('/payments/checkout');
+                  return; 
+              }
+          } 
+          setIsUserProfileModalOpen(true);
+          setOpenDialog("register");
+      } catch (error) {
+          console.error("사용자 데이터 로딩 중 에러:", error);
+          alert("사용자 정보를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      }
+  }
+
 
   const onClickCard = ({ id }) => router.push(`/construction/registration/${id}`);
 
@@ -262,14 +291,16 @@ const ProList = ({ selectedIndustries, selectedRegions, selectedSubRegions }) =>
 
       <Button
         onClick={openCategory}
-        className="fixed bottom-8 right-8 rounded-full w-16 h-16 text-3xl shadow-lg"
+        className="fixed bottom-[calc(8vh+20px)] right-4 rounded-full w-[45px] h-[45px] text-2xl shadow-lg"
       >
         +
       </Button>
-      <CategoryUpload
-        isOpen={isUserProfileModalOpen}
-        onClose={() => setIsUserProfileModalOpen(false)}
-      />
+      {openDialog === "register" && (
+                              <CategoryUpload
+                                isOpen={true}
+                                onClose={() => setOpenDialog(null)}
+                              />
+                          )}
     </div>
   );
 };

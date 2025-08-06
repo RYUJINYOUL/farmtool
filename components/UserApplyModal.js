@@ -45,7 +45,7 @@ export default function UserApplyModal({
     <Dialog open={isOpen} onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
 
-      <Dialog.Panel className="bg-gray-100 p-8 rounded-2xl shadow-lg z-50 max-w-sm w-full relative overflow-y-auto max-h-[90vh]">
+      <Dialog.Panel className="bg-gray-100 p-8 rounded-2xl shadow-lg z-50 h-screen w-full relative overflow-y-auto max-h-[90vh]">
         <div className='pb-5'>
         <div className="absolute top-4 reft-4 text-black-400 text-[18px]">
           신청하기

@@ -10,17 +10,18 @@ import React, { useState } from 'react' // useEffect, useRouter, useSearchParams
 import ProList from "@/components/middle/professionals/ProList"
 import ConOffer from "@/components/middle/professionals/ConOffer"
 import { saram, regions, hierarchicalRegions } from '@/lib/constants';
+import { useSearchParams } from 'next/navigation';
+import Footer from '@/components/template/Footer'
 
-
-const Page = ({ searchParams }) => {
-  // 상태 변수들을 직접 관리
+const Page = () => {
+  const searchParams = useSearchParams();
   const [showIndustryList, setShowIndustryList] = useState(false);
   const [showRegionList, setShowRegionList] = useState(false);
   const [showSubRegionList, setSubShowRegionList] = useState(false);
   const [selectedIndustries, setSelectedIndustries] = useState("전체");
   const [selectedRegions, setSelectedRegions] = useState('전국');
   const [selectedSubRegions, setSelectedSubRegions] = useState('');
-  const initialTabFromUrl = searchParams.tab || "account";
+  const initialTabFromUrl = searchParams.get('tab') || "account";
   const [pag, setPag] = useState(initialTabFromUrl)
 
   
@@ -43,6 +44,7 @@ const Page = ({ searchParams }) => {
   };
 
   return (
+    <>
     <div className='relative md:top-10 bg-gray-50 top-10'>
       <section className='flex justify-center items-center m-4'>
       <div className="md:w-[1100px] w-full lg:mt-10 pt-3.5">
@@ -208,8 +210,12 @@ const Page = ({ searchParams }) => {
       </Tabs>
       </div>
       </section>
-  </div>
+    </div>
+    <Footer />
+    </>
   )
+  
+  
 }
 
 export default Page

@@ -39,6 +39,8 @@ const KakaoAuthPage = () => {
         .then(async (userCredential) => {
           const user = userCredential.user;
 
+          console.log(user);
+
           // Redux에 사용자 정보 저장
           dispatch(setUser({
             uid: user.uid,
@@ -60,13 +62,13 @@ const KakaoAuthPage = () => {
 
           if (userSnap.exists()) {
             try {
-              await updateDoc(userRef, {
+              await setDoc(userRef, {
                 email: user.email ?? null,
                 displayName: user.displayName ?? null,
                 photoURL: user.photoURL ?? null,
                 fcmToken: fcmToken ?? null,
                 pushTime: serverTimestamp(),
-              });
+              }, { merge: true });
               console.log("✅ 기존 사용자 문서 업데이트 완료.");
             } catch (err) {
               console.error("🔥 사용자 문서 업데이트 실패:", err);
@@ -87,7 +89,7 @@ const KakaoAuthPage = () => {
                 permit: [],
                 nara: [],
                 job: [],
-                expirationDate: ''
+                expirationDate: null
               });
               console.log("✅ 신규 사용자 문서 생성 완료.");
             } catch (err) {

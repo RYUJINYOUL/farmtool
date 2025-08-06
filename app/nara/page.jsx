@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { useRouter } from "next/navigation";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoIosHeart } from "react-icons/io";
+import Footer from '@/components/template/Footer';
 import {
   collection,
   doc,
@@ -771,6 +772,7 @@ export default function NaraBidList() {
   );
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 pt-15">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <h1 className="text-xl font-bold text-gray-900 mb-6">낙찰 목록</h1>
@@ -980,5 +982,7 @@ export default function NaraBidList() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
