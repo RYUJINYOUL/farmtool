@@ -778,10 +778,10 @@ export default function NaraBidList() {
         <h1 className="text-xl font-bold text-gray-900 mb-6">낙찰 목록</h1>
 
         {/* 모바일: Floating Action Button */}
-        <div className="fixed bottom-6 right-6 md:hidden z-40">
+        <div className="fixed bottom-16 right-3 md:hidden z-40">
           <button
             onClick={() => setShowDrawer(true)}
-            className="bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+            className="bg-blue-600 text-white w-12 h-12 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
@@ -939,7 +939,7 @@ export default function NaraBidList() {
             </svg>
           </button>
         </div>
-        <div className="p-4 overflow-y-auto h-[calc(100%-120px)]"> {/* 헤더와 푸터 높이를 고려 */}
+        <div className="p-4 overflow-y-auto h-[calc(100%-190px)]"> {/* 헤더와 푸터 높이를 고려 */}
           <MobileFilterUI
             industryNames={industryNames}
             regions={regions}
