@@ -4,7 +4,7 @@ import PaymentSuccessPage from "@/components/PaymentSuccessPage";
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>로딩 중...</div>}>
+    <Suspense fallback={<div>로딩 중</div>}>
       <PaymentSuccessPage />
     </Suspense>
   );
