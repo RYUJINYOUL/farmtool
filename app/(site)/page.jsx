@@ -73,7 +73,7 @@ export default function MyPage() {
             />
           </div>
 
-          <div className="mc:pt-8 pt-4 relative z-20">
+          <div className="md:pt-8 pt-1 relative z-20">
             <MainMenu />
           </div>
         </div>
