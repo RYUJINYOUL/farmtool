@@ -41,6 +41,7 @@ useEffect(() => {
         finalConfirmUrl.searchParams.append("collectionName", collectionName);
         finalConfirmUrl.searchParams.append("subscriptionPeriodInMonths", subscriptionPeriodInMonths);
 
+       
         const response = await fetch(finalConfirmUrl.toString(), {
           method: 'GET',
           headers: {
