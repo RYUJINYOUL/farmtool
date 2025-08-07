@@ -407,7 +407,7 @@ export default function MainMenu() {
                   <BrickWallFire className="w-5 h-5 text-pink-500" />
                   <span className="font-medium text-gray-800">건설업</span>
                 </div>
-               <span className="text-green-900 text-sm"><AnimatedCount target={counts.construction || 0} duration={1500} />개</span>
+               {/* <span className="text-green-900 text-sm"><AnimatedCount target={counts.construction || 0} duration={1500} />개</span> */}
               </button>
             </div>
 
@@ -420,7 +420,7 @@ export default function MainMenu() {
                   <Tractor className="w-5 h-5 text-orange-500" />
                   <span className="font-medium text-gray-800">건설장비</span>
                 </div>
-              <span className="text-gray-400 text-sm">{counts.equipment ? counts.equipment.toLocaleString() : 0}개</span>
+              {/* <span className="text-gray-400 text-sm">{counts.equipment ? counts.equipment.toLocaleString() : 0}개</span> */}
               </button>
             </div>
           </div>
@@ -436,7 +436,7 @@ export default function MainMenu() {
                   <Fence className="w-5 h-5 text-blue-400" />
                   <span className="font-medium text-gray-800">건설자재</span>
                 </div>
-              <span className="text-gray-400 text-sm">{counts.materials ? counts.materials.toLocaleString() : 0}개</span>
+              {/* <span className="text-gray-400 text-sm">{counts.materials ? counts.materials.toLocaleString() : 0}개</span> */}
               </button>
             </div>
 
@@ -449,7 +449,7 @@ export default function MainMenu() {
                   <Copyright className="w-5 h-5 text-blue-500" />
                   <span className="font-medium text-gray-800">인허가</span>
                 </div>
-                 <span className="text-gray-400 text-sm">12,358개(1달 기준)</span>
+                 {/* <span className="text-gray-400 text-sm">12,358개(1달 기준)</span> */}
               </button>
             </div>
           </div>
@@ -494,7 +494,7 @@ export default function MainMenu() {
                   <Hammer className="w-5 h-5 text-green-500" />
                   <span className="font-medium text-gray-800">전문인력</span>
                 </div>
-                <span className="text-gray-400 text-sm">{counts.professionals ? counts.professionals.toLocaleString() : 0}개</span>
+                {/* <span className="text-gray-400 text-sm">{counts.professionals ? counts.professionals.toLocaleString() : 0}개</span> */}
               </button>
             </div>
 
