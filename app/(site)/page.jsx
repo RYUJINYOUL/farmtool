@@ -29,20 +29,20 @@ export default function MyPage() {
   
 
   return (
-    <div className="pt-10 md:-mt-12">
-      <section className='flex justify-center items-center m-2 md:m-1 min-h-[calc(100vh-100px)]'>
+    <div className="pt-12">
+      <section className='flex justify-center items-center m-2 md:m-1'>
         <div className="md:w-[1100px] w-full -mt-2 pt-6 md:pt-8 relative">
           {/* 배경 그라데이션 효과 */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50 via-white to-blue-50 rounded-3xl opacity-50 -z-10" />
+        
           
-          <div className="relative bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl md:p-8 p-6 md:pt-12 pt-8 md:pb-12 pb-10 text-start border border-gray-100 z-10">
-            <div className="space-y-2 mb-8">
+          <div className="relative bg-white/80 backdrop-blur-sm shadow-md rounded-3xl md:p-8 p-6 md:pt-12 pt-8 md:pb-12 pb-10 text-start border border-gray-100 z-10">
+            <div className="space-y-2 md:mb-6 mb-4">
               <h1 className="md:text-3xl text-2xl font-extrabold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 건설 견적, 클릭 한 번에!
               </h1>
-              <p className="text-gray-500 text-sm md:text-base">
+              {/* <p className="text-gray-500 text-sm md:text-base">
                 필요한 모든 건설 서비스를 한 곳에서 쉽고 빠르게
-              </p>
+              </p> */}
             </div>
 
             <div className="transform transition-all duration-300 hover:scale-[1.02]">
@@ -51,7 +51,7 @@ export default function MyPage() {
                   type="text"
                   onClick={() => openCategory()} 
                   placeholder="건설, 장비, 자재, 전문인력, 구직 요청하기"
-                  className="flex-grow text-gray-800 placeholder-gray-400 focus:outline-none md:text-[18px] text-[15px]"
+                  className="flex-grow text-gray-800 placeholder-gray-400 focus:outline-none md:text-[18px] text-[13px]"
                 />
                 <Button
                   onClick={() => openCategory()} 
@@ -62,7 +62,7 @@ export default function MyPage() {
               </div>
             </div>
 
-            <p className="mt-6 text-gray-600 text-sm md:text-base font-medium pl-1 flex items-center gap-2">
+            <p className="mt-6 text-gray-600 text-[13px] md:text-base font-medium pl-1 flex items-center gap-2">
               <span className="text-blue-500">✨</span>
               정보를 입력하고, 여러 업체들의 응답을 받아보세요
             </p>
