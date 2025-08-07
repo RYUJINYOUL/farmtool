@@ -40,18 +40,18 @@ export default function Menu(props) {
       label: "건설자재",
       src: "/materials",
     },
-    {
-      label: "인허가",
-      src: "/permit",
-    },
-    {
-      label: "나라장터낙찰",
-      src: "/nara",
-    },
-    {
-      label: "구인구직",
-      src: "/job",
-    },
+    // {
+    //   label: "인허가",
+    //   src: "/permit",
+    // },
+    // {
+    //   label: "나라장터낙찰",
+    //   src: "/nara",
+    // },
+    // {
+    //   label: "구인구직",
+    //   src: "/job",
+    // },
     {
       label: "전문인력",
       src: "/professionals",

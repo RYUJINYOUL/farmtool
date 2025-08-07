@@ -440,7 +440,7 @@ export default function MainMenu() {
               </button>
             </div>
 
-            <div className="w-full md:w-1/2">
+            {/* <div className="w-full md:w-1/2">
               <button
                 onClick={() => push("/permit")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -448,15 +448,15 @@ export default function MainMenu() {
                 <div className="flex items-center gap-3">
                   <Copyright className="w-5 h-5 text-blue-500" />
                   <span className="font-medium text-gray-800">인허가</span>
-                </div>
+                </div> */}
                  {/* <span className="text-gray-400 text-sm">12,358개(1달 기준)</span> */}
-              </button>
-            </div>
+              {/* </button>
+            </div> */}
           </div>
 
           {/* 세 번째 줄: 등록글과 신청글, 업체 등록 */}
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2">
+            {/* <div className="w-full md:w-1/2">
               <button
                 onClick={() => push("nara")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -467,9 +467,9 @@ export default function MainMenu() {
                 </div>
                 <span className="text-gray-400 text-sm">{totalCount ? totalCount.toLocaleString() : 0}개</span>
               </button>
-            </div>
+            </div> */}
 
-            <div className="w-full md:w-1/2">
+            {/* <div className="w-full md:w-1/2">
                <button
                 onClick={() => push("/job")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -480,7 +480,7 @@ export default function MainMenu() {
                 </div>
                 
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* 네 번째 줄: 주문 신청, 알림 설정 */}
