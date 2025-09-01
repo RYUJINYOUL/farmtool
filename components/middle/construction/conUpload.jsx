@@ -56,10 +56,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   const { push } = useRouter();
   const timestamp = Date.now();
 
-<<<<<<< HEAD
-  // 폼 데이터 관리용 통합 상태
-=======
->>>>>>> 19ea6fa (dkdkkdkd)
+
   const [formState, setFormState] = useState({
     username: '',
     TopCategories: '전체',
@@ -77,10 +74,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     }
   });
 
-<<<<<<< HEAD
-  // ★ 커스텀 훅 사용 ★ (변화 없음)
-=======
->>>>>>> 19ea6fa (dkdkkdkd)
+
   const {
     addrList, locationError, isAddrModalOpen, isLocationLoading,
     setAddrList, setLocationError, setIsAddrModalOpen, setIsLocationLoading,
@@ -97,14 +91,9 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     imageFiles, removeImage, handleFileSelect, moveImage
   } = useImageUpload();
 
-<<<<<<< HEAD
+
   const [error, setError] = useState(''); // 일반적인 폼 에러 메시지
 
-  // 폼 입력 변경 핸들러 (변화 없음, 이미 categorySpecificData를 잘 처리하고 있음)
-=======
-  const [error, setError] = useState(''); 
-
->>>>>>> 19ea6fa (dkdkkdkd)
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     
@@ -131,11 +120,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     }
   };
 
-<<<<<<< HEAD
-  // --- 기존 useEffect 로직 수정 ---
-=======
 
->>>>>>> 19ea6fa (dkdkkdkd)
   useEffect(() => {
     const loadUserData = async () => {
       if (!currentUser?.uid) {
@@ -148,10 +133,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const fetchedUserData = userSnap.data();
-<<<<<<< HEAD
           console.log(fetchedUserData);
-=======
->>>>>>> 19ea6fa (dkdkkdkd)
           setUserData(fetchedUserData);
           setFormState(prev => ({
             ...prev,
@@ -182,11 +164,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     loadUserData();
   }, [currentUser]);
 
-<<<<<<< HEAD
-  // 최종 저장 핸들러
-=======
 
->>>>>>> 19ea6fa (dkdkkdkd)
   const handleSaveUsernameAndProfile = async () => {
     if (!formState.address || !formState.geoFirePoint) {
       setError('주소 검색을 통해 정확한 위치를 설정하고 입력해주세요.');
@@ -214,11 +192,8 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       }
     }
 
-<<<<<<< HEAD
+
     setError(''); // 모든 유효성 검사 통과 시 에러 초기화
-=======
-    setError(''); 
->>>>>>> 19ea6fa (dkdkkdkd)
 
     let imageUrls = [];
     const batch = writeBatch(db);
@@ -290,20 +265,13 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
           region: dataToSave.region,
           subRegion: dataToSave.subRegion,
           imageDownloadUrls: dataToSave.imageDownloadUrls,
-<<<<<<< HEAD
-          ...specificCategoryDataForCategoryCollection, // 동적 필드 데이터 병합
-=======
->>>>>>> 19ea6fa (dkdkkdkd)
           badge: dataToSave.badge,
           notice: dataToSave.notice,
           pushTime: dataToSave.pushTime,
           createdDate: new Date(),
-<<<<<<< HEAD
-          confirmed: false
-=======
           confirmed: false,
           ...specificCategoryDataForCategoryCollection, // 동적 필드 데이터 병합
->>>>>>> 19ea6fa (dkdkkdkd)
+
       };
       batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
   }
