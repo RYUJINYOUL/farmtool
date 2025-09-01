@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Dialog } from "@headlessui/react";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoIosHeart } from "react-icons/io";
+import { Bell, HelpCircle } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { db } from "@/firebase";
 import dayjs from 'dayjs';
@@ -376,7 +377,7 @@ export default function MainMenu() {
     <div className="flex flex-col items-center md:justify-center bg-gray-50 pt-5 md:w-[1100px] md:mx-auto">
       {/* 프로필 카드 */}
       <div className="w-full md:w-[1100px] bg-white shadow-md rounded-2xl p-6 text-center">
-        {/* <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
             {userInfo?.photoURL ? (
               <img
@@ -391,7 +392,7 @@ export default function MainMenu() {
           </div>
           <h2 className="text-xl font-bold text-gray-800">{userInfo?.displayName}</h2>
           <p className="text-sm text-gray-500">{userInfo?.email}</p>
-        </div> */}
+        </div>
 
         {/* 메뉴 리스트 */}
         <div className="space-y-3">
@@ -407,7 +408,7 @@ export default function MainMenu() {
                   <BrickWallFire className="w-5 h-5 text-pink-500" />
                   <span className="font-medium text-gray-800">건설업</span>
                 </div>
-               {/* <span className="text-green-900 text-sm"><AnimatedCount target={counts.construction || 0} duration={1500} />개</span> */}
+               <span className="text-green-900 text-sm"><AnimatedCount target={counts.construction || 0} duration={1500} />개</span>
               </button>
             </div>
 
@@ -420,7 +421,7 @@ export default function MainMenu() {
                   <Tractor className="w-5 h-5 text-orange-500" />
                   <span className="font-medium text-gray-800">건설장비</span>
                 </div>
-              {/* <span className="text-gray-400 text-sm">{counts.equipment ? counts.equipment.toLocaleString() : 0}개</span> */}
+              <span className="text-gray-400 text-sm">{counts.equipment ? counts.equipment.toLocaleString() : 0}개</span>
               </button>
             </div>
           </div>
@@ -436,11 +437,11 @@ export default function MainMenu() {
                   <Fence className="w-5 h-5 text-blue-400" />
                   <span className="font-medium text-gray-800">건설자재</span>
                 </div>
-              {/* <span className="text-gray-400 text-sm">{counts.materials ? counts.materials.toLocaleString() : 0}개</span> */}
+              <span className="text-gray-400 text-sm">{counts.materials ? counts.materials.toLocaleString() : 0}개</span>
               </button>
             </div>
 
-            {/* <div className="w-full md:w-1/2">
+            <div className="w-full md:w-1/2">
               <button
                 onClick={() => push("/permit")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -448,15 +449,15 @@ export default function MainMenu() {
                 <div className="flex items-center gap-3">
                   <Copyright className="w-5 h-5 text-blue-500" />
                   <span className="font-medium text-gray-800">인허가</span>
-                </div> */}
-                 {/* <span className="text-gray-400 text-sm">12,358개(1달 기준)</span> */}
-              {/* </button>
-            </div> */}
+                </div>
+                 <span className="text-gray-400 text-sm">12,358개(1달 기준)</span> 
+              </button>
+            </div>
           </div>
 
           {/* 세 번째 줄: 등록글과 신청글, 업체 등록 */}
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            {/* <div className="w-full md:w-1/2">
+            <div className="w-full md:w-1/2">
               <button
                 onClick={() => push("nara")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -467,9 +468,9 @@ export default function MainMenu() {
                 </div>
                 <span className="text-gray-400 text-sm">{totalCount ? totalCount.toLocaleString() : 0}개</span>
               </button>
-            </div> */}
+            </div> 
 
-            {/* <div className="w-full md:w-1/2">
+             <div className="w-full md:w-1/2">
                <button
                 onClick={() => push("/job")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -480,7 +481,7 @@ export default function MainMenu() {
                 </div>
                 
               </button>
-            </div> */}
+            </div>
           </div>
 
           {/* 네 번째 줄: 주문 신청, 알림 설정 */}
@@ -494,7 +495,7 @@ export default function MainMenu() {
                   <Hammer className="w-5 h-5 text-green-500" />
                   <span className="font-medium text-gray-800">전문인력</span>
                 </div>
-                {/* <span className="text-gray-400 text-sm">{counts.professionals ? counts.professionals.toLocaleString() : 0}개</span> */}
+                <span className="text-gray-400 text-sm">{counts.professionals ? counts.professionals.toLocaleString() : 0}개</span>
               </button>
             </div>
 
@@ -512,7 +513,7 @@ export default function MainMenu() {
           </div>
 
           {/* 다섯 번째 줄: 고객센터 (단일 버튼) */}
-          {/* <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
+          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2"> 
               <button
                 onClick={() => push("/login")}
@@ -539,7 +540,7 @@ export default function MainMenu() {
                 </div>
               </button>
             </div> 
-          </div> */}
+          </div>
         </div>
       </div>
 

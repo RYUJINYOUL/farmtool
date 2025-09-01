@@ -30,9 +30,9 @@ const Footer = () => {
     { name: '건설장비', href: '/equipment', icon: Tractor, color: 'text-orange-500' },
     { name: '건설자재', href: '/materials', icon: Fence, color: 'text-blue-400' },
     { name: '전문인력', href: '/professionals', icon: Hammer, color: 'text-green-500' },
-    // { name: '인허가', href: '/permit', icon: Copyright, color: 'text-blue-500' },
-    // { name: '나라장터', href: '/nara', icon: LaptopMinimalCheck, color: 'text-red-400' },
-    // { name: '구인구직', href: '/job', icon: UserPen, color: 'text-red-500' },
+    { name: '인허가', href: '/permit', icon: Copyright, color: 'text-blue-500' },
+    { name: '나라장터', href: '/nara', icon: LaptopMinimalCheck, color: 'text-red-400' },
+    { name: '구인구직', href: '/job', icon: UserPen, color: 'text-red-500' },
     { name: '내정보', href: '/myinfo', icon: Dock, color: 'text-amber-500' },
   ];
 

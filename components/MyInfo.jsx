@@ -296,7 +296,7 @@ export default function MyInfo() {
         <div className="mt-6 space-y-3">
 
           {/* 첫 번째 줄: 일반 찜 목록, 나라장터 찜 목록 */}
-          {/* <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
+          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
               <button
                 onClick={() => checkLoginAndOpenDialog("favorites")}
@@ -322,10 +322,10 @@ export default function MyInfo() {
                 <span className="text-gray-400 text-sm">{wishListCount.nara}개</span>
               </button>
             </div>
-          </div> */}
+          </div>
 
           {/* 두 번째 줄: 인허가 찜 목록, 회원정보 수정 */}
-          {/* <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
+          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
               <button
                 onClick={() => checkLoginAndOpenDialog("permitFavorites")}
@@ -351,7 +351,7 @@ export default function MyInfo() {
                  <span className="text-gray-400 text-sm">{wishListCount.job}개</span>
               </button>
             </div>
-          </div> */}
+          </div>
 
           {/* 세 번째 줄: 등록글과 신청글, 업체 등록 */}
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">

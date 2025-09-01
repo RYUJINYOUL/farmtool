@@ -54,9 +54,14 @@ export function useAddressSearch(formState, setFormState) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         try {
+<<<<<<< HEAD
           const result = await getAddressByLatLon(lon, lat); // getAddressByLatLon 함수는 api.js에 있다고 가정
           // getAddressByLatLon 함수도 이미 { juso, x, y } 형태의 객체 배열을 반환합니다.
           setAddrList(result); // <-- 이 부분은 변경 없음 (이미 올바름)
+=======
+          const result = await getAddressByLatLon(lon, lat); 
+          setAddrList(result); 
+>>>>>>> 19ea6fa (dkdkkdkd)
           setIsAddrModalOpen(true);
         } catch (apiError) {
           console.error("주소 API 호출 에러:", apiError);

@@ -30,7 +30,7 @@ export default function AddressSearchModal({
 
         <div className="grid grid-cols-4 items-center gap-2 pt-3 mb-2">
               <Input
-                id="address" // formState.address와 일치
+                id="address" 
                 value={formState.address}
                 onChange={handleInputChange}
                 placeholder="주소, 건물명 입력"
