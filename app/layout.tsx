@@ -10,8 +10,29 @@ const inter = Inter({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
-  title: '건설톡 - 건설의 모든 정보',
-  description: '당신만의 특별한 링크 모음을 만들어보세요',
+  title: '건설톡',
+  description: '건설톡',
+  keywords: '건설톡, 장비톡, 건자재톡, 건설 구인구직, 건설전문인력, 인허가, 나라장터',
+  openGraph: {
+    title: '건설톡',
+    description: '건설톡, 장비톡, 건자재톡, 건설 구인구직, 건설전문인력, 인허가, 나라장터',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  icons: {
+    icon: [
+      { url: '/Image/logo.png', type: 'image/png' },
+    ],
+    shortcut: ['/Image/logo.png'],
+    apple: [
+      { url: '/Image/logo.png' },
+    ],
+  },
+  verification: {
+    other: {
+      'naver-site-verification': '3e3c2769a630ba77d8cadb2026d2c8eefe6dd8fc',
+    },
+  },
 }
 
 export default function RootLayout({
@@ -22,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="ko"
      suppressHydrationWarning>
+  
       <body className={inter.className}>
       <ServiceWorkerRegister />
       <ClientLayout>

@@ -82,7 +82,6 @@ const EditUpload2 = ({ isOpen, col, id, onClose }) => {
             construction_phoneNumber: data.construction_phoneNumber || '',
             construction_contactPerson: data.construction_contactPerson || '',
 
-
             address: data.address || '',
             isNotice: data.isNotice || false,
             TopCategories: data.TopCategories || '전체',
