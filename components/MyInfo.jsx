@@ -304,7 +304,7 @@ export default function MyInfo() {
               >
                 <div className="flex items-center gap-3">
                   <Heart className="w-5 h-5 text-pink-500" />
-                  <span className="font-medium text-gray-800">일반 찜 목록</span>
+                  <span className="font-medium text-gray-800 ">일반 찜 목록</span>
                 </div>
                 <span className="text-gray-400 text-sm">{wishListCount.general}개</span>
               </button>
@@ -472,7 +472,7 @@ export default function MyInfo() {
             {/* Dialog Content: 일반 찜 목록 */}
             {openDialog === "favorites" && (
               <div className="flex-shrink-0">
-                <Dialog.Title className="text-xl font-bold mb-4">일반 찜 목록</Dialog.Title>
+                <Dialog.Title className="text-xl font-bold mb-4 dark:text-gray-900">일반 찜 목록</Dialog.Title>
                 {wishListDetails.length === 0 ? (
                   <p className="text-gray-500">찜한 항목이 없습니다.</p>
                 ) : (
@@ -486,7 +486,7 @@ export default function MyInfo() {
                       return (
                         <div
                           key={idx}
-                          className="border p-3 rounded-lg hover:bg-gray-50 transition"
+                          className="border border-gray-200 dark:border-gray-300 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-300 transition"
                         >
                           <Link
                             href={`/${item.category}/${item.middle}/${item.itemId}`}
@@ -602,7 +602,7 @@ export default function MyInfo() {
                 ) : (
                   <div className="space-y-3">
                     {myListDetails.map((item) => (
-                      <div key={item.itemId || uid } className="border p-3 rounded-lg hover:bg-gray-50 transition">
+                      <div key={item.itemId || uid } className="border border-gray-200 dark:border-gray-300 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                         <Link
                           href={`/${item.category}/${item.middle}/${item.id || uid}`}
                           className="block"

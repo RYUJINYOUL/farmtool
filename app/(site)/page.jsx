@@ -5,19 +5,15 @@ import MainMenu from "@/components/MainMenu"
 import Footer from '@/components/template/Footer';
 import { FiSearch } from "react-icons/fi";
 import { useSelector } from 'react-redux';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button";
 import ConUpload from '@/components/middle/construction/conUpload'
+import { useRouter } from 'next/navigation';
 
 
 export default function MyPage() {
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const { currentUser } = useSelector(state => state.user);
+  const router = useRouter();
 
   function openCategory () {
     if (currentUser?.uid) {

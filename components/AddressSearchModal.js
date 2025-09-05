@@ -19,7 +19,7 @@ export default function AddressSearchModal({
   return (
     <Dialog open={isAddrModalOpen} onClose={() => setIsAddrModalOpen(false)} className="fixed inset-0 z-[60] flex items-center justify-center">
       <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
-      <Dialog.Panel className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] overflow-y-auto relative">
+      <Dialog.Panel className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] overflow-y-auto relative">
         <button
           onClick={() => setIsAddrModalOpen(false)}
           className="absolute top-3 right-3 text-gray-400 hover:text-black text-2xl"

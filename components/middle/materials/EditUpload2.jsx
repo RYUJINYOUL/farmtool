@@ -291,7 +291,7 @@ const EditUpload2 = ({ isOpen, col, id, onClose }) => {
         <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
 
         {/* Dialog.Panel은 모달의 실제 콘텐츠를 포함합니다. */}
-        <Dialog.Panel className="bg-white p-6 rounded-lg shadow-xl w-full max-w-[600px] flex flex-col max-h-[90vh] relative">
+        <Dialog.Panel className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-[600px] flex flex-col max-h-[90vh] relative">
           {/* 닫기 버튼 */}
           <button
             onClick={onClose}
@@ -303,7 +303,7 @@ const EditUpload2 = ({ isOpen, col, id, onClose }) => {
 
           {/* DialogHeader 역할을 하는 부분 */}
           <div className="pb-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">수정 게시판</h3>
+            <h3 className="text-lg font-semibold">수정 게시판</h3>
             <p className="text-sm text-gray-500">아래 폼을 작성하여 새로운 정보를 등록하세요.</p>
           </div>
           

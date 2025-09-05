@@ -185,7 +185,7 @@ export default function PermitSearchControls({
       <div className="flex md:flex-row flex-col gap-3 w-full">
         {/* 대분류 선택 드롭다운 */}
         <div className="mb-1 flex-1 relative">
-          <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             {/* <label htmlFor="main-region-select" style={{ fontWeight: 'bold' }}>시도:</label> */}
             <select id="main-region-select" value={tempMainRegion} className='focus:outline-none'
             onChange={(e) => {
@@ -206,7 +206,7 @@ export default function PermitSearchControls({
       <div className="mb-1 flex-1 relative"> 
         {/* 소분류 선택 드롭다운 (시도 선택 시 활성화) */}
         {tempMainRegion && tempMainRegion !== '전국' && (
-           <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+           <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <select id="sub-region-select" value={tempSubRegion} className='focus:outline-none' onChange={(e) => {
               setTempSubRegion(e.target.value);
               setTempLegalDongCode(''); // 시군구 변경 시 법정동 초기화
@@ -225,7 +225,7 @@ export default function PermitSearchControls({
       <div className="mb-1 flex-1 relative"> 
         {/* 법정동 선택 드롭다운 (시군구 선택 시 활성화) */}
         {tempSubRegion && tempSubRegion !== '시군구 선택' && (
-          <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <div className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <select id="legal-dong-select" value={tempLegalDongCode} className='focus:outline-none' onChange={(e) => setTempLegalDongCode(e.target.value)}>
               <option value="">법정동 선택</option>
               {isFetchingDongs ? (

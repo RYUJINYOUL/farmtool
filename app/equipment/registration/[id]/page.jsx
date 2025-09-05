@@ -85,7 +85,7 @@ const Page = (props) => {
           <div className='mt-10' />
           <div className='flex flex-col lg:w-[1100px] w-full'>
             <div className='flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full'>
-              <div className='lg:text-start font-semibold text-center text-[20px]'>{message.companyName}</div>
+              <div className='lg:text-start font-semibold text-center text-[20px] text-gray-900'>{message.companyName}</div>
               
               <div className='lg:text-end text-center text-[14px]'>{timeFromNow(message.createdDate)}
                 </div>
@@ -128,7 +128,7 @@ const Page = (props) => {
                 </table>
               </div>
             <div className='mt-10' />
-            <div className='text-[15px] h-full text-start leading-7'>
+            <div className='text-[15px] h-full text-start leading-7 dark:text-gray-900'>
               <p style={{ whiteSpace: "pre-wrap" }}>{message.constructionExperience}</p>
             </div>
             <div className='mt-10' />
