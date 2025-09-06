@@ -24,7 +24,6 @@ const CheckoutPage = () => {
 
   const handlePaymentSuccess = (paymentKey, orderId, amount) => {
     console.log("Payment successful (client-side):", { paymentKey, orderId, amount });
-    // TODO: 결제 성공 후 서버 측 로직 추가 (예: DB 업데이트, 사용자에게 알림 등)
   };
 
   const handlePaymentFail = (errorCode, errorMessage, orderId) => {
