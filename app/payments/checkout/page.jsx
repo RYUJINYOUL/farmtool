@@ -22,9 +22,41 @@ const CheckoutPage = () => {
   const amount = subscriptionPrices[subscriptionPeriodInMonths];
   const orderName = `구독 ${subscriptionPeriodInMonths}개월`;
 
-  const handlePaymentSuccess = (paymentKey, orderId, amount) => {
-    console.log("Payment successful (client-side):", { paymentKey, orderId, amount });
-    // TODO: 결제 성공 후 서버 측 로직 추가 (예: DB 업데이트, 사용자에게 알림 등)
+   const handlePaymentSuccess = async (paymentData) => {
+    try {
+      const { paymentKey, orderId, amount } = paymentData;
+
+      // 백엔드 Firebase Functions에 결제 승인 요청 (POST)
+      const response = await fetch('YOUR_FIREBASE_CONFIRM_PAYMENT_URL', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.idToken}`, // Firebase 인증 토큰
+        },
+        body: JSON.stringify({
+          paymentKey,
+          orderId,
+          amount,
+          collectionName: 'conApply',
+          subscriptionPeriodInMonths,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // 성공 시, 클라이언트에서 직접 성공 페이지로 리디렉션
+        window.location.href = `/payments/success?orderId=${orderId}&amount=${amount}`;
+      } else {
+        // 실패 시, 에러 페이지로 리디렉션
+        alert(`결제 실패: ${result.message} (${result.code})`);
+        window.location.href = `/payments/fail?code=${result.code}&message=${encodeURIComponent(result.message)}`;
+      }
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      alert('결제 승인 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      window.location.href = `/payments/fail?code=CLIENT_ERROR&message=${encodeURIComponent('클라이언트 오류')}`;
+    }
   };
 
   const handlePaymentFail = (errorCode, errorMessage, orderId) => {

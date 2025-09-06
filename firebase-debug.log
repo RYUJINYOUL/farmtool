@@ -1,0 +1,49 @@
+[debug] [2025-09-06T16:34:20.926Z] ----------------------------------------------------------------------
+[debug] [2025-09-06T16:34:20.933Z] Command:       /usr/local/bin/node /usr/local/bin/firebase functions:secrets:set TOSS_SECRET_KEY
+[debug] [2025-09-06T16:34:20.933Z] CLI Version:   14.8.0
+[debug] [2025-09-06T16:34:20.933Z] Platform:      darwin
+[debug] [2025-09-06T16:34:20.933Z] Node Version:  v20.17.0
+[debug] [2025-09-06T16:34:20.933Z] Time:          Sun Sep 07 2025 01:34:20 GMT+0900 (대한민국 표준시)
+[debug] [2025-09-06T16:34:20.934Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-06T16:34:21.083Z] Object "/emulators/firestore" in "firebase.json" has unknown property: {"additionalProperty":"rules"}
+[debug] [2025-09-06T16:34:21.086Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-06T16:34:21.087Z] > authorizing via signed-in user (ryussi0925@gmail.com)
+[debug] [2025-09-06T16:34:21.087Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-06T16:34:21.087Z] > authorizing via signed-in user (ryussi0925@gmail.com)
+[debug] [2025-09-06T16:34:21.088Z] [iam] checking project farmtool-75b0f for permissions ["firebase.projects.get","secretmanager.secrets.create","secretmanager.secrets.get","secretmanager.secrets.update","secretmanager.versions.add"]
+[debug] [2025-09-06T16:34:21.088Z] Checked if tokens are valid: false, expires at: 1757176266531
+[debug] [2025-09-06T16:34:21.088Z] Checked if tokens are valid: false, expires at: 1757176266531
+[debug] [2025-09-06T16:34:21.089Z] > refreshing access token with scopes: []
+[debug] [2025-09-06T16:34:21.090Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-06T16:34:21.090Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-06T16:34:21.363Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-06T16:34:21.364Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-06T16:34:21.380Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f:testIamPermissions [none]
+[debug] [2025-09-06T16:34:21.381Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f:testIamPermissions x-goog-quota-user=projects/farmtool-75b0f
+[debug] [2025-09-06T16:34:21.381Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f:testIamPermissions {"permissions":["firebase.projects.get","secretmanager.secrets.create","secretmanager.secrets.get","secretmanager.secrets.update","secretmanager.versions.add"]}
+[debug] [2025-09-06T16:34:21.638Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f:testIamPermissions 200
+[debug] [2025-09-06T16:34:21.639Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f:testIamPermissions {"permissions":["firebase.projects.get","secretmanager.secrets.create","secretmanager.secrets.get","secretmanager.secrets.update","secretmanager.versions.add"]}
+[debug] [2025-09-06T16:34:21.640Z] Checked if tokens are valid: true, expires at: 1757180060364
+[debug] [2025-09-06T16:34:21.640Z] Checked if tokens are valid: true, expires at: 1757180060364
+[debug] [2025-09-06T16:34:21.640Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f [none]
+[debug] [2025-09-06T16:34:22.270Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f 200
+[debug] [2025-09-06T16:34:22.270Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/farmtool-75b0f {"projectNumber":"609587756851","projectId":"farmtool-75b0f","lifecycleState":"ACTIVE","name":"farmtool","labels":{"firebase":"enabled"},"createTime":"2024-09-23T12:22:18.189533Z"}
+[debug] [2025-09-06T16:34:22.271Z] Checked if tokens are valid: true, expires at: 1757180060364
+[debug] [2025-09-06T16:34:22.271Z] Checked if tokens are valid: true, expires at: 1757180060364
+[debug] [2025-09-06T16:34:22.271Z] >>> [apiv2][query] GET https://secretmanager.googleapis.com/v1/projects/farmtool-75b0f/secrets/TOSS_SECRET_KEY [none]
+[debug] [2025-09-06T16:34:22.587Z] <<< [apiv2][status] GET https://secretmanager.googleapis.com/v1/projects/farmtool-75b0f/secrets/TOSS_SECRET_KEY 200
+[debug] [2025-09-06T16:34:22.587Z] <<< [apiv2][body] GET https://secretmanager.googleapis.com/v1/projects/farmtool-75b0f/secrets/TOSS_SECRET_KEY {"name":"projects/609587756851/secrets/TOSS_SECRET_KEY","replication":{"automatic":{}},"createTime":"2025-07-01T09:36:41.462831Z","labels":{"firebase-managed":"functions"},"etag":"\"1638dae1da4c5a\""}
+[debug] [2025-09-06T16:41:20.706Z] ExitPromptError: User force closed the prompt with SIGINT
+    at Interface.sigint (/usr/local/lib/node_modules/firebase-tools/node_modules/@inquirer/core/dist/commonjs/lib/create-prompt.js:101:37)
+    at Interface.emit (node:events:519:28)
+    at Interface.emit (node:domain:488:12)
+    at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1126:18)
+    at ReadStream.onkeypress (node:internal/readline/interface:265:20)
+    at ReadStream.emit (node:events:531:35)
+    at ReadStream.emit (node:domain:488:12)
+    at emitKeys (node:internal/readline/utils:371:14)
+    at emitKeys.next (<anonymous>)
+    at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+[error] 
+[error] Error: An unexpected error has occurred.
