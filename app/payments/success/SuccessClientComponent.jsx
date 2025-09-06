@@ -1,6 +1,5 @@
 // app/payments/success/SuccessClientComponent.jsx
-
-"use client";
+"use client"; // 이 컴포넌트는 클라이언트에서만 렌더링됩니다.
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -9,32 +8,56 @@ export default function SuccessClientComponent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
+  const code = searchParams.get('code'); // 실패 페이지에서 넘어올 수도 있으므로 추가
+  const paymentKey= searchParams.get('paymentKey');
 
   const [isLoading, setIsLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 결제 승인은 이미 CheckoutPage에서 완료됨.
-    // 여기서는 URL 정보만 확인하고 화면에 표시
+    // 백엔드(Firebase Functions)에서 결제 정보를 다시 조회할 필요가 있다면 여기서 fetch 호출
+    // 현재는 쿼리 파라미터만 사용하므로 바로 처리
     if (orderId && amount) {
       setPaymentDetails({ orderId, amount });
+      setIsLoading(false);
+    } else if (code) {
+      setError({ code, message: searchParams.get('message') || '결제 실패' });
+      setIsLoading(false);
+    } else {
+      setError({ code: 'INVALID_ACCESS', message: '잘못된 접근입니다.' });
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [orderId, amount]);
+
+    // 또는 필요한 경우 서버에서 결제 정보 조회 (예: /api/payments/verify?orderId=...)
+    // const fetchPaymentVerification = async () => {
+    //   try {
+    //     const res = await fetch(`/api/payments/verify?orderId=${orderId}`);
+    //     if (!res.ok) throw new Error('Payment verification failed');
+    //     const data = await res.json();
+    //     setPaymentDetails(data);
+    //   } catch (err) {
+    //     setError(err.message);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
+    // if (orderId) {
+    //   fetchPaymentVerification();
+    // }
+  }, [orderId, amount, code, searchParams]);
+
 
   if (isLoading) {
     return <div>결제 정보를 불러오는 중...</div>;
   }
 
-  // 오류 코드가 URL에 있는 경우 (fail 페이지에서 넘어온 경우)
-  if (!orderId || !amount) {
-    const code = searchParams.get('code');
-    const message = searchParams.get('message') || '결제 실패';
+  if (error) {
     return (
       <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>
         <h2>결제 처리 중 오류 발생</h2>
-        <p>코드: {code}</p>
-        <p>메시지: {message}</p>
+        <p>코드: {error.code}</p>
+        <p>메시지: {error.message}</p>
         <p>주문 ID: {orderId || '정보 없음'}</p>
         <button onClick={() => window.location.href = '/'}>메인으로 돌아가기</button>
       </div>
