@@ -20,7 +20,7 @@ const CheckoutPage = () => {
 
   const userUid = currentUser?.uid;
   const amount = subscriptionPrices[subscriptionPeriodInMonths];
-  const orderName = `${subscriptionPeriodInMonths}개월`;
+  const orderName = `구독 ${subscriptionPeriodInMonths}개월`;
 
   const handlePaymentSuccess = (paymentKey, orderId, amount) => {
     console.log("Payment successful (client-side):", { paymentKey, orderId, amount });

@@ -32,7 +32,7 @@ const TossPaymentsWidget = ({
       }
       try {
         const tossPayments = await loadTossPayments(clientKey);
-        const widgets = tossPayments.widgets({ customerKey: ANONYMOUS });
+        const widgets = tossPayments.widgets({ customerKey: `${orderId}_${Date.now()}` });
         setWidgets(widgets);
       } catch (error) {
         console.error("Error fetching payment widget:", error);
@@ -70,6 +70,7 @@ const TossPaymentsWidget = ({
     renderPaymentWidgets();
   }, [widgets, amount]);
 
+  
   const requestPayment = useCallback(async () => {
     if (isProcessingPayment) {
       console.warn("Payment request is already in progress.");
