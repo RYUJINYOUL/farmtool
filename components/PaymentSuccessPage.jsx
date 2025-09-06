@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app } from "@/firebase";
+import { app } from "../firebase";
 
 const PaymentSuccessPage = () => {
   const searchParams = useSearchParams();

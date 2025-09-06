@@ -6,11 +6,9 @@ import { useEffect, useState } from 'react';
 
 export default function SuccessClientComponent() {
   const searchParams = useSearchParams();
-  const paymentKey = searchParams.get('paymentKey');
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
-  const collectionName = searchParams.get('collectionName');
-  const subscriptionPeriodInMonths = searchParams.get('subscriptionPeriodInMonths');
+
 
   const [isLoading, setIsLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState(null);

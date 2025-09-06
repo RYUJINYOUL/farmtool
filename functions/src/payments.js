@@ -93,12 +93,12 @@ exports.confirmPayment = onRequest(
             }, { merge: true });
 
     
-          return res.status(200).json({ status: 'SUCCESS', orderId, amount });
-          // if (req.query.from === 'app') {
-          //   return res.redirect(`https://www.cstalk.kr/payment-success?orderId=${orderId}&amount=${amount}&paymentKey=${paymentKey}`);
-          // } else {
-          //   return res.redirect(`${TOSS_SUCCESS_FRONTEND_URL.value()}?orderId=${orderId}&amount=${amount}&paymentKey=${paymentKey}`);
-          // }
+          // return res.status(200).json({ status: 'SUCCESS', orderId, amount });
+          if (req.query.from === 'app') {
+            return res.redirect(`https://www.cstalk.kr/payment-success?orderId=${orderId}&amount=${amount}&paymentKey=${paymentKey}`);
+          } else {
+            return res.status(200).json({ status: 'SUCCESS', orderId, amount });
+          }
 
         } catch (error) {
           console.error('Error confirming payment:', error);
@@ -124,12 +124,12 @@ exports.failPayment = onRequest(
 
     console.error('Payment failed:', { code, message, orderId });
 
-// if (req.query.from === 'app') {
-//   return res.redirect(`https://www.cstalk.kr/payment-fail?code=${code}&message=${encodeURIComponent(message)}&orderId=${orderId}`);
-// } else {
-//   return res.redirect(`${failUrl}?code=${code}&message=${encodeURIComponent(message)}&orderId=${orderId}`);
-// }
+if (req.query.from === 'app') {
+  return res.redirect(`https://www.cstalk.kr/payment-fail?code=${code}&message=${encodeURIComponent(message)}&orderId=${orderId}`);
+} else {
+  return res.redirect(`${failUrl}?code=${code}&message=${encodeURIComponent(message)}&orderId=${orderId}`);
+}
 
-return res.redirect(`${failUrl}?code=${code}&message=${encodeURIComponent(message)}&orderId=${orderId}`);
+// return res.redirect(`${failUrl}?code=${code}&message=${encodeURIComponent(message)}&orderId=${orderId}`);
   }
 );
