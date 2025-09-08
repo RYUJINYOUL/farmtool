@@ -64,7 +64,7 @@ const handlePaymentSuccess = (paymentKey, orderId, amount) => {
                 onChange={(e) => setSubscriptionPeriodInMonths(Number(e.target.value))}
                 className="block w-full appearance-none rounded-xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-base text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out"
               >
-                <option value={1}>1개월 - 15,000원</option>
+                <option value={1}>1개월 - 10원</option>
                 <option value={3}>3개월 - 42,000원</option>
                 <option value={6}>6개월 - 78,000원</option>
                 <option value={12}>12개월 - 118,000원</option>

@@ -1,6 +1,6 @@
 // app/payments/success/page.jsx
 import { Suspense } from "react";
-import PaymentSuccessPage from "@/components/PaymentSuccessPage";
+import PaymentSuccessPage from "../../../components/PaymentSuccessPage";
 
 export default function Page() {
   return (
