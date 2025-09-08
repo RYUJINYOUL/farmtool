@@ -5,6 +5,7 @@ import TossPaymentsWidget from '@/components/TossPaymentsWidget';
 import { useSelector } from 'react-redux';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 
 const subscriptionPrices = {
   1: 15000,
@@ -17,6 +18,9 @@ const CheckoutPage = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [subscriptionPeriodInMonths, setSubscriptionPeriodInMonths] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const searchParams = useSearchParams(); 
+  const from = searchParams.get("from") || "web"; 
 
   const userUid = currentUser?.uid;
   const amount = subscriptionPrices[subscriptionPeriodInMonths];
@@ -94,6 +98,7 @@ const CheckoutPage = () => {
             variant="primary"
             collectionName="conApply"
             subscriptionPeriodInMonths={subscriptionPeriodInMonths}
+            from={from}
           />
         </div>
         
