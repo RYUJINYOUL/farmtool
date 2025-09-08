@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function PaymentSuccessPage() {
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     // next/navigation 대신 표준 URLSearchParams를 사용하여 쿼리 파라미터를 가져옵니다.
@@ -25,7 +27,15 @@ export default function PaymentSuccessPage() {
       paymentKey,
     });
 
-  }, []);
+    // 3초 후 홈 페이지로 이동 (리디렉션)
+    const timer = setTimeout(() => {
+      router.push('/');
+    }, 3000); // 3000 밀리초 = 3초
+
+    // 컴포넌트 언마운트 시 타이머 정리
+    return () => clearTimeout(timer);
+    
+  }, [router]); // 의존성 배열에 router 추가
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
