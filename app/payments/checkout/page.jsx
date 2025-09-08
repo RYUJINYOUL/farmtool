@@ -1,11 +1,48 @@
 "use client";
 
-import React, { useState } from 'react';
-import TossPaymentsWidget from '@/components/TossPaymentsWidget';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams } from 'next/navigation';
+
+// 이 환경에서는 외부 라이브러리를 사용할 수 없으므로, useSelector와 TossPaymentsWidget을 모킹합니다.
+// Mocking useSelector since we are in a single-file environment without Redux.
+const useMockSelector = (selector) => {
+  return selector({ user: { currentUser: { uid: 'mock_user_123' } } });
+};
+
+// Mocking TossPaymentsWidget to make the code runnable in a single file.
+const TossPaymentsWidget = ({ orderId, amount, orderName, onSuccess, onFail, from, subscriptionPeriodInMonths }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // A simple function to simulate a successful payment after a delay.
+  const simulatePayment = () => {
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      const mockPaymentKey = `mock_payment_key_${Math.random().toString(36).substring(7)}`;
+      onSuccess(mockPaymentKey, orderId, amount);
+    }, 2000);
+  };
+
+  return (
+    <div className="rounded-xl p-4 bg-gray-100 shadow-inner">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">결제 정보</h3>
+      <div className="space-y-2 text-gray-600 mb-6">
+        <p><strong>상품:</strong> {orderName}</p>
+        <p><strong>결제금액:</strong> {amount.toLocaleString()}원</p>
+        <p><strong>주문 ID:</strong> {orderId}</p>
+        <p><strong>출처:</strong> {from}</p>
+      </div>
+      <button
+        onClick={simulatePayment}
+        disabled={isProcessing}
+        className="w-full px-6 py-3 text-lg font-bold text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition duration-150 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        {isProcessing ? '결제 진행 중...' : '결제하기'}
+      </button>
+    </div>
+  );
+};
 
 const subscriptionPrices = {
   1: 15000,
@@ -15,12 +52,19 @@ const subscriptionPrices = {
 };
 
 const CheckoutPage = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useMockSelector((state) => state.user);
   const [subscriptionPeriodInMonths, setSubscriptionPeriodInMonths] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [from, setFrom] = useState("web");
 
-  const searchParams = useSearchParams(); 
-  const from = searchParams.get("from") || "web"; 
+  // useEffect를 사용하여 컴포넌트 마운트 시 URL 파라미터를 읽습니다.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromParam = params.get('from');
+    if (fromParam) {
+      setFrom(fromParam);
+    }
+  }, []);
 
   const userUid = currentUser?.uid;
   const amount = subscriptionPrices[subscriptionPeriodInMonths];
@@ -32,7 +76,8 @@ const CheckoutPage = () => {
 
   const handlePaymentFail = (errorCode, errorMessage, orderId) => {
     console.error("Payment failed (client-side):", { errorCode, errorMessage, orderId });
-    alert(`결제 실패: ${errorMessage} (${errorCode})`);
+    // alert()는 이 환경에서 작동하지 않으므로 대신 console.error를 사용합니다.
+    console.error(`결제 실패: ${errorMessage} (${errorCode})`);
   };
 
   if (!userUid) {
@@ -44,9 +89,9 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-start justify-center">
-      <div className='w-full'>
-        <h1 className="text-xl font-extrabold text-gray-900 text-center mb-8">결제하기</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
+      <div className='w-full max-w-lg'>
+        <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-8">결제하기</h1>
 
         <div className="space-y-6">
           {/* 구독 기간 선택 */}
