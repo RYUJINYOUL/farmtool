@@ -8,7 +8,7 @@ import { Dialog } from "@headlessui/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const subscriptionPrices = {
-  1: 300,
+  1: 10,
   3: 42000,
   6: 78000,
   12: 118000,
