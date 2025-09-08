@@ -21,7 +21,6 @@ const CheckoutPage = () => {
 
   // ✅ Suspense 안에서만 안전하게 동작
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "web";
 
   const userUid = currentUser?.uid;
   const amount = subscriptionPrices[subscriptionPeriodInMonths];
@@ -105,7 +104,6 @@ const handlePaymentSuccess = (paymentKey, orderId, amount) => {
             variant="primary"
             collectionName="conApply"
             subscriptionPeriodInMonths={subscriptionPeriodInMonths}
-            from={from}
           />
         </div>
 

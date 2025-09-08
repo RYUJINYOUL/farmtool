@@ -32,7 +32,7 @@ exports.confirmPayment = onRequest(
         // 여기서는 간단하게 orderId를 사용자 ID로 사용합니다.
         // 결제 시 인증된 사용자라면, orderId에 userId를 포함시켜 전달했을 것입니다.
         if (orderId) {
-            userId = orderId;
+            userId = orderId.split('_')[0];
         } else {
             console.error('Order ID is missing, cannot identify user.');
             return res.status(400).json({ code: 'MISSING_ORDER_ID', message: '주문번호가 누락되었습니다.' });

@@ -96,7 +96,7 @@ const TossPaymentsWidget = ({
 
       // 결제 성공 시 클라이언트 페이지로 리디렉션
       // const finalSuccessUrl = `${window.location.origin}/payments/success?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}&from=${from}`;
-      const finalSuccessUrl = `${confirmUrl}?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}&from=${from}`;
+      const finalSuccessUrl = `${confirmUrl}?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}`;
       const finalFailUrl = `${failUrl}?from=${from}`;
 
       await widgets.requestPayment({
