@@ -12,6 +12,7 @@ const TossPaymentsWidget = ({
   orderName,
   collectionName,
   subscriptionPeriodInMonths,
+  from
 }) => {
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
   // const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL; // 사용하지 않습니다.
@@ -94,8 +95,9 @@ const TossPaymentsWidget = ({
       });
 
       // 결제 성공 시 클라이언트 페이지로 리디렉션
-      const finalSuccessUrl = `${window.location.origin}/payments/success?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}`;
-      const finalFailUrl = `${failUrl}`;
+      // const finalSuccessUrl = `${window.location.origin}/payments/success?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}&from=${from}`;
+      const finalSuccessUrl = `${confirmUrl}?collectionName=${collectionName}&subscriptionPeriodInMonths=${subscriptionPeriodInMonths}&from=${from}`;
+      const finalFailUrl = `${failUrl}?from=${from}`;
 
       await widgets.requestPayment({
         orderId: `${orderId}_${Date.now()}`,
