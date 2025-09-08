@@ -21,8 +21,9 @@ const CheckoutPage = () => {
 
   // ✅ Suspense 안에서만 안전하게 동작
   const searchParams = useSearchParams();
+  const appUserUid = searchParams.get('appUserUid'); 
 
-  const userUid = currentUser?.uid;
+  const userUid = `${appUserUid || currentUser?.uid}`;
   const amount = subscriptionPrices[subscriptionPeriodInMonths];
   const orderName = `구독 ${subscriptionPeriodInMonths}개월`;
 
