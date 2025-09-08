@@ -1,93 +1,76 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app } from "../firebase";
 
-const PaymentSuccessPage = () => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL;
+import { useEffect, useState } from 'react';
 
-  const paymentKey = searchParams.get("paymentKey");
-  const orderId = searchParams.get("orderId");
-  const amount = searchParams.get("amount");
-  const collectionName = searchParams.get("collectionName");
-  const subscriptionPeriodInMonths = searchParams.get("subscriptionPeriodInMonths");
+export default function PaymentSuccessPage() {
+  const [paymentInfo, setPaymentInfo] = useState(null);
+  const [error, setError] = useState(null);
 
-  const [status, setStatus] = useState("결제 승인 중...");
-  const [isError, setIsError] = useState(false);
+  useEffect(() => {
+    // next/navigation 대신 표준 URLSearchParams를 사용하여 쿼리 파라미터를 가져옵니다.
+    const searchParams = new URLSearchParams(window.location.search);
+    const orderId = searchParams.get('orderId');
+    const amount = searchParams.get('amount');
+    const paymentKey = searchParams.get('paymentKey');
 
-useEffect(() => {
-    const auth = getAuth(app);
-    let isMounted = true;
+    // 필수 결제 정보가 모두 있는지 확인합니다.
+    if (!orderId || !amount || !paymentKey) {
+      setError('⚠️ 결제 정보가 부족합니다.');
+      return;
+    }
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user || !isMounted) return;
-
-      try {
-        const idToken = await user.getIdToken();
-
-        if (!paymentKey || !orderId || !amount || !collectionName || !subscriptionPeriodInMonths) {
-          setStatus("⚠️ 결제 정보가 부족합니다.");
-          setIsError(true);
-          return;
-        }
-
-        const finalConfirmUrl = new URL(confirmUrl);
-        finalConfirmUrl.searchParams.append("paymentKey", paymentKey);
-        finalConfirmUrl.searchParams.append("orderId", orderId);
-        finalConfirmUrl.searchParams.append("amount", amount);
-        finalConfirmUrl.searchParams.append("collectionName", collectionName);
-        finalConfirmUrl.searchParams.append("subscriptionPeriodInMonths", subscriptionPeriodInMonths);
-
-       
-        const response = await fetch(finalConfirmUrl.toString(), {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${idToken}`,
-            'Content-Type': 'application/json', // JSON 응답을 기대한다는 헤더 추가
-          },
-        });
-
-        const result = await response.json(); // 응답을 JSON으로 파싱
-
-        if (!response.ok) {
-          // 서버에서 보낸 에러 응답 처리
-          throw new Error(result.message || '결제 승인 중 알 수 없는 오류 발생');
-        }
-
-        // 서버에서 보낸 성공 응답 처리
-        setStatus("✅ 결제가 성공적으로 처리되었습니다.");
-        setIsError(false);
-
-        setTimeout(() => {
-          router.push('/');
-        }, 3000);
-
-
-        // TODO: 결제 성공 후 사용자에게 보여줄 정보를 result 객체에서 가져와 사용
-
-      } catch (err) {
-        console.error("결제 승인 중 오류 발생:", err);
-        setStatus(`⚠️ 결제 승인 중 예기치 못한 오류가 발생했습니다: ${err.message}`);
-        setIsError(true);
-      }
+    setPaymentInfo({
+      orderId,
+      amount: parseInt(amount, 10),
+      paymentKey,
     });
 
-    return () => {
-      isMounted = false;
-      unsubscribe();
-    };
-}, [confirmUrl, paymentKey, orderId, amount, collectionName, subscriptionPeriodInMonths]);
-
+  }, []);
 
   return (
-    <div style={{ textAlign: "center", padding: "50px" }}>
-      <h1>결제 처리 중...</h1>
-      <p style={{ color: isError ? "red" : "green" }}>{status}</p>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full text-center">
+        {error ? (
+          <div>
+            <div className="text-red-500 text-6xl mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 mx-auto">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.944 3.374h14.71c1.727 0 2.813-1.874 1.944-3.374L14.441 2.872a1.996 1.996 0 00-3.482 0L2.997 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold mb-2">결제 실패</h1>
+            <p className="text-gray-600 mb-4">{error}</p>
+          </div>
+        ) : paymentInfo ? (
+          <div>
+            <div className="text-green-500 text-6xl mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 mx-auto">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold mb-2">결제가 완료되었습니다!</h1>
+            <p className="text-gray-600 mb-4">성공적으로 결제가 처리되었습니다.</p>
+            <div className="bg-gray-50 rounded-lg p-4 text-left">
+              <div className="flex justify-between py-1 border-b border-gray-200">
+                <span className="font-semibold text-gray-700">주문 번호</span>
+                <span className="text-gray-900 break-all">{paymentInfo.orderId}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-gray-200">
+                <span className="font-semibold text-gray-700">결제 금액</span>
+                <span className="text-gray-900 font-bold">{paymentInfo.amount.toLocaleString()}원</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="font-semibold text-gray-700">결제 키</span>
+                <span className="text-gray-900 break-all">{paymentInfo.paymentKey}</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h1 className="text-2xl font-bold">결제 처리 중...</h1>
+            <p className="text-gray-600">잠시만 기다려주세요.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-export default PaymentSuccessPage;
+}
