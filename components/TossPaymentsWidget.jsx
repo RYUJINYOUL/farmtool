@@ -15,7 +15,7 @@ const TossPaymentsWidget = ({
   from
 }) => {
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY;
-  // const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL; // 사용하지 않습니다.
+  const confirmUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_CONFIRM_URL; // 사용하지 않습니다.
   const failUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_FAIL_URL;
   
   const [widgets, setWidgets] = useState(null);
