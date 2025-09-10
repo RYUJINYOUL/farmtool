@@ -1,551 +1,350 @@
-"use client";
-
 import React, { useEffect, useState, useCallback } from "react";
-import { Dialog } from "@headlessui/react";
-import { IoMdHeartEmpty } from "react-icons/io";
-import { IoIosHeart } from "react-icons/io";
-import { Bell, HelpCircle } from 'lucide-react';
+import moment from "moment";
 import { useRouter } from "next/navigation";
 import { db } from "@/firebase";
-import dayjs from 'dayjs';
 import {
   collection,
-  doc,
-  getDoc,
+  orderBy,
   getDocs,
-  updateDoc,
-  arrayRemove,
-  getAggregateFromServer,
-  count,
-  startAfter,
+  query,
   limit,
-  orderBy
 } from "firebase/firestore";
-import { useSelector } from "react-redux";
-import {
-  Copyright,
-  Tractor,
-  LaptopMinimalCheck,
-  Fence,
-  BrickWallFire,
-  X,
-  Phone,
-  MessageSquare,
-  Dock,
-  UserPen,
-  Hammer,
-  FileUser,
-  LayoutGrid,
-  Stamp,
-} from "lucide-react";
+import { fetchArchitecturalPermitData } from "../lib/ArchPmsApi";
 
+// Reusable Widget Component (재사용 가능한 위젯 컴포넌트)
+const ListWidget = ({ title, moreLink, posts, timeFromNow, onClickItem }) => {
+  return (
+    <div className="bg-white rounded-xl shadow-md p-6 h-full flex flex-col">
+      {/* 위젯 헤더 */}
+      <div className="flex justify-between items-center pb-4 mb-4 border-b border-gray-200">
+        <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+        <a href={moreLink} className="text-[11px] font-medium text-gray-500 hover:text-blue-600 transition-colors">
+          더보기
+        </a>
+      </div>
+
+      {moreLink != "/job" 
+      ? (
+       <ul className="space-y-4 flex-grow overflow-y-auto">
+        {posts.map((post) => (
+          <li
+            key={post.id}
+            onClick={() => onClickItem(post.id)}
+            className="flex items-center space-x-3 cursor-pointer group"
+          >
+            {/* 상태 배지: 건축 인허가 데이터에는 없을 수 있으므로 조건부 렌더링 */}
+            {post.confirmed != null && (
+                <span
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                    post.confirmed ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+                }`}
+                >
+                {post.confirmed ? "확정" : "대기"}
+                </span>
+            )}
+
+            {/* 설명 */}
+            <span className="flex-1 min-w-0 text-sm font-medium text-gray-700 truncate group-hover:text-blue-600 transition-colors">
+              {post.description === "" ? post.name : post.description}
+            </span>
+
+            {/* 날짜 */}
+            <span className="text-xs text-gray-400 font-light flex-shrink-0">
+              {timeFromNow(post.createdDate)}
+            </span>
+          </li>
+        ))}
+      </ul>)
+      : (
+        <div className="text-center py-6">
+          <div className="text-gray-400 text-md mb-2">준비중입니다.</div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 
 export default function MainMenu() {
-  const [openDialog, setOpenDialog] = useState(null);
-  const [wishListCount, setWishListCount] = useState({
-    general: 0,
-    nara: 0,
-    permit: 0
-  });
-  const [userInfo, setUserInfo] = useState({});
-  const [noticeEnabled, setNoticeEnabled] = useState(false);
-  const [wishListDetails, setWishListDetails] = useState([]);
-  const [myListDetails, setMyListDetails] = useState([]);
-  const { currentUser } = useSelector((state) => state.user);
-  const uid = currentUser?.uid;
   const router = useRouter();
-  const { push } = useRouter();
-  const [counts, setCounts] = useState({
-    construction: 0,
-    equipment: 0,
-    professionals: 0,
-    materials: 0,
-  });
-  const [startDate, setStartDate] = useState(dayjs().subtract(1, 'month').format('YYYY-MM-DD'));
-  const [startTime, setStartTime] = useState('00:00');
-  const [endDate, setEndDate] = useState(dayjs().subtract(1, 'day').format('YYYY-MM-DD'));
-  const [endTime, setEndTime] = useState('23:59');
-  const SERVICE_KEY = process.env.NEXT_PUBLIC_API_SERVICE_KEY;
-  const API_URL = "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch";
-  const [totalCount, setTotalCount] = useState(0);
+  const [conApplyMessages, setConApplyMessages] = useState([]); 
+  const [equipApplyMessages, setEquipApplyMessages] = useState([]); 
+  const [matApplyMessages, setMatApplyMessages] = useState([]); 
+  const [proApplyMessages, setProApplyMessages] = useState([]); 
+  const [jobMessages, setJobApplyMessages] = useState([]); 
+  const [permitList, setPermitList] = useState([]);
+  const [naraItems, setNaraItems] = useState([]);
+  const [loading, setLoading] = useState(true); 
 
-
-  useEffect(() => {
-    if (!API_URL || !SERVICE_KEY) return;
-
-    const ac = new AbortController();
-    const signal = ac.signal;
-
-    const fetchTotal = async () => {
-      try {
-
-        const inqryBgnDt = startDate?.replace(/-/g, "") + (startTime?.replace(":", "") || "");
-        const inqryEndDt = endDate?.replace(/-/g, "") + (endTime?.replace(":", "") || "");
-
-        const params = [
-          `serviceKey=${SERVICE_KEY}`,
-          `inqryDiv=1`,
-          `type=json`,
-          `inqryBgnDt=${inqryBgnDt}`,
-          `inqryEndDt=${inqryEndDt}`
-        ];
-
-        const url = `${API_URL}?${params.join('&')}`;
-
-        const res = await fetch(url, { signal });
-        if (!res.ok) {
-          console.error("API error:", res.status, res.statusText);
-          if (setTotalCount) setTotalCount(0);
-          return;
-        }
-
-        const contentType = res.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const json = await res.json();
-          const total = Number(json.response?.body?.totalCount) || 0;
-          if (setTotalCount) setTotalCount(total);
-        } else {
-          // JSON이 아닐 경우(간혹 문자열/XML 반환) 간단히 텍스트로 확인
-          const text = await res.text();
-          console.warn('응답이 JSON이 아닙니다. 응답 예시:', text.slice(0, 500));
-          if (setTotalCount) setTotalCount(0);
-        }
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          // 요청이 취소됨
-          return;
-        }
-        console.error("데이터 페치 중 오류:", err);
-        if (setTotalCount) setTotalCount(0);
-      } 
-    };
-
-    fetchTotal();
-
-    return () => {
-      ac.abort();
-    };
-    // 의존성: 파라미터가 바뀔 때마다 재요청
-  }, [
-    startDate,
-    startTime,
-    endDate,
-    endTime,
-    SERVICE_KEY,
-    API_URL,
-    setTotalCount,
-  ]);
-
-  
-
-  const fetchCounts = async () => {
-    const collections = ["construction", "equipment", "professionals", "materials"];
-
-    const results = await Promise.all(
-      collections.map(async (col) => {
-        const snapshot = await getAggregateFromServer(collection(db, col), {
-          total: count(),
-        });
-        return { [col]: snapshot.data().total };
-      })
-    );
-
-    // 배열 → 객체 병합
-    const mergedCounts = results.reduce((acc, cur) => ({ ...acc, ...cur }), {});
-    setCounts(mergedCounts);
+  const timeFromNow = (timestampObject) => {
+    if (timestampObject && typeof timestampObject.seconds === 'number') {
+      return moment.unix(timestampObject.seconds).format('YYYY.MM.DD');
+    }
+    if (typeof timestampObject === 'string') {
+      return moment(timestampObject, 'YYYYMMDD').format('YYYY.MM.DD');
+    }
+    return '날짜 정보 없음';
   };
 
-  useEffect(() => {
-    fetchCounts();
+  
+  
+
+  const onClickItem = (id, collectionName) => {
+    (collectionName != 'permit' && collectionName != 'nara')
+    ? router.push(`/${collectionName}/apply/${id}`)
+    : router.push(`/${collectionName}`);
+  };
+
+ const handleNaraFetch = useCallback(async (startDate, endDate) => {
+    const API_URL = "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch";
+    try {
+      const params = new URLSearchParams({
+        serviceKey: process.env.NEXT_PUBLIC_API_SERVICE_KEY,
+        pageNo: '1',
+        numOfRows: '50',
+        inqryDiv: '1',
+        type: 'json',
+        inqryBgnDt: startDate + '0000', 
+        inqryEndDt: endDate + '2359',
+        prtcptLmtRgnNm: "전국",
+      });
+      const url = `${API_URL}?${params.toString()}`;
+      console.log(url)
+      const res = await fetch(url);
+      console.log(res)
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await res.json();
+        const rawItems = data.response?.body?.items;
+        const itemsArr = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+        return itemsArr;
+      } else {
+        const text = await res.text();
+        console.error('API 응답이 JSON이 아닙니다:', text);
+        return [];
+      }
+    } catch (err) {
+      console.error('데이터를 불러오는 중 오류가 발생했습니다:', err);
+      return [];
+    }
   }, []);
 
 
 
-  const toggleFavorite = useCallback(async (itemId, middle, category, top) => {
-    if (!currentUser?.uid) {
-      router.push('/login');
-      return;
-    }
-
-    const userId = uid;
-    const wishlistItem = { itemId: itemId, category: category, top: top, middle: middle };
-
-    try {
-      setWishListDetails((prevDetails) =>
-        prevDetails.filter((msg) => msg.itemId !== itemId)
-      );
-      setWishListCount(prev => ({ ...prev, general: prev.general - 1 }));
-
-      const constructionDocRef = doc(db, top, itemId);
-      const userDocRef = doc(db, "users", userId);
-
-     const constructionDocSnap = await getDoc(constructionDocRef);
-
-      if (constructionDocSnap.exists()) {
-        await updateDoc(constructionDocRef, {
-          favorites: arrayRemove(userId)
-        });
-      }
-
-      await updateDoc(userDocRef, {
-        wishList: arrayRemove(wishlistItem)
-      });
-    } catch (error) {
-      console.error("일반 찜하기/찜 해제 중 오류 발생:", error);
-      alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
-      setWishListDetails((prevDetails) => [...prevDetails, { itemId, middle, category, top, companyName: "복구됨", topCategory: "" }]);
-      setWishListCount(prev => ({ ...prev, general: prev.general + 1 }));
-    }
-  }, [uid, currentUser, router]);
-
-
-
   useEffect(() => {
-    if (!uid) return;
-
-    const fetchAllWishListCounts = async () => {
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        const generalWishList = userDoc.data()?.wishList || [];
-        // Nara 찜 목록과 Permit 찜 목록의 개수를 서브컬렉션에서 직접 가져옵니다.
-        const naraSnap = await userDoc.data()?.nara || [];
-        const permitSnap = await userDoc.data()?.permit || [];
-        const jobSnap = await userDoc.data()?.job || [];
-        const myListSnap = await userDoc.data()?.myList || []
+        const q1 = query(collection(db, "conApply"), orderBy("createdDate", "desc"), limit(5));
+        const q2 = query(collection(db, "equipApply"), orderBy("createdDate", "desc"), limit(5));
+        const q3 = query(collection(db, "matApply"), orderBy("createdDate", "desc"), limit(5));
+        const q4 = query(collection(db, "proApply"), orderBy("createdDate", "desc"), limit(5));
+        const q5 = query(collection(db, "jobApply"), orderBy("createdDate", "desc"), limit(5));
 
-        setWishListCount({
-          general: generalWishList.length,
-          nara: naraSnap.length, // 서브컬렉션 문서의 개수
-          permit: permitSnap.length, // 서브컬렉션 문서의 개수
-          job: jobSnap.length,
-          myList: myListSnap.length
+        const endDate = moment().subtract(1, 'days').format('YYYYMMDD');
+        const startDate = moment().subtract(3, 'months').format('YYYYMMDD');
+         const startDate2 = moment().subtract(1, 'months').format('YYYYMMDD');
 
-        });
-      } catch (err) {
-        console.error("찜목록 카운트 로드 오류:", err);
-      }
-    };
+        const permitPromise = fetchArchitecturalPermitData("11680", "10300", startDate, endDate, 1, 5);
+        const naraPromise = handleNaraFetch(startDate2, endDate);
 
-    fetchAllWishListCounts();
-  }, [uid, openDialog]);
+        // Promise.all을 사용하여 두 쿼리를 병렬로 실행
+        const [querySnapshot1, querySnapshot2, querySnapshot3, querySnapshot4, querySnapshot5, permitData, naraData] = await Promise.all([
+          getDocs(q1),
+          getDocs(q2),
+          getDocs(q3),
+          getDocs(q4),
+          getDocs(q5),
+          permitPromise,
+          naraPromise
+        ]);
 
-
-  useEffect(() => {
-    if (!uid || openDialog !== "favorites") return;
-
-    const fetchWishListDetails = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        const userData = userDoc.data();
-        const wishList = userData?.wishList || [];
-
-        const detailPromises = wishList.map(async (item) => {
-          const itemRef = doc(db, item.top, item.itemId);
-          const itemDoc = await getDoc(itemRef);
-
-          if (itemDoc.exists()) {
-            const data = itemDoc.data();
-            return {
-              ...item,
-              companyName: data[`${item.top}_name`] || '알수없음',
-              topCategory: data.TopCategories || "카테고리 없음",
-              favorites: data.favorites || []
-            };
-          } else {
-            return {
-              ...item,
-              companyName: "삭제된 항목",
-              topCategory: "-",
-              favorites: []
-            };
-          }
+        // 'conApply' 컬렉션 데이터 처리
+        const conApplyList = querySnapshot1.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            description: data.conApply_description,
+            createdDate: data.createdDate,
+            confirmed: data.confirmed,
+            name: data.conApply_name
+          };
         });
 
-        const details = await Promise.all(detailPromises);
-        setWishListDetails(details);
-      } catch (err) {
-        console.error("찜 목록 세부정보 로드 오류:", err);
-      }
-    };
-
-    fetchWishListDetails();
-  }, [uid, openDialog]);
-
-
-  useEffect(() => {
-    if (!uid || openDialog !== "myText") return;
-
-    const fetchMyListDetails = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        const userData = userDoc.data();
-        const myList = userData?.myList || [];
-
-        const detailPromises = myList.map(async (item) => {
-          const itemRef = doc(db, item.top, item.id || uid);
-          const itemDoc = await getDoc(itemRef);
-
-          if (itemDoc.exists()) {
-            const data = itemDoc.data();
-            return {
-              ...item,
-              companyName: data[`${item.top}_name`] || '알수없음',
-              topCategory: data.TopCategories || "카테고리 없음",
-              favorites: data.favorites || []
-            };
-          } else {
-            return {
-              ...item,
-              companyName: "삭제된 항목",
-              topCategory: "-",
-            };
-          }
+        // 'equipApply' 컬렉션 데이터 처리 (필드명 수정)
+        const equipApplyList = querySnapshot2.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            description: data.equipApply_description, // 올바른 필드명 사용
+            createdDate: data.createdDate,
+            confirmed: data.confirmed,
+            name: data.equipApply_name
+          };
         });
 
-        const details = await Promise.all(detailPromises);
-        setMyListDetails(details);
-      } catch (err) {
-        console.error("나의 글 목록 세부정보 로드 오류:", err);
+        const matApplyList = querySnapshot3.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            description: data.matApply_description,
+            createdDate: data.createdDate,
+            confirmed: data.confirmed,
+            name: data.matApply_name
+          };
+        });
+
+        // 'equipApply' 컬렉션 데이터 처리 (필드명 수정)
+        const proApplyList = querySnapshot4.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            description: data.proApply_description, // 올바른 필드명 사용
+            createdDate: data.createdDate,
+            confirmed: data.confirmed,
+            name: data.proApply_name
+          };
+        });
+
+        const jobApplyList = querySnapshot5.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            description: data.conApply_description,
+            createdDate: data.createdDate,
+            confirmed: data.confirmed,
+            name: data.proApply_name
+          };
+        });
+
+
+        const formatNaraData = (items) => {
+          if (!items || items.length === 0) return [];
+          return items.map((item, index) => ({
+            id: item.bidNtceNo || `nara-${index}`,
+            description: item.bidNtceNm || "제목 없음",
+            createdDate: item.bidNtceDt || null,
+            name: item.bidNtceNm,
+            confirmed: null,
+            collectionName: 'nara',
+          }));
+        };
+
+
+        if (permitData.data) {
+          const formattedPermits = permitData.data.map((item, index) => ({
+            id: item.mgmPmsrgstPk || `permit-${index}`, // 고유 키가 없으면 인덱스로 대체
+            description: item.platPlc,
+            createdDate: item.archPmsDay,
+            confirmed: null, // confirmed 상태가 없으므로 null
+            collectionName: 'permits' // 라우팅을 위한 컬렉션 이름
+          }));
+          setPermitList(formattedPermits);
+        } else {
+          console.error("건축 인허가 데이터 로딩 오류:", permitData.error);
+        }
+
+
+       if (naraData && naraData.length > 0) {
+          const formattedNaraData = formatNaraData(naraData);
+          setNaraItems(formattedNaraData);
+        } else {
+          console.error("나라장터 데이터 로딩 오류: 데이터가 없거나 형식이 올바르지 않습니다.");
+        }
+
+      
+
+        setConApplyMessages(conApplyList);
+        setEquipApplyMessages(equipApplyList);
+        setMatApplyMessages(matApplyList);
+        setProApplyMessages(proApplyList);
+        setJobApplyMessages(jobApplyList);
+      } catch (error) {
+        console.error("데이터를 가져오는 중 오류 발생:", error);
+      } finally {
+        // 모든 작업이 완료된 후 로딩 상태 종료
+        setLoading(false);
       }
     };
 
-    fetchMyListDetails();
-  }, [uid, openDialog]);
+    fetchAllData();
+  }, []);
 
 
-  useEffect(() => {
-    if (!uid) return;
-    const fetchUserInfo = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", uid));
-        setUserInfo(userDoc.data());
-        setNoticeEnabled(userDoc.data()?.notice || false);
-      } catch (err) {
-        console.error("회원정보 로드 오류:", err);
-      }
-    };
-    fetchUserInfo();
-  }, [uid]);
-
-  const toggleNotice = async () => {
-    try {
-      const newValue = !noticeEnabled;
-      await updateDoc(doc(db, "users", uid), { notice: newValue });
-      setNoticeEnabled(newValue);
-    } catch (err) {
-      console.error("알림 설정 오류:", err);
-    }
-  };
-
-  // 로그인 상태 확인 함수
-  const checkLoginAndOpenDialog = (dialogName) => {
-    if (!currentUser?.uid) {
-      router.push('/login');
-    } else {
-      setOpenDialog(dialogName);
-    }
-  };
-
-
-  function AnimatedCount({ target = 0, duration = 1000 }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const startTime = performance.now();
-
-    const updateCount = (currentTime) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1); // 0~1 사이
-      const current = Math.floor(progress * target);
-      setCount(current);
-
-      if (progress < 1) {
-        requestAnimationFrame(updateCount);
-      }
-    };
-
-    requestAnimationFrame(updateCount);
-  }, [target, duration]);
-
-  return <span>{count.toLocaleString()}</span>;
-}
 
   return (
- 
-    <div className="flex flex-col items-center md:justify-center bg-gray-50 pt-5 md:w-[1100px] md:mx-auto">
-      {/* 프로필 카드 */}
-      <div className="w-full md:w-[1100px] bg-white shadow-md rounded-2xl p-6 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
-            {userInfo?.photoURL ? (
-              <img
-                src={userInfo.photoURL || "/new/unnamed.jpg"}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-              </div>
-            )}
-          </div>
-          <h2 className="text-xl font-bold text-gray-800">{userInfo?.displayName}</h2>
-          <p className="text-sm text-gray-500">{userInfo?.email}</p>
+    <div className="p-4 bg-gray-50 min-h-screen">
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-
-        {/* 메뉴 리스트 */}
-        <div className="space-y-3">
-
-          {/* 첫 번째 줄: 일반 찜 목록, 나라장터 찜 목록 */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2">
-              <button
-                onClick={() => push("/construction")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <BrickWallFire className="w-5 h-5 text-pink-500" />
-                  <span className="font-medium text-gray-800">건설업</span>
-                </div>
-               <span className="text-green-900 text-sm"><AnimatedCount target={counts.construction || 0} duration={1500} />개</span>
-              </button>
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <button
-                onClick={() => push("/equipment")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Tractor className="w-5 h-5 text-orange-500" />
-                  <span className="font-medium text-gray-800">건설장비</span>
-                </div>
-              <span className="text-gray-400 text-sm">{counts.equipment ? counts.equipment.toLocaleString() : 0}개</span>
-              </button>
-            </div>
+      ) : conApplyMessages.length > 0 || equipApplyMessages.length > 0 || matApplyMessages.length > 0 || proApplyMessages.length > 0 || jobMessages.length > 0 ? (
+       <div className="grid grid-row-1 lg:grid-row-3 gap-6"> 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ListWidget
+              title="건설견적리스트"
+              moreLink="/construction?tab=upload"
+              posts={conApplyMessages}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, "construction")}
+            />
+            <ListWidget
+              title="장비견적리스트"
+              moreLink="/equipment?tab=upload"
+              posts={equipApplyMessages}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, "equipment")}
+            />
           </div>
-
-          {/* 두 번째 줄: 인허가 찜 목록, 회원정보 수정 */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2">
-              <button
-                onClick={() => push("/materials")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Fence className="w-5 h-5 text-blue-400" />
-                  <span className="font-medium text-gray-800">건설자재</span>
-                </div>
-              <span className="text-gray-400 text-sm">{counts.materials ? counts.materials.toLocaleString() : 0}개</span>
-              </button>
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <button
-                onClick={() => push("/permit")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Copyright className="w-5 h-5 text-blue-500" />
-                  <span className="font-medium text-gray-800">인허가</span>
-                </div>
-                 <span className="text-gray-400 text-sm">12,358개(1달 기준)</span> 
-              </button>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ListWidget
+              title="건설자재주문리스트"
+              moreLink="/materials?tab=upload"
+              posts={matApplyMessages}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, "materials")}
+            />
+            <ListWidget
+              title="전문인력리스트"
+              moreLink="/professionals?tab=upload"
+              posts={proApplyMessages}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, "professionals")}
+            />
           </div>
-
-          {/* 세 번째 줄: 등록글과 신청글, 업체 등록 */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2">
-              <button
-                onClick={() => push("nara")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <LaptopMinimalCheck className="w-5 h-5 text-red-400" />
-                  <span className="font-medium text-gray-800">나라장터낙찰</span>
-                </div>
-                <span className="text-gray-400 text-sm">{totalCount ? totalCount.toLocaleString() : 0}개</span>
-              </button>
-            </div> 
-
-             <div className="w-full md:w-1/2">
-               <button
-                onClick={() => push("/job")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <UserPen className="w-5 h-5 text-red-500" />
-                  <span className="font-medium text-gray-800">구인구직</span>
-                </div>
-                
-              </button>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ListWidget
+              title="구인구직리스트"
+              moreLink="/job"
+              posts={jobMessages}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, "job")}
+            />
+            <ListWidget
+              title="건축인허가리스트"
+              moreLink="/permit"
+              posts={permitList}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, 'permit')}
+            />
           </div>
-
-          {/* 네 번째 줄: 주문 신청, 알림 설정 */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2">
-               <button
-                onClick={() => push("/professionals")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Hammer className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-gray-800">전문인력</span>
-                </div>
-                <span className="text-gray-400 text-sm">{counts.professionals ? counts.professionals.toLocaleString() : 0}개</span>
-              </button>
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <button
-                onClick={() => push("/myinfo")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Dock className="w-5 h-5 text-amber-500" />
-                  <span className="font-medium text-gray-800">내정보</span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* 다섯 번째 줄: 고객센터 (단일 버튼) */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2"> 
-              <button
-                onClick={() => push("/login")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Bell className="w-5 h-5 text-yellow-500" />
-                  <span className="font-medium text-gray-800">알림 설정</span>
-                </div>
-                <span className="text-gray-400 text-sm">
-                  {noticeEnabled ? "ON" : "OFF"}
-                </span>
-              </button>
-            </div>
-            
-            <div className="hidden md:block w-full md:w-1/2">
-            <button
-                onClick={() => push("/login")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <HelpCircle className="w-5 h-5 text-purple-500" />
-                  <span className="font-medium text-gray-800">고객센터</span>
-                </div>
-              </button>
-            </div> 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ListWidget
+              title="낙찰리스트"
+              moreLink="/nara"
+              posts={naraItems}
+              timeFromNow={timeFromNow}
+              onClickItem={(id) => onClickItem(id, "nara")}
+            />
+           
           </div>
         </div>
-      </div>
-
-     
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-lg mb-2">검색 결과가 없습니다.</div>
+          <div className="text-gray-500 text-sm">다른 조건으로 검색해보세요.</div>
+        </div>
+      )}
     </div>
-
   );
 }

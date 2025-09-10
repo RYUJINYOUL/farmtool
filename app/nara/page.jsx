@@ -554,9 +554,9 @@ export default function NaraBidList() {
       if (presmptPrceBgn) params.push(`presmptPrceBgn=${presmptPrceBgn.replace(/,/g, '')}`);
       if (presmptPrceEnd) params.push(`presmptPrceEnd=${presmptPrceEnd.replace(/,/g, '')}`);
       const url = `${API_URL}?${params.join('&')}`;
+      console.log(url);
       const res = await fetch(url);
       const contentType = res.headers.get('content-type');
-      console.log(url)
       let data;
       if (contentType && contentType.includes('application/json')) {
         data = await res.json();

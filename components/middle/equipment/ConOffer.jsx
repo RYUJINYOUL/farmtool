@@ -25,10 +25,11 @@ import { db } from "@/firebase";
 import Image from "next/image";
 import ConUpload from '@/components/middle/construction/conUpload'
 
+
 const ITEMS_PER_PAGE = 12;
 
-// ProList 컴포넌트: 일반 React 컴포넌트처럼 props를 직접 받음
-const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받기
+
+const ConOffer = ({ 
   selectedIndustries,
   selectedRegions, 
   selectedSubRegions
@@ -37,20 +38,18 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
   const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const router = useRouter(); // openCategory 함수에서 사용
+  const router = useRouter(); 
   const { currentUser } = useSelector(state => state.user);
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const loader = useRef(null);
   const timeFromNow = timestampObject => {
-
-
-  if (timestampObject && typeof timestampObject.seconds === 'number') {
-    return moment.unix(timestampObject.seconds).format('YYYY.MM.DD');
-  } else {
-    console.error("Invalid timestamp object provided:", timestampObject);
-    return '날짜 정보 없음';
-  }
-};
+      if (timestampObject && typeof timestampObject.seconds === 'number') {
+        return moment.unix(timestampObject.seconds).format('YYYY.MM.DD');
+      } else {
+        console.error("Invalid timestamp object provided:", timestampObject);
+        return '날짜 정보 없음';
+      }
+    };
 
   const toggleFavorite = useCallback(async (itemId, currentFavorites) => {
     if (!currentUser?.uid) {
@@ -65,7 +64,6 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
 
     const wishlistItem = { itemId: itemId, category: category, top: top, middle: 'apply' };
 
-    // Optimistic UI update: UI를 먼저 업데이트하여 사용자 경험 개선
     setMessages(prevMessages => 
       prevMessages.map(msg => 
         msg.id === itemId 
@@ -90,7 +88,6 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
         await updateDoc(userDocRef, {
           wishList: arrayRemove(wishlistItem)
         });
-        console.log(`찜 해제: Item ${itemId} from user ${userId}`);
       } else {
         await updateDoc(constructionDocRef, {
           favorites: arrayUnion(userId)
@@ -98,10 +95,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
         await updateDoc(userDocRef, {
           wishList: arrayUnion(wishlistItem)
         });
-        console.log(`찜 설정: Item ${itemId} by user ${userId}`);
       }
     } catch (error) {
-      console.error("Error toggling favorite: ", error);
       setMessages(prevMessages => 
         prevMessages.map(msg => 
           msg.id === itemId 
@@ -170,14 +165,12 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
         return {
           id: doc.id,
           address: data.address || data.data_address,
-
-          description: data.equipApply_description,    //설명
-          constructionExperience: data.equipApply_career,  //경력사항
+          description: data.equipApply_description,   
+          constructionExperience: data.equipApply_career, 
           companyName: data.equipApply_name || '',
-          contactPerson: data.equipApply_rental,  //운전원포함여부
+          contactPerson: data.equipApply_rental,  
           phoneNumber: data.equipApply_phoneNumber,
-          rentalRates : data.equipApply_rentalRates,    //비용
-
+          rentalRates : data.equipApply_rentalRates,    
           imageDownloadUrls: data.imageDownloadUrls || [],
           createdDate: data.createdDate,
           SubCategories: data.SubCategories,
@@ -197,7 +190,6 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
       setHasMore(newTweetList.length === ITEMS_PER_PAGE);
 
     } catch (error) {
-      console.error("Error fetching messages: ", error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -214,7 +206,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     toggleFavorite 
   ]);
 
-  // 의존성 배열에 fetchMessages 추가 (ESLint 경고 방지 및 최신 함수 참조 보장)
+
+
   useEffect(() => {
     setMessages([]);
     setLastVisible(null);
@@ -222,6 +215,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     setLoading(false);
     fetchMessages(true);
   }, [selectedIndustries, selectedRegions, selectedSubRegions]); 
+
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -262,6 +257,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     router.push(`/equipment/apply/${id}`);
   };
 
+
+
   return (
      <div className='w-full h-full'>
           {messages.length > 0 ? (
@@ -291,8 +288,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                     <div className='flex flex-row gap-2'>
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
-                            toggleFavorite(id, favorites); // itemId와 현재 favorites 배열 전달
+                            e.stopPropagation(); 
+                            toggleFavorite(id, favorites); 
                           }}
                           className='rounded-full' >
                           {isWishListed ? <IoIosHeart color='red' size={20} /> : <IoMdHeartEmpty size={20} />}
@@ -303,21 +300,20 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                         </span> */}
                         </div>
                   </div>
-                  {/* --- 이미지 표시 로직 시작 --- */}
+             
                   {imageDownloadUrls && imageDownloadUrls.length > 0 && (
                     <div className="mb-4 overflow-hidden rounded-md md:w-[300px] md:h-[100px] h-[100px]">
                     <Image
-                      src={imageDownloadUrls[0]} // 첫 번째 이미지만 표시
+                      src={imageDownloadUrls[0]} 
                       alt={companyName || '업체 이미지'}
-                      width={500} // 이미지 너비 고정
-                      height={100} // 이미지 높이 고정
-                      layout="relative" // 이미지 크기를 width와 height에 고정
-                      objectFit="cover" // 이미지가 컨테이너를 채우도록 설정 (넘치는 부분은 잘림)
-                      // Image 컴포넌트 자체에는 rounded-md를 제거하고 부모 div에 적용
+                      width={500} 
+                      height={100} 
+                      layout="relative" 
+                      objectFit="cover" 
                     />
                   </div>
                   )}
-                  {/* --- 이미지 표시 로직 끝 --- */}
+    
                   <div className="space-y-3 text-sm text-gray-600">
                     <div className="flex justify-between">
                       <span className="text-gray-500">경력사항:</span>
@@ -347,7 +343,6 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                     </div>
                     <div className="pt-2 border-t border-gray-100">
                       <div className="text-xs text-gray-600" style={{ whiteSpace: 'pre-line' }}>
-                        {/* 줄바꿈 처리 및 띄어쓰기 문제 해결을 위해 replace 사용 */}
                         {(description || '').replace(/\\n/g, '\n')}
                       </div>
                     </div>
@@ -392,4 +387,4 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
   );
 };
 
-export default ConOffer; // <-- export 이름 ProList로 변경
+export default ConOffer; 
