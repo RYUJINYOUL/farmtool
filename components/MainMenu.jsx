@@ -98,17 +98,17 @@ export default function MainMenu() {
  const handleNaraFetch = useCallback(async (startDate, endDate) => {
     const API_URL = "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch";
     try {
-      const params = new URLSearchParams({
-        serviceKey: process.env.NEXT_PUBLIC_API_SERVICE_KEY,
-        pageNo: '1',
-        numOfRows: '50',
-        inqryDiv: '1',
-        type: 'json',
-        inqryBgnDt: startDate + '0000', 
-        inqryEndDt: endDate + '2359',
-        prtcptLmtRgnNm: "전국",
-      });
-      const url = `${API_URL}?${params.toString()}`;
+      const params = [
+        `serviceKey=${process.env.NEXT_PUBLIC_API_SERVICE_KEY}`,
+        `pageNo=1`,
+        `numOfRows=5`,
+        `inqryDiv=1`,
+        `type=json`,
+        `inqryBgnDt=${startDate}0000`,
+        `inqryEndDt=${endDate}2359`,
+      ];
+
+      const url = `${API_URL}?${params.join("&")}`;
       console.log(url)
       const res = await fetch(url);
       console.log(res)
