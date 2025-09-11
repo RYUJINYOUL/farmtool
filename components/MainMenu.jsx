@@ -26,9 +26,9 @@ const ListWidget = ({ title, moreLink, posts, timeFromNow, onClickItem }) => {
       {moreLink != "/job" 
       ? (
        <ul className="space-y-4 flex-grow overflow-y-auto">
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <li
-            key={post.id}
+            key={`post-${post.id}-${index}`}
             onClick={() => onClickItem(post.id)}
             className="flex items-center space-x-3 cursor-pointer group"
           >
@@ -94,6 +94,7 @@ export default function MainMenu() {
     ? router.push(`/${collectionName}/apply/${id}`)
     : router.push(`/${collectionName}`);
   };
+
 
  const handleNaraFetch = useCallback(async (startDate, endDate) => {
     const API_URL = "https://apis.data.go.kr/1230000/as/ScsbidInfoService/getScsbidListSttusCnstwkPPSSrch";
@@ -217,19 +218,17 @@ export default function MainMenu() {
           };
         });
 
-
         const formatNaraData = (items) => {
           if (!items || items.length === 0) return [];
           return items.map((item, index) => ({
             id: item.bidNtceNo || `nara-${index}`,
             description: item.bidNtceNm || "제목 없음",
-            createdDate: item.bidNtceDt || null,
+            createdDate: item.fnlSucsfDate || null,
             name: item.bidNtceNm,
             confirmed: null,
             collectionName: 'nara',
           }));
         };
-
 
         if (permitData.data) {
           const formattedPermits = permitData.data.map((item, index) => ({
@@ -244,15 +243,12 @@ export default function MainMenu() {
           console.error("건축 인허가 데이터 로딩 오류:", permitData.error);
         }
 
-
        if (naraData && naraData.length > 0) {
           const formattedNaraData = formatNaraData(naraData);
           setNaraItems(formattedNaraData);
         } else {
           console.error("나라장터 데이터 로딩 오류: 데이터가 없거나 형식이 올바르지 않습니다.");
         }
-
-      
 
         setConApplyMessages(conApplyList);
         setEquipApplyMessages(equipApplyList);
@@ -273,7 +269,7 @@ export default function MainMenu() {
 
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div className="p-4 bg-gray-50">
       {loading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -336,7 +332,6 @@ export default function MainMenu() {
               timeFromNow={timeFromNow}
               onClickItem={(id) => onClickItem(id, "nara")}
             />
-           
           </div>
         </div>
       ) : (

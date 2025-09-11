@@ -186,7 +186,11 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
         };
       });
 
-      setMessages(prevMessages => isInitialLoad ? newTweetList : [...prevMessages, ...newTweetList]);
+      setMessages((prevMessages) => {
+        const combined = isInitialLoad ? newTweetList : [...prevMessages, ...newTweetList];
+        const unique = Array.from(new Map(combined.map((item) => [item.id, item])).values());
+        return unique;
+      });
 
       if (snapshot.docs.length > 0) {
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
@@ -380,7 +384,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
           )}
            <Button
                 onClick={() => openCategory()} 
-                className="fixed bottom-8 right-8 rounded-full w-16 h-16 text-3xl shadow-lg"
+                className="fixed bottom-[calc(8vh+20px)] right-4 rounded-full w-16 h-16 text-3xl shadow-lg"
               >
                 +
               </Button>

@@ -79,6 +79,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
       )
     );
 
+
     try {
       const constructionDocRef = doc(db, 'conApply', itemId);
       const userDocRef = doc(db, "users", userId);
@@ -116,7 +117,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
       );
       alert("찜하기/찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
-  }, [db, currentUser, router]);
+  }, [db, currentUser, router, setMessages]);
   
 
 
@@ -183,7 +184,12 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
         };
       });
 
-      setMessages(prevMessages => isInitialLoad ? newTweetList : [...prevMessages, ...newTweetList]);
+      setMessages((prevMessages) => {
+        const combined = isInitialLoad ? newTweetList : [...prevMessages, ...newTweetList];
+        const unique = Array.from(new Map(combined.map((item) => [item.id, item])).values());
+        return unique;
+      });
+
 
       if (snapshot.docs.length > 0) {
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
@@ -373,7 +379,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
           )}
            <Button
                 onClick={() => openCategory()} 
-                className="fixed bottom-8 right-8 rounded-full w-16 h-16 text-3xl shadow-lg"
+                className="fixed bottom-[calc(8vh+20px)] right-4 rounded-full w-16 h-16 text-3xl shadow-lg"
               >
                 +
               </Button>
