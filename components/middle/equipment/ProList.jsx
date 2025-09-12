@@ -349,7 +349,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
                     </span>
                   </div>
                   <div className="pt-2 border-t border-gray-100">
-                    <div className="text-xs text-gray-600" style={{ whiteSpace: 'pre-line' }}>
+                    <div className="text-xs text-gray-600 truncate">
                       {/* 줄바꿈 처리 및 띄어쓰기 문제 해결을 위해 replace 사용 */}
                       {(constructionExperience || '').replace(/\\n/g, '\n')}
                     </div>

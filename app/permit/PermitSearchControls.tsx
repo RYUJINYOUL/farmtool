@@ -70,7 +70,7 @@ export default function PermitSearchControls({
         setDongFetchError(null);
         try {
           const { data, error } = await fetchLegalDongCodes(tempMainRegion, tempSubRegion);
-          console.log("가져온 법정동 데이터:", data); // 데이터 확인을 위한 로그
+        
           if (error) {
             setDongFetchError(error);
             setLegalDongs([]);

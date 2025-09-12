@@ -54,20 +54,6 @@ export default function Menu3(props) {
 
 const slideRight = () => {
   var slider = document.getElementById('nav2');
-  // slider.scroll(100, 400)
-  // console.log(slider.offsetWidth)
-  // if (headerImageSrc === "/tree/reser") {
-  //   slider.scroll(100, 200)
-  // }
-  // if (headerImageSrc === "/tree/pro") {
-  //   slider.scroll(200, 400)
-  // }
-  // if (headerImageSrc === "/tree/jun") {
-  //   slider.scroll(300, 500)
-  // }
-  // if (headerImageSrc === "/tree/gyu") {
-  //   slider.scroll(500, 600)
-  // }
 };
   
   return (

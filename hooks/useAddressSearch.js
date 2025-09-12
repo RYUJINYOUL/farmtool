@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { GeoPoint } from 'firebase/firestore'; // GeoPoint 임포트 (Firebase 설정에 따라 경로 다를 수 있음)
-import * as geohash from 'ngeohash'; // geohash 임포트
-import { parseRegionAndSubRegion } from '@/lib/addressParser'; // 주소 파싱 함수 임포트
-import { getAddress, getAddressByLatLon } from '@/lib/geo'; // 주소 API 호출 함수 임포트 (가정)
+import { GeoPoint } from 'firebase/firestore'; 
+import * as geohash from 'ngeohash'; 
+import { parseRegionAndSubRegion } from '@/lib/addressParser'; 
+import { getAddress, getAddressByLatLon } from '@/lib/geo'; 
 
 export function useAddressSearch(formState, setFormState) {
   const [addrList, setAddrList] = useState([]);
@@ -10,7 +10,7 @@ export function useAddressSearch(formState, setFormState) {
   const [isAddrModalOpen, setIsAddrModalOpen] = useState(false);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
 
-  // 일반 주소 검색
+
   async function addrs() {
     setAddrList([]);
     setLocationError('');
@@ -20,10 +20,8 @@ export function useAddressSearch(formState, setFormState) {
       return;
     }
     try {
-      const res = await getAddress(formState.address); // getAddress 함수는 api.js에 있다고 가정
-      // getAddress 함수는 이미 { juso, x, y } 형태의 객체 배열을 반환하므로,
-      // 추가적인 map 처리가 필요 없습니다.
-      const result = res; // <-- 이 부분을 수정했습니다.
+      const res = await getAddress(formState.address); 
+      const result = res; 
       setAddrList(result);
       setIsAddrModalOpen(true);
       if (result.length === 0) {

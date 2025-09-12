@@ -99,7 +99,6 @@ export default function ClientPermitList({
         });
         // 2. users/{uid}/permits 서브컬렉션에서 해당 문서 삭제
         await deleteDoc(userPermitsSubCollectionDocRef);
-        console.log(`사용자 ${userId}의 permit 배열 및 서브컬렉션에서 ${permitIdToToggle} 제거 성공`);
       } else {
         // 찜 설정:
         // 1. users/{uid} 문서의 permit 배열에 platPlc 추가
@@ -112,7 +111,6 @@ export default function ClientPermitList({
           favoritedAt: new Date(), // 찜한 시간 기록
           userId: userId // 찜한 사용자 ID 기록
         });
-        console.log(`사용자 ${userId}의 permit 배열 및 서브컬렉션에 ${permitIdToToggle} 추가 성공`);
       }
     } catch (error) {
       console.error("찜하기/찜 해제 중 오류 발생: ", error);
@@ -147,11 +145,9 @@ export default function ClientPermitList({
           setUserPermitIdsInUserDoc(Array.isArray(fetchedUserData.permit) ? fetchedUserData.permit : []);
         } else {
           // 사용자 문서가 없으면 생성하거나, 빈 찜 목록으로 처리
-          console.log("사용자 문서가 존재하지 않습니다. 찜 목록을 비워둡니다.");
           setUserPermitIdsInUserDoc([]);
         }
       } catch (err) {
-        console.error("사용자 찜 목록 ID를 불러오는 데 실패했습니다:", err);
         setError("찜 목록을 불러오는 데 실패했습니다.");
         setUserPermitIdsInUserDoc([]);
       } finally {
@@ -191,7 +187,7 @@ export default function ClientPermitList({
   const loadMorePermits = useCallback(async () => {
     if (isLoading) return;
     if (permits.length >= totalCount && totalCount > 0) {
-      console.log("더 이상 로드할 데이터가 없습니다.");
+      
       return;
     }
 

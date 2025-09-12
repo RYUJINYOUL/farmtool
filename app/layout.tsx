@@ -44,7 +44,6 @@ export default function RootLayout({
   return (
     <html lang="ko"
      suppressHydrationWarning>
-  
       <body className={inter.className}>
       <ServiceWorkerRegister />
       <ClientLayout>

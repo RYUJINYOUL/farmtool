@@ -126,10 +126,6 @@ export default function NaraWishList({ onClose }) { // initialNaraWishListDetail
         nara: arrayRemove(naraDocId) // 만약 users 문서에 nara 필드가 배열로 있다면
       });
 
-      console.log(`나라장터 찜 항목 ${naraDocId} 제거 성공`);
-
-      // 찜 해제 후 목록을 처음부터 새로 로드하여 최신 상태를 반영
-      // 이렇게 하면 페이지네이션 상태(lastDoc, hasMore)도 정확하게 재설정됩니다.
       setNaraWishListDetails([]); // 목록 비우기 (새로 로드 준비)
       setLastDoc(null);
       setHasMore(true);
@@ -139,7 +135,6 @@ export default function NaraWishList({ onClose }) { // initialNaraWishListDetail
     } catch (error) {
       console.error("나라장터 찜 해제 중 오류 발생:", error);
       alert("나라장터 찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
-      // 오류 발생 시 UI 롤백 (여기서는 찜 해제된 아이템 복구)
       setNaraWishListDetails((prevDetails) => [...prevDetails, item]);
     }
   }, [uid, currentUser, router, fetchNaraWishListDetails]);

@@ -19,21 +19,18 @@ function Logo(props) {
 
   return (
     <section className='items-center'>
-        {/* <div className="lg:hidden">
-        <IconButton
-        onClickIcon={onClickMenu}
-        icon={<RxHamburgerMenu size={24} />}
+         <div className='cursor-pointer flex flex-row items-center gap-x-2 pl-4' onClick={onClickLogo}>
+        <img
+            src='/Image/logo.png'
+            alt='건설톡 로고'
+            className='h-8 w-8'
         />
-        </div> */}
-        <div className='cursor-pointer flex flex-row items-center' onClick={onClickLogo} >
-           
-            <div className={cn('font-semibold md:text-[20px] text-[20px] text-black cursor-pointer whitespace-nowrap pl-4', 
-            total.total&&"text-black",
-            // pathname!=="/"&&"text-black",
-          )}
-             >건설톡</div>
+        <div className={cn('font-medium md:text-[20px] text-[20px] text-black cursor-pointer whitespace-nowrap', 
+            total.total && 'text-black',
+        )}>
+            건설톡
         </div>
-       
+    </div>
     </section>
   )
 }

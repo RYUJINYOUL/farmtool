@@ -110,9 +110,7 @@ export default function MainMenu() {
       ];
 
       const url = `${API_URL}?${params.join("&")}`;
-      console.log(url)
       const res = await fetch(url);
-      console.log(res)
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await res.json();

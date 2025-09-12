@@ -55,9 +55,6 @@ export default function ClientPermitList({
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-
-    console.log(initialPermits)
-    // initialPermits를 받아서 바로 클라이언트에서 필터링하고 정렬합니다.
     const filteredAndSortedInitialPermits = initialPermits
     .filter(permit => {
       if (!permit.stcnsDay) return false; // 허가일이 없으면 제외
@@ -88,7 +85,6 @@ export default function ClientPermitList({
     // totalCount는 API의 총 개수이므로, 필터링된 permits.length와 직접 비교하기 어려울 수 있습니다.
     // 여기서는 API의 totalCount를 '더보기'의 기준으로 계속 사용하고, 클라이언트에서 필터링합니다.
     if (permits.length >= totalCount && totalCount > 0) { // permits.length 대신 currentPage와 totalCount로 판단
-      console.log("더 이상 로드할 데이터가 없습니다.");
       return;
     }
 

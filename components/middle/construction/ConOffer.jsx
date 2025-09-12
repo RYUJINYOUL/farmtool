@@ -19,11 +19,15 @@ import {
   doc, 
   updateDoc, 
   arrayUnion, 
-  arrayRemove 
+  arrayRemove,
+  getDoc
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import Image from "next/image";
 import ConUpload from '@/components/middle/construction/conUpload'
+import PhoneNumberDisplay from '@/components/PhoneNumberDisplay';
+
+
 
 const ITEMS_PER_PAGE = 12;
 
@@ -42,15 +46,14 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
   const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false);
   const loader = useRef(null);
   const timeFromNow = timestampObject => {
-
-
   if (timestampObject && typeof timestampObject.seconds === 'number') {
     return moment.unix(timestampObject.seconds).format('YYYY.MM.DD');
-  } else {
-    console.error("Invalid timestamp object provided:", timestampObject);
-    return '날짜 정보 없음';
-  }
-};
+    } else {
+      console.error("Invalid timestamp object provided:", timestampObject);
+      return '날짜 정보 없음';
+    }
+  };
+  
 
   const toggleFavorite = useCallback(async (itemId, currentFavorites) => {
     if (!currentUser?.uid) {
@@ -252,6 +255,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
     };
   }, [hasMore, loading, fetchMessages]);
 
+  
 
   function openCategory () {
     if (currentUser?.uid) {
@@ -272,6 +276,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
               {messages.map(({ address, imageDownloadUrls, createdDate, confirmed, constructionExperience, document, 
               favorites, companyName, phoneNumber, description, id}, idx) => { 
                  const isWishListed = currentUser?.uid && favorites.includes(currentUser.uid);
+              
                return (  
                 <div key={idx}
                      className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer"
@@ -300,10 +305,6 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                           className='rounded-full' >
                           {isWishListed ? <IoIosHeart color='red' size={20} /> : <IoMdHeartEmpty size={20} />}
                         </button>
-                        {/* 좋아요 수 표시 (favorites 배열의 길이) */}
-                        {/* <span className="text-red-600 text-[18px] rounded-full font-medium">
-                        {favorites.length}
-                        </span> */}
                         </div>
                   </div>
                   {/* --- 이미지 표시 로직 시작 --- */}
@@ -316,14 +317,13 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                       height={100} // 이미지 높이 고정
                       layout="relative" // 이미지 크기를 width와 height에 고정
                       objectFit="cover" // 이미지가 컨테이너를 채우도록 설정 (넘치는 부분은 잘림)
-                      // Image 컴포넌트 자체에는 rounded-md를 제거하고 부모 div에 적용
                     />
                   </div>
                   )}
                   {/* --- 이미지 표시 로직 끝 --- */}
                   <div className="space-y-3 text-sm text-gray-600">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">경력사항:</span>
+                      <span className="text-gray-500">연혁:</span>
                       <span className="font-medium">{constructionExperience || '-'}</span>
                     </div>
                     <div className="flex justify-between">
@@ -332,12 +332,12 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">전화번호:</span>
-                      <span className="font-medium">{phoneNumber}</span>
+                      <PhoneNumberDisplay data={phoneNumber} dataType="phone" />
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">주소:</span>
                       <span className="font-medium">
-                        {(address || '').split(' ').slice(2).join(' ')}
+                        <PhoneNumberDisplay data={(address || '').split(' ').slice(2).join(' ')} dataType="address" />
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -345,7 +345,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                       <span className="font-medium">{timeFromNow(createdDate)}</span>
                     </div>
                     <div className="pt-2 border-t border-gray-100">
-                      <div className="text-xs text-gray-600" style={{ whiteSpace: 'pre-line' }}>
+                      <div className="text-xs text-gray-600 truncate">
                         {/* 줄바꿈 처리 및 띄어쓰기 문제 해결을 위해 replace 사용 */}
                         {(description || '').replace(/\\n/g, '\n')}
                       </div>

@@ -69,7 +69,7 @@ const KakaoAuthPage = () => {
                 fcmToken: fcmToken ?? null,
                 pushTime: serverTimestamp(),
               }, { merge: true });
-              console.log("✅ 기존 사용자 문서 업데이트 완료.");
+  
             } catch (err) {
               console.error("🔥 사용자 문서 업데이트 실패:", err);
             }
@@ -91,7 +91,7 @@ const KakaoAuthPage = () => {
                 job: [],
                 expirationDate: null
               });
-              console.log("✅ 신규 사용자 문서 생성 완료.");
+         
             } catch (err) {
               console.error("🔥 사용자 문서 생성 실패:", err);
             }

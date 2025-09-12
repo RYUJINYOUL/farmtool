@@ -57,16 +57,12 @@ exports.kakaoCallback = onRequest(
       });
 
       const user = await userRes.json();
-      console.log('카카오 API 응답:', user);
       
       const uid = `kakao${user.id}`;
       const nickname = user.kakao_account?.profile?.nickname;
       const email = user.kakao_account?.email;
       const photoURL = user.kakao_account?.profile?.profile_image_url;
 
-      console.log('Firebase에 전달할 데이터:', { uid, nickname, email, photoURL });
-
-      // 사용자 프로필 업데이트 또는 생성
       let firebaseUid = uid;
       const existingUserByEmail = email ? await admin.auth().getUserByEmail(email).catch(() => null) : null;
 
@@ -76,7 +72,7 @@ exports.kakaoCallback = onRequest(
           displayName: nickname,
           photoURL: photoURL,
         });
-        console.log('✅ 기존 계정에 카카오 정보 업데이트 완료.');
+       
       } else {
         try {
           await admin.auth().updateUser(firebaseUid, {
@@ -84,7 +80,7 @@ exports.kakaoCallback = onRequest(
             email: email,
             photoURL: photoURL,
           });
-          console.log('✅ 기존 사용자 프로필 업데이트 완료');
+    
         } catch (error) {
           if (error.code === 'auth/user-not-found') {
             await admin.auth().createUser({
@@ -93,7 +89,7 @@ exports.kakaoCallback = onRequest(
               email: email,
               photoURL: photoURL,
             });
-            console.log('✅ 신규 사용자 생성 완료');
+
           } else {
             throw error;
           }

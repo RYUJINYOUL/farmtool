@@ -24,7 +24,6 @@ if (
   window.location.hostname === "localhost" &&
   process.env.NEXT_PUBLIC_USE_EMULATOR === "true"
 ) {
-  console.log("🔥 Firebase Emulator 모드 활성화됨");
   connectFirestoreEmulator(db, "localhost", 8080);
   connectAuthEmulator(auth, "http://localhost:9099");
 }

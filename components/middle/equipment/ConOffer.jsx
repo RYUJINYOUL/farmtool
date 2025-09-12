@@ -346,7 +346,7 @@ const ConOffer = ({
                       <span className="font-medium">{timeFromNow(createdDate)}</span>
                     </div>
                     <div className="pt-2 border-t border-gray-100">
-                      <div className="text-xs text-gray-600" style={{ whiteSpace: 'pre-line' }}>
+                      <div className="text-xs text-gray-600 truncate">
                         {(description || '').replace(/\\n/g, '\n')}
                       </div>
                     </div>

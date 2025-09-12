@@ -89,7 +89,6 @@ exports.confirmPayment = onRequest(
             expirationDate: expirationDate,
           }, { merge: true });
 
-          console.log('✅ Firestore save success for user:', userId);
         } catch (dbError) {
           console.error('❌ Firestore save failed:', dbError);
           const finalFailUrl = `${TOSS_FAIL_FRONTEND_URL.value()}?code=FIRESTORE_ERROR&message=${encodeURIComponent(dbError.message)}&orderId=${orderId}`;

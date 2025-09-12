@@ -84,7 +84,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
         await updateDoc(userDocRef, {
           wishList: arrayRemove(wishlistItem)
         });
-        console.log(`찜 해제: Item ${itemId} from user ${userId}`);
+
       } else {
         await updateDoc(constructionDocRef, {
           favorites: arrayUnion(userId)
@@ -92,7 +92,6 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
         await updateDoc(userDocRef, {
           wishList: arrayUnion(wishlistItem)
         });
-        console.log(`찜 설정: Item ${itemId} (Category: ${category}) by user ${userId}`);
       }
     } catch (error) {
       console.error("Error toggling favorite: ", error);
@@ -343,7 +342,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
                     </span>
                   </div>
                   <div className="pt-2 border-t border-gray-100">
-                    <div className="text-xs text-gray-600" style={{ whiteSpace: 'pre-line' }}>
+                   <div className="text-xs text-gray-600 truncate">
                       {/* 줄바꿈 처리 및 띄어쓰기 문제 해결을 위해 replace 사용 */}
                       {(constructionExperience || '').replace(/\\n/g, '\n')}
                     </div>

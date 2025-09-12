@@ -120,16 +120,10 @@ export default function JobWishList({ onClose }) { // initialNaraWishListDetails
       );
 
       await deleteDoc(naraDocRef);
-      // users 문서의 nara 배열 업데이트는 유지 (서브컬렉션이 아닌, users 문서 내에 배열로 ID를 저장하는 경우)
-      // 만약 users 문서에 nara 배열로 ID를 저장하지 않는다면 아래 라인은 제거해야 합니다.
       await updateDoc(userDocRef, {
         job: arrayRemove(naraDocId) // 만약 users 문서에 nara 필드가 배열로 있다면
       });
 
-      console.log(`구인구직 찜 항목 ${naraDocId} 제거 성공`);
-
-      // 찜 해제 후 목록을 처음부터 새로 로드하여 최신 상태를 반영
-      // 이렇게 하면 페이지네이션 상태(lastDoc, hasMore)도 정확하게 재설정됩니다.
       setNaraWishListDetails([]); // 목록 비우기 (새로 로드 준비)
       setLastDoc(null);
       setHasMore(true);

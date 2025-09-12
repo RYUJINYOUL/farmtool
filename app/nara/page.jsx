@@ -460,7 +460,7 @@ export default function NaraBidList() {
         });
         // 2. users/{uid}/nara 서브컬렉션에서 해당 문서 삭제
         await deleteDoc(userNaraSubCollectionDocRef);
-        console.log(`사용자 ${userId}의 nara 배열 및 서브컬렉션에서 ${naraDocId} 제거 성공`);
+  
       } else {
         // 찜 설정:
         // 1. users/{uid} 문서의 'nara' 배열에 ID 추가
@@ -473,7 +473,7 @@ export default function NaraBidList() {
           favoritedAt: new Date(), // 찜한 시간 기록
           userId: userId // 찜한 사용자 ID 기록
         });
-        console.log(`사용자 ${userId}의 nara 배열 및 서브컬렉션에 ${naraDocId} 추가 성공`);
+
       }
     } catch (error) {
       console.error("나라장터 찜하기/찜 해제 중 오류 발생: ", error);
@@ -506,11 +506,11 @@ export default function NaraBidList() {
           // 'nara' 필드가 배열인지 확인하고, 아니면 빈 배열로 초기화
           setUserFavoritedNaraIds(Array.isArray(userData.nara) ? userData.nara : []);
         } else {
-          console.log("사용자 문서가 존재하지 않습니다. 나라장터 찜 목록을 비워둡니다.");
+   
           setUserFavoritedNaraIds([]);
         }
       } catch (error) {
-        console.error("사용자 나라장터 찜 배열을 불러오는 중 오류 발생:", error);
+
         setUserFavoritedNaraIds([]);
       } finally {
         setLoading(false); // 사용자 찜 데이터 로딩 완료
@@ -554,7 +554,7 @@ export default function NaraBidList() {
       if (presmptPrceBgn) params.push(`presmptPrceBgn=${presmptPrceBgn.replace(/,/g, '')}`);
       if (presmptPrceEnd) params.push(`presmptPrceEnd=${presmptPrceEnd.replace(/,/g, '')}`);
       const url = `${API_URL}?${params.join('&')}`;
-      console.log(url);
+
       const res = await fetch(url);
       const contentType = res.headers.get('content-type');
       let data;

@@ -132,7 +132,7 @@ const LoginPage = () => {
                     // wishList, permit, nara, job 등은 사용자가 직접 조작하는 데이터이므로 여기서 덮어쓰지 않음
                     // badge, notice 등은 초기값으로 설정하거나, 앱 로직에 따라 결정
                 });
-                console.log("기존 사용자 문서 업데이트 완료.");
+            
             } else {
                 // 문서가 존재하지 않으면 새로 생성 (초기값 설정)
                 await setDoc(userDocRef, {

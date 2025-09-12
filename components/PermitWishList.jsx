@@ -114,14 +114,12 @@ export default function PermitWishList({ onClose }) { // initialPermitWishListDe
         permit: arrayRemove(permitDocId) // 만약 users 문서에 permit 필드가 배열로 있다면
       });
 
-      console.log(`인허가 찜 항목 ${permitDocId} 제거 성공`);
       setPermitWishListDetails([]); // 목록 비우기 (새로 로드 준비)
       setLastDoc(null);
       setHasMore(true);
       fetchPermitWishListDetails(true);
 
     } catch (error) {
-      console.error("인허가 찜 해제 중 오류 발생:", error);
       alert("인허가 찜 해제 중 오류가 발생했습니다. 다시 시도해주세요.");
       setPermitWishListDetails((prevDetails) => [...prevDetails, item]);
     }

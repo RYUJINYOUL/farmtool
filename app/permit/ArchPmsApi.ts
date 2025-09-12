@@ -113,7 +113,6 @@ export async function fetchLegalDongCodes(mainRegionName: string, subRegionName:
     });
 
     const url = `${STAN_REGIN_CD_BASE_URL}?${params.toString()}`;
-    console.log(`법정동 코드 API 호출 URL: ${url}`);
 
     const response = await fetch(url, { next: { revalidate: 3600 } });
 
@@ -208,7 +207,6 @@ export async function fetchArchitecturalPermitData(
     });
 
     const url = `${ARCH_PMS_BASE_URL}?${params.toString()}`;
-    console.log(`건축 인허가 API 호출 URL: ${url}`);
 
     const response = await fetch(url, { next: { revalidate: 3600 } });
 
