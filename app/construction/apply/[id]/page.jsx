@@ -7,7 +7,6 @@ import { doc, getDoc, updateDoc } from "firebase/firestore"; // updateDoc 추가
 import PlayListCarousel4 from '@/components/PlayListCarousel4';
 import { db } from '@/firebase';
 import { useSelector } from 'react-redux';
-import useUserExpirationDate from '@/hooks/useUserExpirationDate'
 import PhoneNumberDisplay from '@/components/PhoneNumberDisplay';
 
 const Page = (props) => {
@@ -22,9 +21,7 @@ const Page = (props) => {
     }
     return moment(timestamp).format('YYYY.MM.DD');
   };
-  const userExpirationDate = useUserExpirationDate(); 
-  const Datetimenow = new Date();
-  const isPhoneNumberVisible = currentUser?.uid && userExpirationDate > Datetimenow;
+
 
  
   const toggleConfirmed = async () => {
@@ -154,7 +151,7 @@ const Page = (props) => {
                     <th className="px-4 py-2 bg-gray-50 font-medium">공사주소</th>
                     <td className="px-4 py-2"> 
                        <span className="font-medium">
-                         <PhoneNumberDisplay data={(message.address || '').split(' ').slice(2).join(' ')} dataType="address" />
+                         <PhoneNumberDisplay data={(message.address || '').split(' ').slice(2).join(' ')} dataType="address" userKey={message.userKey} />
                        </span>
                       </td>
                   </tr>
@@ -163,7 +160,7 @@ const Page = (props) => {
                     <td className="px-4 py-2">
                       
                         <span className="font-medium">
-                           <PhoneNumberDisplay data={message.phoneNumber} dataType="phone" />
+                           <PhoneNumberDisplay data={message.phoneNumber} dataType="phone" userKey={message.userKey} />
                         </span>
                    
                     </td>

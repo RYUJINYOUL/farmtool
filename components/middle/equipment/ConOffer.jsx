@@ -24,6 +24,7 @@ import {
 import { db } from "@/firebase";
 import Image from "next/image";
 import ConUpload from '@/components/middle/construction/conUpload'
+import PhoneNumberDisplay from '@/components/PhoneNumberDisplay';
 
 
 const ITEMS_PER_PAGE = 12;
@@ -175,7 +176,8 @@ const ConOffer = ({
           createdDate: data.createdDate,
           SubCategories: data.SubCategories,
           favorites: data.favorites || [],
-          confirmed: data.confirmed
+          confirmed: data.confirmed,
+          userKey: data.userKey
         };
       });
 
@@ -268,7 +270,7 @@ const ConOffer = ({
           {messages.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {messages.map(({ address, imageDownloadUrls, createdDate, confirmed, constructionExperience, rentalRates, 
-              favorites, companyName, phoneNumber, description, id, contactPerson}, idx) => { 
+              favorites, companyName, phoneNumber, description, id, contactPerson, userKey}, idx) => { 
                  const isWishListed = currentUser?.uid && favorites.includes(currentUser.uid);
                return (  
                 <div key={idx}
@@ -333,12 +335,12 @@ const ConOffer = ({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">전화번호:</span>
-                      <span className="font-medium">{phoneNumber}</span>
+                      <PhoneNumberDisplay data={phoneNumber} dataType="phone" userKey={userKey}/>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">주소:</span>
-                      <span className="font-medium">
-                        {(address || '').split(' ').slice(2).join(' ')}
+                     <span className="font-medium">
+                        <PhoneNumberDisplay data={(address || '').split(' ').slice(2).join(' ')} dataType="address" userKey={userKey}/>
                       </span>
                     </div>
                     <div className="flex justify-between">

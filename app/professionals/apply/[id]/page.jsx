@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore"; // updateDoc 추가
 import PlayListCarousel4 from '@/components/PlayListCarousel4';
 import { db } from '@/firebase';
 import { useSelector } from 'react-redux';
+import PhoneNumberDisplay from '@/components/PhoneNumberDisplay';
 
 const Page = (props) => {
   const { id } = props.params;
@@ -160,18 +161,19 @@ const Page = (props) => {
                   </tr>
                   <tr className="border-b border-gray-200">
                     <th className="px-4 py-2 bg-gray-50 font-medium">주소</th>
-                    <td className="px-4 py-2">{message.address || "-"}</td>
+                    <td className="px-4 py-2"> 
+                       <span className="font-medium">
+                         <PhoneNumberDisplay data={(message.address || '').split(' ').slice(2).join(' ')} dataType="address" userKey={message.userKey}/>
+                       </span>
+                      </td>
                   </tr>
                   <tr>
                     <th className="px-4 py-2 bg-gray-50 font-medium">연락처</th>
-                    <td className="px-4 py-2">
-                      <a
-                        href={`tel:${message.phoneNumber}`}
-                        className="text-blue-600 hover:underline font-medium"
-                      >
-                        {message.phoneNumber || "-"}
-                      </a>
-                    </td>
+                    <td className="px-4 py-2"> 
+                       <span className="font-medium">
+                         <PhoneNumberDisplay data={message.phoneNumber} dataType="phone" userKey={message.userKey}/>
+                       </span>
+                      </td>
                   </tr>
                 </tbody>
               </table>

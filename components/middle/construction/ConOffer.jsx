@@ -183,7 +183,8 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
           companyName: data.conApply_name,
           phoneNumber: data.conApply_phoneNumber,
           description: data.conApply_description,
-          confirmed: data.confirmed
+          confirmed: data.confirmed,
+          userKey: data.userKey
         };
       });
 
@@ -274,7 +275,7 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
           {messages.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {messages.map(({ address, imageDownloadUrls, createdDate, confirmed, constructionExperience, document, 
-              favorites, companyName, phoneNumber, description, id}, idx) => { 
+              favorites, companyName, phoneNumber, description, id, userKey}, idx) => { 
                  const isWishListed = currentUser?.uid && favorites.includes(currentUser.uid);
               
                return (  
@@ -332,12 +333,12 @@ const ConOffer = ({ // <-- 이름 변경 및 searchParams 대신 직접 props �
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">전화번호:</span>
-                      <PhoneNumberDisplay data={phoneNumber} dataType="phone" />
+                      <PhoneNumberDisplay data={phoneNumber} dataType="phone" userKey={userKey} />
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">주소:</span>
                       <span className="font-medium">
-                        <PhoneNumberDisplay data={(address || '').split(' ').slice(2).join(' ')} dataType="address" />
+                        <PhoneNumberDisplay data={(address || '').split(' ').slice(2).join(' ')} dataType="address" userKey={userKey} />
                       </span>
                     </div>
                     <div className="flex justify-between">
