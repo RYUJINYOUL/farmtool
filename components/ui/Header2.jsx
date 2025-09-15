@@ -73,7 +73,7 @@ const Header2 = ({children}) => {
 
   return (
     <header ref={headRef} className="w-full">
-      <div className="w-full pt-3 md:pt-3 bg-white">
+      <div className="w-full pt-[15px] pb-[13px] md:py-[5px] bg-white">
         <PagePadding>  
           <div className="w-full max-w-[1100px] mx-auto">
             <div className="flex items-center justify-between">

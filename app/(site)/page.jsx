@@ -55,7 +55,7 @@ export default function MyPage() {
                 />
                 <Button
                   onClick={() => openCategory()} 
-                  className="bg-gray-900 hover:bg-gray-800 rounded-full p-2.5 flex items-center justify-center ml-2 transition-colors duration-300"
+                  className="bg-green-600 hover:bg-green-700 rounded-full p-2.5 flex items-center justify-center ml-2 transition-colors duration-300"
                 >
                   <FiSearch className="text-white text-xl" />
                 </Button>
@@ -107,7 +107,7 @@ export default function MyPage() {
                       e.preventDefault();
                       router.push('/nara');
                     }}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
                     클릭
                   </button>
@@ -129,7 +129,7 @@ export default function MyPage() {
                       e.preventDefault();
                       router.push('/permit');
                     }}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
                     클릭
                   </button>
@@ -151,7 +151,7 @@ export default function MyPage() {
                       e.preventDefault();
                       router.push('/construction');
                     }}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
                     클릭
                   </button>
@@ -173,7 +173,7 @@ export default function MyPage() {
                       e.preventDefault();
                       router.push('/equipment');
                     }}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
                     클릭
                   </button>

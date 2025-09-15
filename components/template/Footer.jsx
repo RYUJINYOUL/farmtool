@@ -15,14 +15,11 @@ import {
   Dock,
   Hammer,
   Home,
-  ChevronDown,
-  ChevronUp,
   LaptopMinimalCheck,
 } from "lucide-react";
 
 const Footer = () => {
   const pathname = usePathname();
-  const [showAllInfo, setShowAllInfo] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const getActiveCategoryFromPath = (path) => {
@@ -79,35 +76,42 @@ const Footer = () => {
   return (
     <section className="relative">
       {/* 푸터 정보 */}
-      <div className='w-full flex flex-col justify-center items-center gap-3 mb-24'>
-        <div className="w-full max-w-[1100px] px-4 pt-8 md:pt-12">
+      <div className='w-full flex flex-col justify-center items-center gap-3 mt-8 mb-48'>
+        <div className="w-full max-w-[1100px] px-4">
           {/* 기본 정보 */}
-          <div className="flex items-center justify-between py-3 border-b border-gray-200">
+          <div className="flex items-center flex-wrap gap-x-4 gap-y-2 pt-1 pb-[20px] border-b border-gray-200">
             <span className="text-sm font-semibold text-gray-900">건설톡</span>
-            <button 
-              onClick={() => setShowAllInfo(!showAllInfo)}
-              className="flex items-center gap-1 px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
-            >
-              <span className="text-xs text-gray-600">회사정보</span>
-              {showAllInfo ? (
-                <ChevronUp className="w-3.5 h-3.5 text-gray-500" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
-              )}
-            </button>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-600">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">대표자</span>
+                <span>{companyInfo[1].value}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium"></span>
+                <span>{companyInfo[2].value}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium"></span>
+                <span>{companyInfo[3].value}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">주소</span>
+                <span>{companyInfo[4].value}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">No.</span>
+                <span>{companyInfo[5].value}</span>
+              </div>
+            </div>
           </div>
 
           {/* 상세 정보 */}
-          {showAllInfo && (
-            <div className="py-5 space-y-3 animate-fadeIn bg-gray-50/50 mt-3 rounded-lg px-4">
-              {companyInfo.slice(1).map((info) => (
-                <div key={info.title} className="flex text-xs text-gray-600">
-                  <span className="w-24 font-medium">{info.title}</span>
-                  <span>{info.value}</span>
-                </div>
-              ))}
+          <div className="py-5 bg-gray-50/50 mt-3 rounded-lg px-4">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 text-xs text-gray-600">
             </div>
-          )}
+            <div className="mt-2 text-xs text-gray-600">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -136,7 +140,7 @@ const Footer = () => {
           </div>
 
           {/* 모바일 네비게이션 */}
-             <div className="md:hidden h-full flex justify-center">
+          <div className="md:hidden h-full flex justify-center">
             <Swiper
               slidesPerView="auto"
               spaceBetween={16}
