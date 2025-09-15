@@ -16,19 +16,26 @@ import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
+  DrawerTitle,
 } from "@/components/ui/drawer"
-import { GiHamburgerMenu } from "react-icons/gi";
+import { RiMenu4Line, RiUser3Line } from "react-icons/ri";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 
 const HeaderDrawer = ({ children }) => {
   return (<Drawer direction='left'>
   <DrawerTrigger>{children}</DrawerTrigger>
-  <DrawerContent className='w-[240px] h-full'>
-  <nav className='w-[240px] h-full border-r-[1px] border-neutral-600 '>
-        <div className='p-[24px] bg-gray-50'><Logo total={true}/></div>
-        <div className='bg-gray-50 h-full'><Navigator /></div>
-      </nav>
+  <DrawerContent className='w-[280px] h-full'>
+    <DrawerTitle className="sr-only">메인 메뉴</DrawerTitle>
+    <nav className='w-full h-full bg-white'>
+      <div className='p-6 border-b border-gray-100'>
+        <Logo total={true}/>
+      </div>
+      <div className='py-4'>
+        <Navigator />
+      </div>
+    </nav>
   </DrawerContent>
 </Drawer>
   );
@@ -65,14 +72,14 @@ const Header2 = ({children}) => {
 
 
   return (
-    <header ref={headRef} className="overflow-y-auto w-full h-full">
+    <header ref={headRef} className="overflow-y-auto w-full h-full pt-1">
       
      {/* <section className="relative top-0 w-full">
         <div className={cn('block sticky top-100 w-full', (pathname !== "/")&&"hidden")}><Gallery/></div>
       </section> */}
 
        <PagePadding>  
-   <section className={cn('absolute w-full top-0 left-0 flex md:h-[62px] h-[55px] z-10 items-start md:justify-center sm:justify-between', 
+   <section className={cn('absolute w-full top-1 left-0 flex md:h-[62px] h-[48px] z-10 items-start md:justify-center sm:justify-between', 
     isScrolled&&"md:bg-white bg-gray-50")}>
       
    <div className='flex flex-col'>
@@ -84,7 +91,7 @@ const Header2 = ({children}) => {
         )}
       >
         {/* 헤더: 좌중앙우 */}
-        <div className="relative mx-auto flex h-[55px] w-full items-center justify-between lg:w-[1100px] md:h-[62px]">
+        <div className="relative mx-auto flex h-[48px] w-full items-center justify-between lg:w-[1100px] md:h-[62px]">
           {/* 중앙: 로고 */}
           <div>
             <Logo total={isScrolled} />
@@ -96,11 +103,16 @@ const Header2 = ({children}) => {
               <Menu total={isScrolled} />
               </article>
 
-              <HeaderDrawer>
-              <article className='lg:hidden pr-5'>
-              <GiHamburgerMenu className={cn("text-black", isScrolled&&"text-black")} size={30} />
-              </article>
-              </HeaderDrawer>
+              <div className="flex items-center gap-4 lg:hidden">
+                <Link href="/myinfo" className="flex items-center">
+                  <RiUser3Line className={cn("text-black", isScrolled&&"text-black")} size={24} />
+                </Link>
+                <HeaderDrawer>
+                  <article className='pr-5'>
+                    <RiMenu4Line className={cn("text-black", isScrolled&&"text-black")} size={28} />
+                  </article>
+                </HeaderDrawer>
+              </div>
             </section>
         </div>
 

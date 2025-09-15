@@ -57,33 +57,36 @@ export default function Navigator() {
 
   return (
     <div>
-      <section className="flex flex-row pl-7 pt-4 pb-4 gap-5">
-        <div
-          className="text-[14px] text-black items-center hover:text-cyan-600 cursor-pointer"
+      <section className="flex flex-row px-6 py-3 gap-4 border-b border-gray-100">
+        <button
+          className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           onClick={currentUser ? handleLogout : handleLogin}
         >
           {currentUser ? "로그아웃" : "로그인"}
-        </div>
-        <div className="text-[14px] text-black items-center">|</div>
-        <div
-          className="text-[14px] text-black items-center hover:text-cyan-600 cursor-pointer"
+        </button>
+        <div className="text-gray-300">|</div>
+        <button
+          className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           onClick={() => push("/register", { scroll: false })}
         >
           회원가입
-        </div>
+        </button>
       </section>
 
-      <section className="flex flex-col gap-2 p-4">
+      <section className="flex flex-col py-2">
         {homeCategoryList.map((item) => (
           <div
             onClick={() => onClickCategory(item)}
             key={item.label}
             className={cn(
-              "h-[38px] text-black min-w-fit px-2 flex justify-start items-center border border-transparent rounded-lg hover:text-cyan-600",
-              item.label === homeCategory && "underline underline-offset-8"
+              "h-11 text-gray-600 px-6 flex items-center text-[15px] hover:bg-gray-50 transition-all duration-200 cursor-pointer relative group",
+              item.label === homeCategory && "text-gray-900 bg-gray-50/80 font-medium after:absolute after:left-0 after:w-1 after:h-6 after:bg-gray-900 after:rounded-r-full after:top-1/2 after:-translate-y-1/2"
             )}
           >
-            {item.label}
+            <span className="relative">
+              {item.label}
+              <span className="absolute left-0 right-0 bottom-0 h-px bg-gray-900 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"/>
+            </span>
           </div>
         ))}
       </section>

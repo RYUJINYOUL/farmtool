@@ -203,177 +203,193 @@ const PostDetailWithQuotation = ({ id, col, postAuthorUid, postImageUrls, listBa
 
   return (
     <div>
-      <section className="flex gap-[25px] flex-col justify-center items-center mt-10">
-        <div className='flex flex-col lg:w-[1100px] w-full'>
-          <div className='flex flex-row items-center justify-between lg:w-[1100px] w-full'>
-            <div className='font-semibold text-[20px]'>견적서</div>
-            <div className='flex flex-row items-center gap-3'>
+      <section className="flex flex-col items-center mb-8">
+        <div className='w-full max-w-[1100px]'>
+          <div className='flex items-center justify-between mb-6'>
+            <h2 className='text-2xl font-bold text-gray-900'>견적서</h2>
+            <div className='flex items-center gap-2'>
               <button
-                className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
-                 onClick={() => {
-                    push(`${listBasePath}?tab=upload`);
-                  }}
+                className='px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 rounded-md border border-gray-200 hover:border-gray-300 transition-colors bg-white'
+                onClick={() => {
+                  push(`${listBasePath}?tab=upload`);
+                }}
               >목록</button>
               {currentUser?.uid === postAuthorUid && (
                 <>
                   <button
-                    className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
+                    className='px-3 py-1.5 text-sm text-red-600 hover:text-red-700 rounded-md border border-red-200 hover:border-red-300 transition-colors bg-white'
                     onClick={deleteMainPost}
-                  >게시물 삭제</button>
-                  
+                  >삭제</button>
                   <button
-                    className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
+                    className='px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 rounded-md border border-blue-200 hover:border-blue-300 transition-colors bg-white'
                     onClick={() => openCategory()}
-                  >게시물 수정</button>
+                  >수정</button>
                 </>
               )}
             </div>
           </div>
-          <hr className="mt-1 h-0.5 border-t-0 bg-neutral-200 opacity-100 dark:opacity-50" />
+          <div className="h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
         </div>
       </section>
 
       <section className='flex justify-center items-center w-full'>
-        <div className='flex flex-col lg:w-[1100px] p-5 w-full bg-[#fafafa]'>
-
+        <div className='w-full max-w-[1100px] space-y-8'>
           {/* 견적서 리스트 */}
-          {quotations.length === 0 ? (
-            <div className="text-center text-gray-500 py-10">아직 등록된 견적서가 없습니다.</div>
-          ) : (
-            quotations.map((quotation) => {
-              const viewAllowed = isViewAllowed(quotation.uid);
-              return (
-                <div
-                  key={quotation.id}
-                  className="border border-gray-200 rounded-lg overflow-hidden mb-4"
-                >
-                  <table className="min-w-full text-sm text-left text-gray-700">
-                    <tbody>
-                      <tr className="border-b border-gray-100">
-                        <th className="px-4 py-2 w-32 bg-gray-50 font-medium">업체명</th>
-                        <td className="px-4 py-2">{viewAllowed ? quotation.companyName : '*****'}
-                          {/* {viewAllowed ? (
-                            <Link
-                              href={`/${quotation.division[1]}/registration/${quotation.uid}`}
-                              className="text-blue-600 hover:underline font-medium"
-                            >
-                              {quotation.companyName}
-                            </Link>
-                          ) : (
-                            '*****'
-                          )} */}
-                        </td>
-                      </tr>
-                      <tr className="border-b border-gray-100">
-                        <th className="px-4 py-2 bg-gray-50 font-medium">등록일</th>
-                        <td className="px-4 py-2">{timeFromNow(quotation.createdDate)}</td>
-                      </tr>
-                      <tr className="border-b border-gray-100">
-                        <th className="px-4 py-2 bg-gray-50 font-medium">가격</th>
-                        <td className="px-4 py-2">{viewAllowed ? `${quotation.price}원` : '*****'}</td>
-                      </tr>
-                      <tr>
-                        <th className="px-4 py-2 bg-gray-50 font-medium">연락처</th>
-                        <td className="px-4 py-2">
-                          {viewAllowed ? (
-                            <a
-                              href={`tel:${quotation.phoneNumber}`}
-                              className="text-blue-600 hover:underline font-medium"
-                            >
-                              {quotation.phoneNumber}
-                            </a>
-                          ) : (
-                            '*****'
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th className="px-4 py-2 bg-gray-50 font-medium">내용</th>
-                        <td className="px-4 py-2">{viewAllowed ? quotation.content : '*****'}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  {currentUser?.uid === quotation.uid && (
-                    <button
-                      className='px-4 py-2 mt-2 text-[12px] text-red-500 p-0.5 hover:bg-red-50'
-                      onClick={() => { deleteQuotation(quotation.id, quotation.uid); }}
-                    >삭제</button>
-                  )}
-                </div>
-              );
-            })
-          )}
+          <div className="space-y-4">
+            {quotations.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-100">
+                <p className="text-gray-500">아직 등록된 견적서가 없습니다.</p>
+              </div>
+            ) : (
+              quotations.map((quotation) => {
+                const viewAllowed = isViewAllowed(quotation.uid);
+                return (
+                  <div
+                    key={quotation.id}
+                    className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+                  >
+                    <div className="p-6 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <h3 className="font-medium text-gray-900">
+                            {viewAllowed ? quotation.companyName : '*****'}
+                          </h3>
+                          <p className="text-sm text-gray-500">{timeFromNow(quotation.createdDate)}</p>
+                        </div>
+                        {currentUser?.uid === quotation.uid && (
+                          <button
+                            onClick={() => { deleteQuotation(quotation.id, quotation.uid); }}
+                            className="text-sm text-red-500 hover:text-red-600 hover:underline"
+                          >
+                            삭제
+                          </button>
+                        )}
+                      </div>
 
-          <div className='mt-5' />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <dt className="text-sm font-medium text-gray-500">가격</dt>
+                          <dd className="text-base text-gray-900">
+                            {viewAllowed ? `${quotation.price.toLocaleString()}원` : '*****'}
+                          </dd>
+                        </div>
+                        <div className="space-y-1">
+                          <dt className="text-sm font-medium text-gray-500">연락처</dt>
+                          <dd className="text-base text-gray-900">
+                            {viewAllowed ? (
+                              <a
+                                href={`tel:${quotation.phoneNumber}`}
+                                className="text-blue-600 hover:text-blue-700 hover:underline"
+                              >
+                                {quotation.phoneNumber}
+                              </a>
+                            ) : '*****'}
+                          </dd>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <dt className="text-sm font-medium text-gray-500">견적 내용</dt>
+                        <dd className="text-base text-gray-900 whitespace-pre-wrap">
+                          {viewAllowed ? quotation.content : '*****'}
+                        </dd>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
 
           {/* 견적 입력폼 */}
-          {currentUser ? (
-            <form
-              className='flex flex-col md:p-0 pr-10 w-full items-center justify-center'
-              onSubmit={handleSubmit(onClickAddQuotationButton)}
-            >
-              <h3 className='text-lg font-bold mb-3 self-start'>견적서 작성</h3>
-              <div className='w-full mb-3'>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 rounded-lg font-medium bg-gray-100 border border-gray-200
-                  placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  placeholder={currentUser?.displayName}
-                   {...register("companyName")}
-                />
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            {currentUser ? (
+              <form onSubmit={handleSubmit(onClickAddQuotationButton)} className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">견적서 작성</h3>
+                <div className="space-y-4">
+                  <div>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-200
+                        text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+                        placeholder-gray-400 transition-colors"
+                      placeholder={currentUser?.displayName || "업체명"}
+                      {...register("companyName")}
+                    />
+                  </div>
+
+                  <div>
+                    <textarea
+                      className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-200
+                        text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+                        placeholder-gray-400 transition-colors resize-y"
+                      placeholder="견적 내용을 상세히 작성해주세요."
+                      rows="4"
+                      {...register("content", { required: "내용을 입력해주세요." })}
+                    />
+                    {errors.content && 
+                      <p className="mt-1 text-sm text-red-600">*{errors.content.message}</p>
+                    }
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <input
+                        type="number"
+                        className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-200
+                          text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+                          placeholder-gray-400 transition-colors"
+                        placeholder="가격 (숫자만 입력)"
+                        {...register("price", { required: "가격을 입력해주세요.", valueAsNumber: true })}
+                      />
+                      {errors.price && 
+                        <p className="mt-1 text-sm text-red-600">*{errors.price.message}</p>
+                      }
+                    </div>
+
+                    <div>
+                      <input
+                        type="tel"
+                        className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-200
+                          text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+                          placeholder-gray-400 transition-colors"
+                        placeholder="연락처"
+                        {...register("phoneNumber", { required: "연락처를 입력해주세요." })}
+                      />
+                      {errors.phoneNumber && 
+                        <p className="mt-1 text-sm text-red-600">*{errors.phoneNumber.message}</p>
+                      }
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
+                        rounded-lg shadow-sm hover:shadow transition-all duration-200"
+                    >
+                      견적서 등록
+                    </button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <div className="p-8 text-center">
+                <div className="py-8 px-4 rounded-lg bg-gray-50 border border-gray-100">
+                  <p className="text-gray-600">로그인 후 견적서를 작성할 수 있습니다.</p>
+                </div>
               </div>
-              <div className='w-full mb-3'>
-                <textarea
-                  className="w-full px-4 py-2 rounded-lg font-medium bg-gray-100 border border-gray-200
-                  placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white resize-y"
-                  placeholder="견적 내용 (상세 설명)"
-                  rows="4"
-                  {...register("content", { required: "내용을 입력해주세요." })}
-                />
-                {errors.content && <p className="text-red-500 text-xs mt-1 self-start">*{errors.content.message}</p>}
-              </div>
-              <div className='w-full mb-3'>
-                <input
-                  type="number"
-                  className="w-full px-4 py-2 rounded-lg font-medium bg-gray-100 border border-gray-200
-                  placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  placeholder="가격 (숫자만 입력)"
-                  {...register("price", { required: "가격을 입력해주세요.", valueAsNumber: true })}
-                />
-                {errors.price && <p className="text-red-500 text-xs mt-1 self-start">*{errors.price.message}</p>}
-              </div>
-              <div className='w-full mb-3'>
-                <input
-                  type="tel"
-                  className="w-full px-4 py-2 rounded-lg font-medium bg-gray-100 border border-gray-200
-                  placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                  placeholder="연락처"
-                  {...register("phoneNumber", { required: "연락처를 입력해주세요." })}
-                />
-              </div>
-              <div className='w-full flex justify-end'>
-                <button
-                  type="submit"
-                  className="text-white px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 transition-colors text-[16px] whitespace-nowrap"
-                >
-                  견적 등록
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="text-center text-gray-500 py-5 border border-gray-200 rounded-lg bg-white">
-              로그인 후 견적서를 작성할 수 있습니다.
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </section>
 
       <EditUpload
-             isOpen={isUserProfileModalOpen} 
-             onClose={() => setIsUserProfileModalOpen(false)}
-             col={col} 
-             id={id}
-            />
+        isOpen={isUserProfileModalOpen} 
+        onClose={() => setIsUserProfileModalOpen(false)}
+        col={col} 
+        id={id}
+      />
     </div>
   );
 };

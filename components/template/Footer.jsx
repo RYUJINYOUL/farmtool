@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import { usePathname } from 'next/navigation';
 import {
   BrickWallFire,
   Tractor,
@@ -20,16 +21,31 @@ import {
 } from "lucide-react";
 
 const Footer = () => {
-  const [activeCategory, setActiveCategory] = useState('홈');
+  const pathname = usePathname();
   const [showAllInfo, setShowAllInfo] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  const getActiveCategoryFromPath = (path) => {
+    switch(path) {
+      case '/': return '홈';
+      case '/construction': return '건설업';
+      case '/equipment': return '건설장비';
+      case '/materials': return '건설자재';
+      case '/professionals': return '전문인력';
+      case '/permit': return '인허가';
+      case '/nara': return '나라장터';
+      case '/job': return '구인구직';
+      case '/myinfo': return '내정보';
+      default: return '홈';
+    }
+  };
+
   const categories = [
     { name: '홈', href: '/', icon: Home, color: 'text-gray-900' },
-    // { name: '건설업', href: '/construction', icon: BrickWallFire, color: 'text-pink-500' },
-    // { name: '건설장비', href: '/equipment', icon: Tractor, color: 'text-orange-500' },
-    // { name: '건설자재', href: '/materials', icon: Fence, color: 'text-blue-400' },
-    // { name: '전문인력', href: '/professionals', icon: Hammer, color: 'text-green-500' },
+    { name: '건설업', href: '/construction', icon: BrickWallFire, color: 'text-pink-500' },
+    { name: '건설장비', href: '/equipment', icon: Tractor, color: 'text-orange-500' },
+    { name: '건설자재', href: '/materials', icon: Fence, color: 'text-blue-400' },
+    { name: '전문인력', href: '/professionals', icon: Hammer, color: 'text-green-500' },
     { name: '인허가', href: '/permit', icon: Copyright, color: 'text-blue-500' },
     { name: '나라장터', href: '/nara', icon: LaptopMinimalCheck, color: 'text-red-400' },
     { name: '구인구직', href: '/job', icon: UserPen, color: 'text-red-500' },
@@ -64,29 +80,29 @@ const Footer = () => {
     <section className="relative">
       {/* 푸터 정보 */}
       <div className='w-full flex flex-col justify-center items-center gap-3 mb-24'>
-        <div className="w-full max-w-[1100px] px-4">
+        <div className="w-full max-w-[1100px] px-4 pt-8 md:pt-12">
           {/* 기본 정보 */}
-          <div className="flex items-center justify-between py-2 border-b border-gray-100">
-            <span className="text-sm font-medium text-gray-900">건설톡</span>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200">
+            <span className="text-sm font-semibold text-gray-900">건설톡</span>
             <button 
               onClick={() => setShowAllInfo(!showAllInfo)}
-              className="flex items-center text-gray-500 hover:text-gray-700"
+              className="flex items-center gap-1 px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
             >
-              <span className="text-xs mr-1">회사정보</span>
+              <span className="text-xs text-gray-600">회사정보</span>
               {showAllInfo ? (
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="w-3.5 h-3.5 text-gray-500" />
               ) : (
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
               )}
             </button>
           </div>
 
           {/* 상세 정보 */}
           {showAllInfo && (
-            <div className="py-4 space-y-2 animate-fadeIn">
+            <div className="py-5 space-y-3 animate-fadeIn bg-gray-50/50 mt-3 rounded-lg px-4">
               {companyInfo.slice(1).map((info) => (
-                <div key={info.title} className="flex text-xs text-gray-500">
-                  <span className="w-20">{info.title}</span>
+                <div key={info.title} className="flex text-xs text-gray-600">
+                  <span className="w-24 font-medium">{info.title}</span>
                   <span>{info.value}</span>
                 </div>
               ))}
@@ -106,12 +122,11 @@ const Footer = () => {
                 <Link 
                   key={category.name}
                   href={category.href}
-                  className={`flex flex-col items-center py-2 px-3 transition-colors duration-200 hover:text-blue-500 ${
-                    activeCategory === category.name 
-                    ? 'text-blue-600 font-medium' 
-                    : 'text-gray-600'
+                  className={`flex flex-col items-center py-2 px-3 transition-all duration-200 relative group ${
+                    getActiveCategoryFromPath(pathname) === category.name 
+                    ? 'text-gray-900 font-semibold' 
+                    : 'text-gray-500 hover:text-gray-900'
                   }`}
-                  onClick={() => setActiveCategory(category.name)}
                 >
                   <Icon className={`w-5 h-5 mb-1 ${category.color}`} />
                   <span className="text-sm">{category.name}</span>
@@ -135,12 +150,11 @@ const Footer = () => {
                   <SwiperSlide key={category.name} style={{ width: 'auto', height: '100%' }}>
                     <Link 
                       href={category.href}
-                      className={`flex flex-col items-center justify-center h-full px-3 whitespace-nowrap transition-colors duration-200 ${
-                        activeCategory === category.name 
-                        ? 'text-blue-600 font-medium' 
-                        : 'text-gray-600'
+                      className={`flex flex-col items-center justify-center h-full px-3 whitespace-nowrap transition-all duration-200 ${
+                        getActiveCategoryFromPath(pathname) === category.name 
+                        ? 'text-gray-900 font-semibold scale-105' 
+                        : 'text-gray-500 hover:text-gray-900'
                       }`}
-                      onClick={() => setActiveCategory(category.name)}
                     >
                       <Icon className={`w-5 h-5 mb-0.5 ${category.color}`} />
                       <span className="text-[10px]">{category.name}</span>

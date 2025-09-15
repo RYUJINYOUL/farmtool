@@ -192,99 +192,103 @@ const Comment = ({ id, col, path, urls }) => {
 
   return (
     <div>
-      <section className="flex gap-[25px] flex-col justify-center items-center">
-        <div className='flex flex-col lg:w-[1100px] w-full'>
-          <div className='flex flex-row items-center justify-between lg:w-[1100px] w-full'>
-            <div className='font-semibold text-[20px]'>답변</div>
-            <div className='flex flex-row items-center gap-3'>
+      <section className="flex flex-col justify-center items-center space-y-6">
+        <div className='w-full max-w-[1100px]'>
+          <div className='flex items-center justify-between pb-4 border-b border-gray-200'>
+            <h2 className='text-xl md:text-2xl font-bold text-gray-900'>답변</h2>
+            <div className='flex items-center gap-2'>
               <button
-                className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
+                className='px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 rounded-md border border-gray-200 hover:border-gray-300 transition-colors bg-white'
                 onClick={() => {
-                  const baseConPath = path.substring(0, path.indexOf('/', 1)); // '/con' 부분만 추출
+                  const baseConPath = path.substring(0, path.indexOf('/', 1));
                   push(baseConPath);
                 }}
               >목록</button>
-              {/* 게시물 작성자(postAuthorUid)와 현재 로그인 사용자(currentUser?.uid)가 일치할 때만 삭제 버튼 표시 */}
               {currentUser?.uid === postAuthorUid && (
-                <button
-                  className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
-                  onClick={() => { deleteMainDocumentAndComments(id) }}
-                >게시물 삭제</button>
-              )}
-              {currentUser?.uid === postAuthorUid && (
-                <button
-                      className='mb-10 text-[12px] text-[#666] p-0.5 rounded-sm border border-gray-200'
-                      onClick={() => openCategory()}
-                    >게시물 수정</button>
+                <>
+                  <button
+                    className='px-3 py-1.5 text-sm text-red-600 hover:text-red-700 rounded-md border border-red-200 hover:border-red-300 transition-colors bg-white'
+                    onClick={() => { deleteMainDocumentAndComments(id) }}
+                  >삭제</button>
+                  <button
+                    className='px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 rounded-md border border-blue-200 hover:border-blue-300 transition-colors bg-white'
+                    onClick={() => openCategory()}
+                  >수정</button>
+                </>
               )}
             </div>
           </div>
-          <hr className="mt-1 h-0.5 border-t-0 bg-neutral-200 opacity-100 dark:opacity-50" />
         </div>
       </section>
 
       <section className='flex justify-center items-center w-full'>
-        <div className='flex flex-col lg:w-[1100px] p-5 w-full bg-[#fafafa]'>
-
-          {/* 댓글 목록 */}
-          {comments.length === 0 ? (
-            <div className="text-center text-gray-500 py-10">아직 답변이 없습니다.</div>
-          ) : (
-            comments.map(({ name, description, createdDate, id: commentId, uid: commentUid }, index) => {
-              return (
-                <div key={commentId} className="border-b border-gray-200 py-4 last:border-b-0">
-                  <div className='flex md:flex-row flex-col md:justify-between items-start w-full'>
-                    <div className='text-[13px] text-gray-700'>{name}</div>
-                    <div className='text-[13px] text-gray-500'>{timeFromNow(createdDate)}</div>
-                  </div>
-                  <div className='mt-2 text-[15px] text-[#666] leading-7 text-start'>{description}</div>
-                  {/* 댓글 작성자 UID와 현재 로그인 사용자 UID가 일치할 때만 삭제 버튼 표시 */}
-                  {currentUser?.uid === commentUid && (
-                    <button
-                      className='mt-2 text-[12px] text-red-500 p-0.5 rounded-sm border border-gray-200 hover:bg-red-50'
-                      onClick={() => { deleteComment(commentId, commentUid) }}
-                    >삭제</button>
-                  )}
-                </div>
-              );
-            })
-          )}
-
-          <div className='mt-3' />
-
-          {/* 댓글 입력 폼 */}
+        <div className='w-full max-w-[1100px] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden'>
+          {/* 답변 입력 폼 */}
           {currentUser ? (
-            <form
-              className='flex flex-col md:p-0 pr-10 w-full items-center justify-center'
-              onSubmit={handleSubmit(onClickAddCommentButton)}
-            >
-              <div className='flex flex-row md:w-[1100px] w-full items-start justify-center'>
-                <textarea
-                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200
-                     placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white resize-y"
-                  placeholder="답변을 입력해주세요."
-                  name="description"
-                  rows="3"
-                  cols="16"
-                  {...register("description", { required: "내용을 입력해주세요." })}
-                />
-                <div className='w-1/11 h-[95px] flex items-center justify-center ml-2'>
-                  <button
-                    type="submit"
-                    className="h-full text-white px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors
-                                 text-[16px] text-center whitespace-nowrap"
-                  >
-                    등록
-                  </button>
+            <div className="border-b border-gray-100">
+              <form
+                className='p-6'
+                onSubmit={handleSubmit(onClickAddCommentButton)}
+              >
+                <div className='space-y-4'>
+                  <textarea
+                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200
+                      placeholder-gray-400 text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:bg-white
+                      focus:ring-1 focus:ring-blue-500 transition-all resize-y"
+                    placeholder="답변을 입력해주세요."
+                    name="description"
+                    rows="3"
+                    {...register("description", { required: "내용을 입력해주세요." })}
+                  />
+                  <div className='flex justify-end'>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 text-sm font-medium text-white rounded-lg bg-blue-600 hover:bg-blue-700 
+                        transition-colors duration-200 flex items-center gap-2"
+                    >
+                      답변 등록
+                    </button>
+                  </div>
+                  {errors.description && 
+                    <p className="text-red-500 text-xs">*{errors.description.message}</p>
+                  }
                 </div>
-              </div>
-              {errors.description && <p className="text-red-500 text-xs mt-1 self-start ml-2">*{errors.description.message}</p>}
-            </form>
+              </form>
+            </div>
           ) : (
-            <div className="text-center text-gray-500 py-5 border border-gray-200 rounded-lg bg-white">
-              로그인 후 답변을 작성할 수 있습니다.
+            <div className="p-6 text-center">
+              <div className="py-8 px-4 rounded-lg bg-gray-50 border border-gray-100">
+                <p className="text-gray-600">로그인 후 답변을 작성할 수 있습니다.</p>
+              </div>
             </div>
           )}
+
+          {/* 답변 목록 */}
+          <div className="divide-y divide-gray-100">
+            {comments.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">아직 답변이 없습니다.</div>
+            ) : (
+              comments.map(({ name, description, createdDate, id: commentId, uid: commentUid }) => (
+                <div key={commentId} className="p-6 hover:bg-gray-50/50 transition-colors">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="font-medium text-gray-900">{name}</span>
+                      <span className="text-sm text-gray-500">{timeFromNow(createdDate)}</span>
+                    </div>
+                    {currentUser?.uid === commentUid && (
+                      <button
+                        className="text-sm text-red-500 hover:text-red-600 hover:underline transition-colors"
+                        onClick={() => { deleteComment(commentId, commentUid) }}
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{description}</p>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </section>
 

@@ -84,48 +84,49 @@ const Page = (props) => {
         <section className="flex gap-[50px] min-h-1/2 flex-col justify-center items-center">
           <div className='mt-10' />
           <div className='flex flex-col lg:w-[1100px] w-full'>
-            <div className='flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full'>
-              <div className='lg:text-start font-semibold text-center text-[20px] text-gray-900'>{message.companyName}</div>
-              
-              <div className='lg:text-end text-center text-[14px]'>{timeFromNow(message.createdDate)}
-                </div>
+            <div className='flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full mb-6'>
+              <div className='space-y-1'>
+                <h1 className='lg:text-start font-bold text-center text-2xl md:text-3xl text-gray-900'>{message.companyName}</h1>
+                <p className='text-gray-500 text-sm md:text-base'>등록일: {timeFromNow(message.createdDate)}</p>
+              </div>
             </div>
             
-            <hr className="my-1 h-0.5 border-t-0 bg-neutral-200 opacity-100 dark:opacity-50" />
+            <div className="h-px w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 mb-8" />
             <PlayListCarousel4
               playlistArray={message.imageDownloadUrls}
             />
                <div className={`overflow-x-auto ${message.imageDownloadUrls.length === 0 ? "" : "pt-10" }`}>
-                <table className="min-w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
-                  <tbody>
-                    <tr>
-                      <th className="px-4 py-2 bg-gray-50 font-medium">대표자</th>
-                      <td className="px-4 py-2">{message.contactPerson || '-'}</td>
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <th className="px-4 py-2 bg-gray-50 font-medium">사업자등록번호</th>
-                      <td className="px-4 py-2">{message.businessLicense || '-'}</td>
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <th className="px-4 py-2 bg-gray-50 font-medium">해당업종</th>
-                      <td className="px-4 py-2">{(message.SubCategories || []).join(', ') || '-'}</td>
-                    </tr>
-                    <tr className="border-b border-gray-200">
-                      <th className="px-4 py-2 bg-gray-50 font-medium">주소</th>
-                      <td className="px-4 py-2">{message.address || '-'}</td>
-                    </tr>
-                    <tr>
-                      <th className="px-4 py-2 bg-gray-50 font-medium">연락처</th>
-                      <td className="px-4 py-2"><a
-                            href={`tel:${message.phoneNumber}`}
-                            className="text-blue-600 hover:underline font-medium"
-                          >
-                            {message.phoneNumber || '-'}
-                          </a>
-                          </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0.5 overflow-hidden">
+                    <div className="grid grid-cols-3 p-4 bg-gray-50/50">
+                      <dt className="col-span-1 font-medium text-gray-600">대표자</dt>
+                      <dd className="col-span-2 text-gray-900">{message.contactPerson || '-'}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 p-4 bg-gray-50/50">
+                      <dt className="col-span-1 font-medium text-gray-600">사업자등록번호</dt>
+                      <dd className="col-span-2 text-gray-900">{message.businessLicense || '-'}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 p-4 bg-gray-50/50">
+                      <dt className="col-span-1 font-medium text-gray-600">해당업종</dt>
+                      <dd className="col-span-2 text-gray-900">{(message.SubCategories || []).join(', ') || '-'}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 p-4 bg-gray-50/50">
+                      <dt className="col-span-1 font-medium text-gray-600">주소</dt>
+                      <dd className="col-span-2 text-gray-900">{message.address || '-'}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 p-4 bg-gray-50/50 md:col-span-2">
+                      <dt className="col-span-1 font-medium text-gray-600">연락처</dt>
+                      <dd className="col-span-2">
+                        <a
+                          href={`tel:${message.phoneNumber}`}
+                          className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
+                        >
+                          {message.phoneNumber || '-'}
+                        </a>
+                      </dd>
+                    </div>
+                  </div>
+                </div>
               </div>
             <div className='mt-10' />
             <div className='text-[15px] h-full text-start leading-7 dark:text-gray-900'>

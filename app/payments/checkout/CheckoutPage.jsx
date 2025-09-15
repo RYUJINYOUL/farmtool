@@ -6,16 +6,18 @@ import TossPaymentsWidget from "@/components/TossPaymentsWidget";
 import { useSelector } from 'react-redux';
 import { Dialog } from "@headlessui/react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDownIcon } from "lucide-react";
 
 const subscriptionPrices = {
-  1: 300,
-  3: 42000,
-  6: 78000,
-  12: 118000,
+  1: 13900,
+  3: 35000,
+  6: 65000,
+  12: 115000,
 };
 
 const CheckoutPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(null);
   const [subscriptionPeriodInMonths, setSubscriptionPeriodInMonths] = useState(1);
   const { currentUser } = useSelector(state => state.user);
 
@@ -27,20 +29,77 @@ const CheckoutPage = () => {
   const handlePaymentFail = () => {}; 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl w-full space-y-8 p-10 bg-white shadow-2xl rounded-3xl transform transition-all">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+      <div className="w-full max-w-[1100px] space-y-8 py-10 bg-white transform transition-all">
         {/* Header Section */}
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900">결제하기</h1>
           <p className="mt-2 text-sm text-gray-600">
-            안전하고 간편한 결제로 건설톡 프리미엄 서비스를 이용해 보세요.
+            안전하고 간편한 결제로 건설톡<br></br> 프리미엄 서비스를 이용해 보세요.
           </p>
         </div>
 
-        {/* Pricing & Features Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
-          <p className="text-blue-600 font-bold text-lg mb-2">건설업, 건설장비, 구인구직, 전문인력, 건설자재</p>
-          <p className="text-blue-600 font-bold text-lg">전부 등록 가능! 무제한 견적서 등록!</p>
+        {/* Premium Features Section */}
+        <div className="space-y-6">
+          <div className="bg-green-500 py-4 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-white text-center">건설톡 프리미엄 회원</h2>
+          </div>
+          
+          <div className="bg-white border border-gray-200 rounded-lg divide-y">
+            {/* Accordion Item 1 */}
+            <div>
+              <button
+                onClick={() => setActiveTab(activeTab === 1 ? null : 1)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="text-lg font-bold text-gray-900">무제한 견적서 등록</h3>
+                <ChevronDownIcon 
+                  className={`w-5 h-5 text-gray-500 transition-transform ${activeTab === 1 ? 'transform rotate-180' : ''}`}
+                />
+              </button>
+              {activeTab === 1 && (
+                <div className="px-6 py-4 bg-gray-50">
+                  <p className="text-gray-700">모든 카테고리 견적서 등록</p>
+                </div>
+              )}
+            </div>
+
+            {/* Accordion Item 2 */}
+            <div>
+              <button
+                onClick={() => setActiveTab(activeTab === 2 ? null : 2)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="text-lg font-bold text-gray-900">업체 등록</h3>
+                <ChevronDownIcon 
+                  className={`w-5 h-5 text-gray-500 transition-transform ${activeTab === 2 ? 'transform rotate-180' : ''}`}
+                />
+              </button>
+              {activeTab === 2 && (
+                <div className="px-6 py-4 bg-gray-50">
+                  <p className="text-gray-700">건설업, 건설장비, 구인구직, 전문인력, 건설자재 등록</p>
+                </div>
+              )}
+            </div>
+
+            {/* Accordion Item 3 */}
+            <div>
+              <button
+                onClick={() => setActiveTab(activeTab === 3 ? null : 3)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="text-lg font-bold text-gray-900">소식 받기</h3>
+                <ChevronDownIcon 
+                  className={`w-5 h-5 text-gray-500 transition-transform ${activeTab === 3 ? 'transform rotate-180' : ''}`}
+                />
+              </button>
+              {activeTab === 3 && (
+                <div className="px-6 py-4 bg-gray-50">
+                  <p className="text-gray-700">이메일 주소로 나라장터 인허가 뉴스 신규견적 소식 받기</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Subscription Period Section */}
@@ -55,10 +114,10 @@ const CheckoutPage = () => {
               onChange={(e) => setSubscriptionPeriodInMonths(Number(e.target.value))}
               className="block w-full appearance-none rounded-xl border border-gray-300 bg-white py-4 pl-4 pr-10 text-base text-gray-800 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition duration-150 ease-in-out"
             >
-              <option value={1}>1개월 - 300원</option>
-              <option value={3}>3개월 - 42,000원</option>
-              <option value={6}>6개월 - 78,000원</option>
-              <option value={12}>12개월 - 118,000원</option>
+              <option value={1}>1개월 - 13,900원</option>
+              <option value={3}>3개월 - 35,000원</option>
+              <option value={6}>6개월 - 65,000원</option>
+              <option value={12}>12개월 - 115,000원</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

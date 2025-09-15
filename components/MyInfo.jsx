@@ -384,18 +384,6 @@ export default function MyInfo() {
           {/* 네 번째 줄: 주문 신청, 알림 설정 */}
           <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
-               <button
-                onClick={() => checkLoginAndOpenDialog("register")}
-                className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-green-500" />
-                  <span className="font-medium text-gray-800">업체 등록</span>
-                </div>
-              </button>
-            </div>
-
-            <div className="w-full md:w-1/2">
               <button
                 onClick={() => checkLoginAndOpenDialog("apply")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -406,11 +394,8 @@ export default function MyInfo() {
                 </div>
               </button>
             </div>
-          </div>
 
-          {/* 다섯 번째 줄: 고객센터 (단일 버튼) */}
-          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
-            <div className="w-full md:w-1/2"> {/* md:w-1/2를 유지하여 다른 버튼과 너비 통일 */}
+            <div className="w-full md:w-1/2">
               <button
                 onClick={() => checkLoginAndOpenDialog("notifications")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
@@ -424,9 +409,12 @@ export default function MyInfo() {
                 </span>
               </button>
             </div>
-            {/* 여기에 필요한 경우 두 번째 컬럼을 위한 빈 div 또는 다른 요소를 추가할 수 있습니다. */}
+          </div>
+
+          {/* 다섯 번째 줄: 고객센터와 기업 회원 전환 */}
+          <div className="w-full max-w-[1100px] mx-auto flex flex-col md:flex-row md:gap-2 space-y-3 md:space-y-0">
             <div className="w-full md:w-1/2">
-            <button
+              <button
                 onClick={() => checkLoginAndOpenDialog("help")}
                 className="flex items-center justify-between w-full bg-gray-100 hover:bg-gray-200 rounded-lg p-4"
               >
@@ -435,7 +423,19 @@ export default function MyInfo() {
                   <span className="font-medium text-gray-800">고객센터</span>
                 </div>
               </button>
-            </div> {/* 데스크톱에서 공간 유지를 위한 빈 div */}
+            </div>
+
+            <div className="w-full md:w-1/2">
+              <button
+                onClick={() => checkLoginAndOpenDialog("register")}
+                className="flex items-center justify-between w-full bg-green-500 hover:bg-green-600 rounded-lg p-4 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-white" />
+                  <span className="font-medium text-white">기업 회원 전환</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>

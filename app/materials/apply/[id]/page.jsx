@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import Image from "next/image";
 import moment from 'moment';
 import PostDetailWithQuotation from '@/components/middle/materials/Quotation';
@@ -10,7 +10,8 @@ import { useSelector } from 'react-redux';
 import PhoneNumberDisplay from '@/components/PhoneNumberDisplay';
 
 const Page = (props) => {
-  const { id } = props.params;
+  const params = use(props.params);
+  const { id } = params;
   const [postData, setPostData] = useState(null);
   const [message, setMessages] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,87 +99,94 @@ const Page = (props) => {
   }
 
   return (
-    <div>
-      <div className="lg:my-10 p-3.5 w-full">
-        <section className="flex gap-[50px] min-h-1/2 flex-col justify-center items-center">
-          <div className="mt-10" />
-          <div className="flex flex-col lg:w-[1100px] w-full">
-            <div className="flex md:flex-row flex-col md:justify-between items-start lg:w-[1100px] w-full">
-              <div className="lg:text-start font-semibold text-center text-[20px] dark:text-gray-900">
-                {message.companyName}
+    <div className="w-full pt-16 md:pt-20 pb-8 px-4 md:px-6">
+      <div className="max-w-[1100px] mx-auto">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 md:p-8 space-y-8">
+            {/* 헤더 섹션 */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  {message.companyName}
+                </h1>
+                <p className="text-gray-500 text-sm md:text-base">
+                  등록일: {timeFromNow(message.createdDate)}
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="lg:text-end text-center text-[14px] dark:text-gray-900">
-                  {timeFromNow(message.createdDate)}
-                </div>
-             {currentUser?.uid === message.userKey && (
+              {currentUser?.uid === message.userKey && (
                 <button
                   onClick={toggleConfirmed}
-                  className={`px-3 py-1 rounded text-white font-medium ${
+                  className={`px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 ${
                     message.confirmed
-                      ? "bg-red-500 hover:bg-red-600"
-                      : "bg-blue-500 hover:bg-blue-600"
-                  }`}
+                      ? "bg-red-500 hover:bg-red-600 shadow-red-100"
+                      : "bg-blue-500 hover:bg-blue-600 shadow-blue-100"
+                  } shadow-md hover:shadow-lg`}
                 >
-                  {message.confirmed ? "확정" : "대기"}
+                  {message.confirmed ? "확정 완료" : "대기 중"}
                 </button>
-                 )}
-              </div>
+              )}
             </div>
 
-            <hr className="my-1 h-0.5 border-t-0 bg-neutral-200 opacity-100 dark:opacity-50" />
+            <div className="h-px w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
 
             <PlayListCarousel4 playlistArray={message.imageDownloadUrls} />
 
-            <div className={`overflow-x-auto ${message.imageDownloadUrls.length === 0 ? "" : "pt-10" }`}>
-              <table className="min-w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
-                <tbody>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-4 py-2 bg-gray-50 font-medium w-32">필요자재</th>
-                    <td className="px-4 py-2">
-                      {message.constructionExperience || "-"}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-4 py-2 bg-gray-50 font-medium">분류</th>
-                    <td className="px-4 py-2">
-                      {(message.SubCategories || []).join(", ") || "-"}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-4 py-2 bg-gray-50 font-medium">주소</th>
-                    <td className="px-4 py-2"> 
-                       <span className="font-medium">
-                         <PhoneNumberDisplay data={(message.address || '').split(' ').slice(2).join(' ')} dataType="address" userKey={message.userKey}/>
-                       </span>
-                      </td>
-                  </tr>
-                  <tr>
-                    <th className="px-4 py-2 bg-gray-50 font-medium">연락처</th>
-                    <td className="px-4 py-2">
-                      <span className="font-medium">
-                           <PhoneNumberDisplay data={message.phoneNumber} dataType="phone" userKey={message.userKey}/>
-                        </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <div className={`space-y-8 ${message.imageDownloadUrls.length === 0 ? "" : "pt-6" }`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-50/50 rounded-xl p-6 space-y-1">
+                  <dt className="text-sm font-medium text-gray-500">필요자재</dt>
+                  <dd className="text-base text-gray-900">{message.constructionExperience || "-"}</dd>
+                </div>
 
-            <div className="text-[15px] h-full text-start leading-7 px-4 py-5 dark:text-gray-900">
-              <p style={{ whiteSpace: "pre-wrap" }}>{message.description}</p>
+                <div className="bg-gray-50/50 rounded-xl p-6 space-y-1">
+                  <dt className="text-sm font-medium text-gray-500">분류</dt>
+                  <dd className="text-base text-gray-900">{(message.SubCategories || []).join(", ") || "-"}</dd>
+                </div>
+
+                <div className="bg-gray-50/50 rounded-xl p-6 space-y-1">
+                  <dt className="text-sm font-medium text-gray-500">주소</dt>
+                  <dd className="text-base text-gray-900">
+                    <PhoneNumberDisplay
+                      data={(message.address || '').split(' ').slice(2).join(' ')}
+                      dataType="address"
+                      userKey={message.userKey}
+                    />
+                  </dd>
+                </div>
+
+                <div className="bg-gray-50/50 rounded-xl p-6 space-y-1">
+                  <dt className="text-sm font-medium text-gray-500">연락처</dt>
+                  <dd className="text-base text-gray-900">
+                    <PhoneNumberDisplay
+                      data={message.phoneNumber}
+                      dataType="phone"
+                      userKey={message.userKey}
+                    />
+                  </dd>
+                </div>
+              </div>
+
+              {message.description && (
+                <div className="bg-gray-50/50 rounded-xl p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">상세 설명</h2>
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {message.description}
+                  </p>
+                </div>
+              )}
             </div>
-            <div className="mt-10" />
           </div>
-        </section>
+        </div>
 
-        <PostDetailWithQuotation
-          id={id}
-          col="matApply"
-          postAuthorUid={message.userKey}
-          postImageUrls={message.imageDownloadUrls}
-          listBasePath={"/materials"}
-        />
+        <div className="mt-8">
+          <PostDetailWithQuotation
+            id={id}
+            col="matApply"
+            postAuthorUid={message.userKey}
+            postImageUrls={message.imageDownloadUrls}
+            listBasePath={"/materials"}
+          />
+        </div>
 
         <div className="h-[150px]" />
       </div>
