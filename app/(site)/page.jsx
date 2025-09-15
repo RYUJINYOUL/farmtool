@@ -30,7 +30,7 @@ export default function MyPage() {
 
   return (
     <div className="bg-gray-50">
-      <section className='flex justify-center items-center m-2 md:m-1 pt-1 md:pt-2'>
+      <section className='flex justify-center items-center m-2 md:m-1 pt-2 md:pt-2'>
         <div className="md:w-[1100px] w-full relative">
           {/* 배경 그라데이션 효과 */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl opacity-70" />
@@ -101,12 +101,16 @@ export default function MyPage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">나라장터 입찰정보</h3>
                     <p className="text-sm text-gray-600">전국의 최신 입찰 정보를 확인하세요</p>
                   </div>
-                  <Button
-                    onClick={() => router.push('/nara')}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push('/nara');
+                    }}
+                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
-                    자세히 보기
-                  </Button>
+                    클릭
+                  </button>
                 </div>
               </div>
             </SwiperSlide>
@@ -119,12 +123,16 @@ export default function MyPage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">전국 인허가 정보</h3>
                     <p className="text-sm text-gray-600">실시간 건축 인허가 현황을 확인하세요</p>
                   </div>
-                  <Button
-                    onClick={() => router.push('/permit')}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push('/permit');
+                    }}
+                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
-                    자세히 보기
-                  </Button>
+                    클릭
+                  </button>
                 </div>
               </div>
             </SwiperSlide>
@@ -137,12 +145,16 @@ export default function MyPage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">전국 건설업 정보</h3>
                     <p className="text-sm text-gray-600">건설업 등록 및 현황 정보를 확인하세요</p>
                   </div>
-                  <Button
-                    onClick={() => router.push('/construction')}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push('/construction');
+                    }}
+                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
-                    자세히 보기
-                  </Button>
+                    클릭
+                  </button>
                 </div>
               </div>
             </SwiperSlide>
@@ -155,12 +167,16 @@ export default function MyPage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">건설장비 제휴업체</h3>
                     <p className="text-sm text-gray-600">전국 건설장비 임대 업체를 찾아보세요</p>
                   </div>
-                  <Button
-                    onClick={() => router.push('/equipment')}
-                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push('/equipment');
+                    }}
+                    className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-lg transition-colors"
                   >
-                    자세히 보기
-                  </Button>
+                    클릭
+                  </button>
                 </div>
               </div>
             </SwiperSlide>

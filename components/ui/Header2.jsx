@@ -72,11 +72,8 @@ const Header2 = ({children}) => {
 
 
   return (
-    <header ref={headRef} className="overflow-y-auto w-full h-full">
-      <div className={cn(
-        'sticky top-0 w-full pt-3 md:pt-2 z-10',
-        isScrolled ? 'border-b border-gray-200 bg-white/95 backdrop-blur-sm' : ''
-      )}>
+    <header ref={headRef} className="w-full">
+      <div className="w-full pt-3 md:pt-3 bg-white">
         <PagePadding>  
           <div className="w-full max-w-[1100px] mx-auto">
             <div className="flex items-center justify-between">

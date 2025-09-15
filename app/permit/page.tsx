@@ -71,8 +71,8 @@ export default async function ArchitecturalPermitsPage({ searchParams }: Archite
 
   return (
     <>
-    <div className='min-h-screen bg-gray-50 md:pt-10 pt-5'>
-    <main style={{ maxWidth: '1100px', margin: '40px auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div className='min-h-screen bg-gray-50 md:pt-1 pt-1'>
+    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
 
       {/* 검색 컨트롤 컴포넌트 */}
       <PermitSearchControls

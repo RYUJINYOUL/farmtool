@@ -141,8 +141,12 @@ const Footer = () => {
               slidesPerView="auto"
               spaceBetween={16}
               className="h-full px-4"
-              centeredSlides={false}
               slideToClickedSlide={true}
+              initialSlide={categories.findIndex(cat => getActiveCategoryFromPath(pathname) === cat.name)}
+              onSlideChange={(swiper) => {
+                const activeSlide = swiper.activeIndex;
+                swiper.slideTo(activeSlide, 300);
+              }}
             >
               {categories.map((category) => {
                 const Icon = category.icon;

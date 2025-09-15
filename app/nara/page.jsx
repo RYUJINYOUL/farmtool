@@ -773,8 +773,8 @@ export default function NaraBidList() {
 
   return (
     <>
-    <div className="min-h-screen bg-gray-50 pt-15">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-50 pt-1">
+      <div className="max-w-7xl mx-auto px-4 pt-2">
         <h1 className="text-xl font-bold text-gray-900 mb-6">낙찰 목록</h1>
 
         {/* 모바일: Floating Action Button */}

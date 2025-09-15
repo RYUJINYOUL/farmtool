@@ -45,9 +45,9 @@ const Page = () => {
 
   return (
     <>
-      <div className='relative md:top-10 bg-gray-50 top-10'>
+      <div className='relative md:top-1 bg-gray-50 top-1'>
         <section className='flex justify-center items-center m-4'>
-          <div className="md:w-[1100px] w-full lg:mt-10 pt-3.5">
+          <div className="md:w-[1100px] w-full pt-2">
             <Tabs value={pag} onValueChange={setPag} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="account">건설자재</TabsTrigger>
