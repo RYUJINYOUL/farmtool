@@ -29,8 +29,8 @@ const CheckoutPage = () => {
   const handlePaymentFail = () => {}; 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
-      <div className="w-full max-w-[1100px] space-y-8 py-10 bg-white transform transition-all">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full max-w-[1100px] mx-auto space-y-8 py-10 bg-white transform transition-all">
         {/* Header Section */}
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900">결제하기</h1>

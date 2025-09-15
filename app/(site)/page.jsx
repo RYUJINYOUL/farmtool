@@ -29,8 +29,8 @@ export default function MyPage() {
   
 
   return (
-    <div className="pt-12 bg-gray-50">
-      <section className='flex justify-center items-center m-2 md:m-1 pt-3 md:pt-6'>
+    <div className="bg-gray-50">
+      <section className='flex justify-center items-center m-2 md:m-1 pt-1 md:pt-2'>
         <div className="md:w-[1100px] w-full relative">
           {/* 배경 그라데이션 효과 */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl opacity-70" />

@@ -72,80 +72,41 @@ const Header2 = ({children}) => {
 
 
   return (
-    <header ref={headRef} className="overflow-y-auto w-full h-full pt-1">
-      
-     {/* <section className="relative top-0 w-full">
-        <div className={cn('block sticky top-100 w-full', (pathname !== "/")&&"hidden")}><Gallery/></div>
-      </section> */}
-
-       <PagePadding>  
-   <section className={cn('absolute w-full top-1 left-0 flex md:h-[62px] h-[48px] z-10 items-start md:justify-center sm:justify-between', 
-    isScrolled&&"md:bg-white bg-gray-50")}>
-      
-   <div className='flex flex-col'>
-      <div className='md:absolute sm:absolute lg:relative lg:w-[1100px] w-full flex items-center justify-between sm:justify-between'>
-          <section
-        className={cn(
-          'absolute w-full top-0 left-0 z-10',
-          isScrolled && 'md:bg-white bg-bg-gray-50',
-        )}
-      >
-        {/* 헤더: 좌중앙우 */}
-        <div className="relative mx-auto flex h-[48px] w-full items-center justify-between lg:w-[1100px] md:h-[62px]">
-          {/* 중앙: 로고 */}
-          <div>
-            <Logo total={isScrolled} />
-          </div>
-          
-
-          <section className='flex items-center'>
-              <article className='hidden lg:block'>
-              <Menu total={isScrolled} />
-              </article>
-
-              <div className="flex items-center gap-4 lg:hidden">
-                <Link href="/myinfo" className="flex items-center">
-                  <RiUser3Line className={cn("text-black", isScrolled&&"text-black")} size={24} />
-                </Link>
-                <HeaderDrawer>
-                  <article className='pr-5'>
-                    <RiMenu4Line className={cn("text-black", isScrolled&&"text-black")} size={28} />
-                  </article>
-                </HeaderDrawer>
+    <header ref={headRef} className="overflow-y-auto w-full h-full">
+      <div className={cn(
+        'sticky top-0 w-full pt-3 md:pt-2 z-10',
+        isScrolled ? 'border-b border-gray-200 bg-white/95 backdrop-blur-sm' : ''
+      )}>
+        <PagePadding>  
+          <div className="w-full max-w-[1100px] mx-auto">
+            <div className="flex items-center justify-between">
+              <div>
+                <Logo total={isScrolled} />
               </div>
-            </section>
-        </div>
 
-        {/* ▼ 아래로 내려간 카테고리 메뉴 */}
-        {/* {(homeCategory === '건설업' ||
-          homeCategory === '건설장비' ||
-          homeCategory === '건설자재' ||
-          homeCategory === '인허가' ||
-          homeCategory === '나라장터' ||
-          homeCategory === '구인구직' ||
-          homeCategory === '전문인력') &&
-          pathname !== "/" && ( // ← 홈일 땐 표시 안 함
-            <div className="w-full bg-[#fafafa]">
-              <div className="mx-auto lg:w-[1100px]">
-                {homeCategory === '조경공사' && <Menu2 total={true} />}
-                {homeCategory === '조경수' && <Menu3 total={true} />}
-                {homeCategory === '조경시설물' && <Menu4 total={true} />}
-                {homeCategory === '장비및철거' && <Menu5 total={true} />}
-                <div className="mt-2.5" />
-                <hr className="border-1 bg-neutral-100 opacity-100 dark:opacity-50" />
+              <div className="flex items-center">
+                <div className="hidden lg:block">
+                  <Menu total={isScrolled} />
+                </div>
+
+                <div className="flex items-center gap-4 lg:hidden">
+                  <Link href="/myinfo" className="flex items-center">
+                    <RiUser3Line className={cn("text-black", isScrolled&&"text-black")} size={24} />
+                  </Link>
+                  <HeaderDrawer>
+                    <div className="pr-5">
+                      <RiMenu4Line className={cn("text-black", isScrolled&&"text-black")} size={28} />
+                    </div>
+                  </HeaderDrawer>
+                </div>
               </div>
             </div>
-      )} */}
-      </section>
-
-    </div>
+          </div>
+        </PagePadding>
       </div>
-      </section>
-      </PagePadding>
-    <section>{children}</section>
-
+      <section>{children}</section>
     </header>
-  )
+  );
 }
 
 export default Header2
