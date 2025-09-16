@@ -204,7 +204,7 @@ const Page = () => {
                     selectedRegions={selectedRegions}
                     selectedSubRegions={selectedSubRegions}
                    />
-                </TabsContent>
+                </TabsContent> 
 
 
               </Tabs>

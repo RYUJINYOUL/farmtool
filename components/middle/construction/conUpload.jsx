@@ -215,7 +215,8 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       }
     } catch (error) {
       console.error("Error adding document: ", error);
-      alert('사진 용량이 너무 큽니다. 나에게 카톡으로 보낸 후 다운로드받아 다시 올려주세요');
+      // alert('사진 용량이 너무 큽니다. 나에게 카톡으로 보낸 후 다운로드받아 다시 올려주세요');
+      alert("사진 업로드 에러: " + (error.message || JSON.stringify(error)));
     }
 
     let fcmToken = null;
