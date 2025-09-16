@@ -42,12 +42,12 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   onClose
 }) {
   const { currentUser } = useSelector((state) => state.user);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { push } = useRouter();
   const timestamp = Date.now();
 
-  const [formState, setFormState] = useState<any>({
+  const [formState, setFormState] = useState({
     username: '',
     TopCategories: '전체',
     SubCategories: ['전체'],
