@@ -179,23 +179,6 @@ export default function UserApplyModal({
                 </button>
               </div>
             )}
-             {/* 선택된 소분류 태그 표시 */}
-            {/* {formState.SubCategories.length > 0 && !(formState.SubCategories.length === 1 && formState.SubCategories[0] === "전체") && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formState.SubCategories.filter(name => name !== "전체").map(name => (
-                  <span key={name} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-[10px] flex items-center">
-                    {name}
-                    <button
-                      type="button"
-                      className="ml-2 text-blue-600 hover:text-red-500 transition-colors"
-                      onClick={() => handleSubRegionRemove(name)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )} */}
           </div>
 
           {/* 주소 검색 입력 필드 및 버튼 */}
@@ -215,36 +198,14 @@ export default function UserApplyModal({
 
 
 
-
-
-    {/*여기서 카테고리 별 변동 */}
-     {/*여기서 카테고리 별 변동 */}
-      {/*여기서 카테고리 별 변동 */}
-       {/*여기서 카테고리 별 변동 */}
-        {/*여기서 카테고리 별 변동 */}
-         {/* <Professional 
-          formState={formState}
-          handleInputChange={handleInputChange}
-          error={error} 
-          /> */}
-
-
-           {/* ★ 여기가 이제 동적으로 변경될 부분 ★ */}
-          {/* CategoryApplyField 컴포넌트를 사용하여 선택된 대분류에 맞는 필드를 렌더링 */}
           <CategoryApplyField
-            TopCategory={formState.TopCategories} // 선택된 한글 대분류 전달
+            TopCategory={formState.TopCategories} 
             formState={formState}
             handleInputChange={handleInputChange}
             error={error}
           />
 
 
-
-
-
-
-
-          {/* 저장 버튼 */}
           <Button
             onClick={handleSaveUsernameAndProfile}
             className="mt-4 bg-black hover:bg-black-700 text-white py-2 rounded-lg text-lg font-semibold w-full"

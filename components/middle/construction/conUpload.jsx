@@ -133,7 +133,6 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const fetchedUserData = userSnap.data();
-          console.log(fetchedUserData);
           setUserData(fetchedUserData);
           setFormState(prev => ({
             ...prev,
@@ -210,7 +209,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
 
         for (const file of imageFiles) {
           const compressedFile = await imageCompression(file, options);
-          const url = await uploadGrassImage(compressedFile, userUid);
+          const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
           imageUrls.push(url);
         }
       }

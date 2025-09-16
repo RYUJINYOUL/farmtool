@@ -230,7 +230,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
 
         for (const file of imageFiles) {
           const compressedFile = await imageCompression(file, options);
-          const url = await uploadGrassImage(compressedFile, userUid);
+          const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
           imageUrls.push(url);
         }
       }
