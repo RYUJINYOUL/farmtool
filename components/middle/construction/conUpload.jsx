@@ -203,7 +203,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     try {
       if (imageFiles.length > 0) {
         const options = {
-          maxSizeMB: 0.5,
+          maxSizeMB: 3,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
@@ -216,7 +216,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       }
     } catch (error) {
       console.error("Error adding document: ", error);
-      alert('데이터 저장 중 오류가 발생했습니다.');
+      alert('사진 용량이 너무 큽니다. 나에게 카톡으로 보낸 후 다운로드받아 다시 올려주세요');
     }
 
     let fcmToken = null;

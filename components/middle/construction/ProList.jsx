@@ -198,7 +198,8 @@ const ProList = ({ selectedIndustries, selectedRegions, selectedSubRegions }) =>
   
           if (userSnap.exists()) {
               const fetchedUserData = userSnap.data();
-              const expirationDate = fetchedUserData.expirationDate?.toDate();
+              // const expirationDate = fetchedUserData.expirationDate?.toDate();
+              const expirationDate = fetchedUserData.expirationDate?.toDate() || null;
               const now = new Date();
   
               if (!expirationDate || expirationDate < now) {

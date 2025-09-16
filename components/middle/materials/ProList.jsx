@@ -256,7 +256,7 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
   
           if (userSnap.exists()) {
               const fetchedUserData = userSnap.data();
-              const expirationDate = fetchedUserData.expirationDate?.toDate();
+              const expirationDate = fetchedUserData.expirationDate?.toDate() || null;
               const now = new Date();
   
               if (!expirationDate || expirationDate < now) {
