@@ -255,7 +255,13 @@ const ProList = ({ // <-- 이름 변경 및 searchParams 대신 직접 props 받
 
         if (userSnap.exists()) {
             const fetchedUserData = userSnap.data();
-            const expirationDate = fetchedUserData.expirationDate?.toDate() || null;
+            const firestoreTimestamp = fetchedUserData.expirationDate;
+                let expirationDate = null;
+                
+                if (firestoreTimestamp && typeof firestoreTimestamp.toDate === 'function') {
+                    // .toDate() 메서드가 있을 때만 변환합니다.
+                    expirationDate = firestoreTimestamp.toDate();
+                }
             const now = new Date();
 
             if (!expirationDate || expirationDate < now) {
