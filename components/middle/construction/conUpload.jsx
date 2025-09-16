@@ -202,21 +202,25 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     // 1. 이미지 압축 단계
     let compressedFile;
     try {
-      if (imageFiles.length > 0) {
-        const options = {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 500,
-          useWebWorker: true,
-        };
-        for (const file of imageFiles) {
-          compressedFile = await imageCompression(file, options);
-        }
-      }
-    } catch (compressionError) {
-      console.error("이미지 압축 오류:", compressionError);
-      alert("이미지 압축 오류: " + (compressionError.message || JSON.stringify(compressionError)));
-      return; // 압축 실패 시 함수 종료
-    }
+  // 이미지를 압축하는 부분만 try 블록에 넣습니다.
+  const compressedFile = await imageCompression(file, options);
+  
+  // 압축 후, 업로드하는 부분은 따로 처리하여 오류를 분리합니다.
+  const url = await uploadGrassImage(compressedFile, userUid, currentEnglishCategory);
+  imageUrls.push(url);
+  
+} catch (error) {
+  // 오류 메시지를 분석하여 구체적인 원인을 알 수 있습니다.
+  console.error("오류 발생:", error);
+  
+  if (error.message && error.message.includes('image-compression')) {
+    alert("이미지 압축 오류: 파일이 너무 크거나 메모리가 부족합니다. 사진 크기를 줄여서 다시 시도해주세요.");
+  } else if (error.code && error.code.startsWith('storage')) {
+    alert("파일 업로드 오류: 네트워크가 불안정합니다. 잠시 후 다시 시도해주세요.");
+  } else {
+    alert("알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+  }
+}
     
     // 2. 이미지 업로드 단계
     try {
@@ -229,7 +233,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       alert("이미지 업로드 오류: " + (uploadError.message || JSON.stringify(uploadError)));
       return; // 업로드 실패 시 함수 종료
     }
-    
+
 
     let fcmToken = null;
     try {
