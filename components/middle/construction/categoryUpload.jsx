@@ -223,7 +223,7 @@ export default function CategoryUpload({ // 컴포넌트 이름을 카멜케이�
     try {
       if (imageFiles.length > 0) {
         const options = {
-          maxSizeMB: 0.5,
+          maxSizeMB: 5,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
         };

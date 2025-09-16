@@ -203,7 +203,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     try {
       if (imageFiles.length > 0) {
         const options = {
-          maxSizeMB: 1,
+          maxSizeMB: 5,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
         };

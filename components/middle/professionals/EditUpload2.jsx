@@ -228,7 +228,7 @@ const EditUpload2 = ({ isOpen, col, id, onClose }) => {
 
         if (filesToUpload.length > 0) {
             const options = {
-                maxSizeMB: 0.5,
+                maxSizeMB: 5,
                 maxWidthOrHeight: 1024,
                 useWebWorker: true,
             };
