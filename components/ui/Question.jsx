@@ -109,9 +109,9 @@ export default function question({ pag, setPag }) {
     if (files[i].type.split('/')[0] !== 'image') continue;
     if (!images.some(e => e.name === files[i].name)) {
       const options = {
-        maxSizeMB: 0.3,              // 최대 0.3MB로 압축
-        maxWidthOrHeight: 1024,   // 최대 폭 또는 높이 1024px
-        useWebWorker: true,
+        maxSizeMB: 1, // 모바일은 더 작게
+  maxWidthOrHeight: 800,
+  useWebWorker: true,
       };
 
       try {
