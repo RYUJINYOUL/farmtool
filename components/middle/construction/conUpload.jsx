@@ -202,8 +202,8 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     try {
       if (imageFiles.length > 0) {
         const options = {
-          maxSizeMB: 3, // 모바일은 더 작게
-          maxWidthOrHeight: 1024,
+          maxSizeMB: 0.5, // 모바일은 더 작게
+          maxWidthOrHeight: 500,
           useWebWorker: true,
         };
 
