@@ -199,25 +199,37 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     const userUid = currentUser.uid;
     const id = `${userUid}-${timestamp}`;
 
+    // 1. 이미지 압축 단계
+    let compressedFile;
     try {
       if (imageFiles.length > 0) {
         const options = {
-          maxSizeMB: 0.5, // 모바일은 더 작게
+          maxSizeMB: 0.5,
           maxWidthOrHeight: 500,
           useWebWorker: true,
         };
-
         for (const file of imageFiles) {
-          const compressedFile = await imageCompression(file, options);
-          const url = await uploadGrassImage(compressedFile, userUid, currentEnglishCategory);
-          imageUrls.push(url);
+          compressedFile = await imageCompression(file, options);
         }
       }
-    } catch (error) {
-      console.error("Error adding document: ", error);
-      // alert('사진 용량이 너무 큽니다. 나에게 카톡으로 보낸 후 다운로드받아 다시 올려주세요');
-      alert("사진 업로드 에러: " + (error.message || JSON.stringify(error)));
+    } catch (compressionError) {
+      console.error("이미지 압축 오류:", compressionError);
+      alert("이미지 압축 오류: " + (compressionError.message || JSON.stringify(compressionError)));
+      return; // 압축 실패 시 함수 종료
     }
+    
+    // 2. 이미지 업로드 단계
+    try {
+        if (compressedFile) { // 압축된 파일이 있다면
+            const url = await uploadGrassImage(compressedFile, userUid, currentEnglishCategory);
+            imageUrls.push(url);
+        }
+    } catch (uploadError) {
+      console.error("이미지 업로드 오류:", uploadError);
+      alert("이미지 업로드 오류: " + (uploadError.message || JSON.stringify(uploadError)));
+      return; // 업로드 실패 시 함수 종료
+    }
+    
 
     let fcmToken = null;
     try {
