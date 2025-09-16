@@ -2,40 +2,49 @@
 
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebase';
-import { doc, getDoc, writeBatch, serverTimestamp, GeoPoint, arrayUnion } from 'firebase/firestore';
+import { Button } from "@/components/ui/button";
+import { doc, getDoc, writeBatch, collection, serverTimestamp, GeoPoint, arrayUnion } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useSelector } from 'react-redux';
-
-import UserApplyModal from '@/components/UserApplyModal';
-import AddressSearchModal from '@/components/AddressSearchModal';
-
+import UseCaseCarousel from '@/components/UseCaseCarousel'; // 이 컴포넌트는 사용되지 않는 것 같지만, 코드에 있으므로 유지합니다.
 import { saveFcmToken } from "@/lib/fcm";
+
+// ★ 새로 만든 커스텀 훅 임포트 ★
 import { useAddressSearch } from '@/hooks/useAddressSearch';
 import { useCategorySelection } from '@/hooks/useCategorySelection';
 import useImageUpload from '@/hooks/useImageUpload';
+
+// 새로 만든 컴포넌트 임포트
+import UserApplyModal from '@/components/UserApplyModal';
+import AddressSearchModal from '@/components/AddressSearchModal';
 import imageCompression from 'browser-image-compression';
 import { uploadGrassImage } from '@/hooks/useUploadImage';
 import { KOREAN_TO_ENGLISH_APPLY, CATEGORY_APPLY_FIELDS, CATEGORY_LINK } from '@/lib/constants';
 
-// 🔹 데이터 클리닝 함수
+// 데이터 클리닝 함수 (변화 없음)
 const cleanAndConvertToNull = (data) => {
   const cleanedData = {};
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
-      if (value instanceof GeoPoint) {
+      if (value instanceof GeoPoint) { // <-- 이 조건 추가
         cleanedData[key] = value;
-      } else if (typeof value === 'string' && value.trim() === '') {
+      }
+      else if (typeof value === 'string' && value.trim() === '') {
         cleanedData[key] = null;
-      } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      }
+      else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         cleanedData[key] = cleanAndConvertToNull(value);
-      } else {
+      }
+      else {
         cleanedData[key] = value;
       }
     }
   }
   return cleanedData;
 };
+
 
 export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로 수정했습니다.
   isOpen,
@@ -47,6 +56,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   const { push } = useRouter();
   const timestamp = Date.now();
 
+
   const [formState, setFormState] = useState({
     username: '',
     TopCategories: '전체',
@@ -57,14 +67,14 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     subRegion: '',
     imageDownloadUrls: [],
     categorySpecificData: {
-      proApply: {},
-      conApply: {},
-      equipApply: {},
-      matApply: {},
+      proApply: {}, // '전문인력' 카테고리의 동적 필드
+      conApply: {},  // '건설업' 카테고리의 동적 필드
+      equipApply: {},     // '건설장비' 카테고리의 동적 필드
+      matApply: {},     // '건설자재' 카테고리의 동적 필드
     }
   });
 
-  // hooks
+
   const {
     addrList, locationError, isAddrModalOpen, isLocationLoading,
     setAddrList, setLocationError, setIsAddrModalOpen, setIsLocationLoading,
@@ -81,35 +91,36 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     imageFiles, removeImage, handleFileSelect, moveImage
   } = useImageUpload();
 
-  const [error, setError] = useState('');
 
-  // 🔹 input 핸들러
+  const [error, setError] = useState(''); // 일반적인 폼 에러 메시지
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    
     setError('');
 
-    const englishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
-    const isCategorySpecificField = CATEGORY_APPLY_FIELDS[englishCategory]?.some(
+    const currentEnglishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
+    const isCategorySpecificField = CATEGORY_APPLY_FIELDS[currentEnglishCategory]?.some(
       (field) => field.id === id
     );
 
     if (isCategorySpecificField) {
-      setFormState((prev) => ({
+      setFormState(prev => ({
         ...prev,
         categorySpecificData: {
           ...prev.categorySpecificData,
-          [englishCategory]: {
-            ...(prev.categorySpecificData[englishCategory] || {}),
+          [currentEnglishCategory]: {
+            ...(prev.categorySpecificData[currentEnglishCategory] || {}),
             [id]: value
           }
         }
       }));
     } else {
-      setFormState((prev) => ({ ...prev, [id]: value }));
+      setFormState(prev => ({ ...prev, [id]: value }));
     }
   };
 
-  // 🔹 유저 데이터 로드
+
   useEffect(() => {
     const loadUserData = async () => {
       if (!currentUser?.uid) {
@@ -123,7 +134,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
         if (userSnap.exists()) {
           const fetchedUserData = userSnap.data();
           setUserData(fetchedUserData);
-          setFormState((prev) => ({
+          setFormState(prev => ({
             ...prev,
             username: fetchedUserData.username || '',
             TopCategories: fetchedUserData.TopCategories || '전체',
@@ -134,10 +145,10 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
             subRegion: fetchedUserData.subRegion || '',
             imageDownloadUrls: fetchedUserData.imageDownloadUrls || [],
             categorySpecificData: {
-              proApply: fetchedUserData.categorySpecificData?.proApply || {},
-              conApply: fetchedUserData.categorySpecificData?.conApply || {},
-              equipApply: fetchedUserData.categorySpecificData?.equipApply || {},
-              matApply: fetchedUserData.categorySpecificData?.matApply || {},
+              professionals: fetchedUserData.categorySpecificData?.professionals || {},
+              construction: fetchedUserData.categorySpecificData?.construction || {},
+              equipment: fetchedUserData.categorySpecificData?.equipment || {},
+              materials: fetchedUserData.categorySpecificData?.materials || {},
               ...(fetchedUserData.categorySpecificData || {}),
             }
           }));
@@ -152,7 +163,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     loadUserData();
   }, [currentUser]);
 
-  // 🔹 저장
+
   const handleSaveUsernameAndProfile = async () => {
     if (!formState.address || !formState.geoFirePoint) {
       setError('주소 검색을 통해 정확한 위치를 설정하고 입력해주세요.');
@@ -167,12 +178,12 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       return;
     }
 
-    const englishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
-    const fieldsForCurrentCategory = CATEGORY_APPLY_FIELDS[englishCategory] || [];
+    const currentEnglishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
+    const fieldsForCurrentCategory = CATEGORY_APPLY_FIELDS[currentEnglishCategory] || [];
 
     for (const field of fieldsForCurrentCategory) {
       if (field.required) {
-        const fieldValue = formState.categorySpecificData[englishCategory]?.[field.id];
+        const fieldValue = formState.categorySpecificData[currentEnglishCategory]?.[field.id];
         if (!fieldValue || fieldValue.trim() === '') {
           setError(`${field.placeholder} (필수)를 입력해주세요.`);
           return;
@@ -180,39 +191,42 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       }
     }
 
-    setError('');
+
+    setError(''); // 모든 유효성 검사 통과 시 에러 초기화
+
     let imageUrls = [];
     const batch = writeBatch(db);
     const userUid = currentUser.uid;
     const id = `${userUid}-${timestamp}`;
 
-    // 이미지 업로드
     try {
       if (imageFiles.length > 0) {
         const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 800,
+          maxSizeMB: 3, // 모바일은 더 작게
+          maxWidthOrHeight: 1024,
           useWebWorker: true,
         };
+
         for (const file of imageFiles) {
           const compressedFile = await imageCompression(file, options);
-          const url = await uploadGrassImage(compressedFile, userUid, englishCategory);
+          const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
           imageUrls.push(url);
         }
       }
     } catch (error) {
-      console.error("이미지 업로드 에러:", error);
+      console.error("Error adding document: ", error);
+      // alert('사진 용량이 너무 큽니다. 나에게 카톡으로 보낸 후 다운로드받아 다시 올려주세요');
       alert("사진 업로드 에러: " + (error.message || JSON.stringify(error)));
     }
 
-    // fcmToken
     let fcmToken = null;
     try {
       fcmToken = await saveFcmToken(userUid);
     } catch (error) {
-      console.error("FCM 토큰 에러:", error);
+      console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
     }
 
+ 
     const initialDataToSave = {
       username: formState.username,
       TopCategories: formState.TopCategories,
@@ -232,38 +246,83 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     };
 
     const dataToSave = cleanAndConvertToNull(initialDataToSave);
+    const selectedKoreanCategory = formState.TopCategories;
+    const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
 
-    // 카테고리별 저장
-    if (englishCategory && formState.TopCategories !== '전체') {
-      // global category collection
-      const categoryUserDocRef = doc(db, englishCategory, id);
-      const specificCategoryData = dataToSave.categorySpecificData[englishCategory] || {};
-      batch.set(categoryUserDocRef, {
-        ...dataToSave,
-        ...specificCategoryData,
-        userKey: userUid,
-        confirmed: false
-      }, { merge: true });
+    if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
+      const categoryUserDocRef = doc(db, englishCategoryToSave, id);   
+      const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
-      // user subcollection
-      const categoryUserSubRef = doc(db, "users", userUid, englishCategory, id);
-      batch.set(categoryUserSubRef, {
-        ...dataToSave,
-        ...specificCategoryData,
-        userKey: userUid,
-        confirmed: false
-      }, { merge: true });
+      const categoryCollectionData = {
+          username: dataToSave.username, // dataToSave에서 가져옴
+          address: dataToSave.address,   // dataToSave에서 가져옴
+          userKey: userUid,
+          favorites: dataToSave.favorites,
+          TopCategories: dataToSave.TopCategories,
+          SubCategories: dataToSave.SubCategories,
+          geoFirePoint: dataToSave.geoFirePoint,
+          fcmToken: dataToSave.fcmToken,
+          region: dataToSave.region,
+          subRegion: dataToSave.subRegion,
+          imageDownloadUrls: dataToSave.imageDownloadUrls,
+          badge: dataToSave.badge,
+          notice: dataToSave.notice,
+          pushTime: dataToSave.pushTime,
+          createdDate: new Date(),
+          confirmed: false,
+          ...specificCategoryDataForCategoryCollection, // 동적 필드 데이터 병합
 
-      // myList 업데이트
-      const userDocRef = doc(db, "users", userUid);
-      const category = CATEGORY_LINK[englishCategory];
-      const wishlistItem = { category: category, id: id, middle: 'apply', top: englishCategory };
-      batch.update(userDocRef, {
-        division: arrayUnion(englishCategory),
-        myList: arrayUnion(wishlistItem)
-      });
-    }
+      };
+      batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
+  }
 
+
+   if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
+      const categoryUserDocRef = doc(db, "users", userUid, englishCategoryToSave, id)   //id
+      const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
+
+      const categoryCollectionData = {
+          username: dataToSave.username, // dataToSave에서 가져옴
+          address: dataToSave.address,   // dataToSave에서 가져옴
+          userKey: userUid,
+          favorites: dataToSave.favorites,
+          TopCategories: dataToSave.TopCategories,
+          SubCategories: dataToSave.SubCategories,
+          geoFirePoint: dataToSave.geoFirePoint,
+          fcmToken: dataToSave.fcmToken,
+          region: dataToSave.region,
+          subRegion: dataToSave.subRegion,
+          imageDownloadUrls: dataToSave.imageDownloadUrls,
+          ...specificCategoryDataForCategoryCollection, // 동적 필드 데이터 병합
+          badge: dataToSave.badge,
+          notice: dataToSave.notice,
+          pushTime: dataToSave.pushTime,
+          createdDate: new Date(),
+          confirmed: false
+      };
+      batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
+  }
+
+
+
+  const userDocRef = doc(db, "users", userUid);
+    const category = CATEGORY_LINK[englishCategoryToSave];
+  
+      const wishlistItem = { category: category, id: id, middle: 'apply', top: englishCategoryToSave };  //top 삭제 id로 저장
+      if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
+          batch.update(userDocRef, {
+              division: arrayUnion(
+                  englishCategoryToSave
+              ),
+              myList: arrayUnion(
+                  wishlistItem
+              ),
+          });
+      }
+  
+
+
+    
     try {
       await batch.commit();
       onClose();
@@ -273,6 +332,7 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
       setError('정보 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
+
 
   if (loading) {
     return (
@@ -327,3 +387,4 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     </div>
   );
 }
+
