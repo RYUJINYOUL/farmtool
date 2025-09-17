@@ -10,13 +10,7 @@ import { clearUser } from '../../store/userSlice';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
 import { RiKakaoTalkFill, RiUser3Line } from "react-icons/ri";
 
-const scrollMap = {
-  // "/con": [0, 0],
-  // "/tree": [50, 0],
-  // "/sisul": [100, 0],
-  // "/jang": [150, 0],
-  //  "/nara": [200, 0],
-};
+
 
 export default function Menu(props) {
   const { push, refresh } = useRouter();
@@ -26,6 +20,11 @@ export default function Menu(props) {
   const dispatch = useDispatch();
   const auth = getAuth(app);
   const currentUser = useSelector((state) => state.user.currentUser);
+  const [mounted, setMounted] = useState(false);  
+
+  useEffect(() => {
+    setMounted(true);  // 추가
+  }, []);
 
   let total = props;
   const homeCategoryList = [
@@ -66,18 +65,7 @@ export default function Menu(props) {
       });
   };
 
-  useEffect(() => {
-    const slider = document.getElementById("nav");
-    if (!slider) return;
-    const currentCoords = scrollMap[headerImageSrc];
-    if (!currentCoords) return;
-    const [targetX] = currentCoords;
-    const prevSrc = previousSrcRef.current;
-    if (!prevSrc || prevSrc === headerImageSrc) {
-      slider.scrollTo({ left: targetX });
-    }
-    previousSrcRef.current = headerImageSrc;
-  }, [headerImageSrc]);
+  
 
   return (
     <nav id="nav" className="flex items-center w-full+10 md:m-0 md:px-60 ml-5 pr-4 md:pr-0 overflow-x-auto">
@@ -106,15 +94,17 @@ export default function Menu(props) {
         </div>
       ))}
       <div className="flex items-center pl-4 sticky right-1">
-        <button
-          onClick={currentUser?.uid ? handleLogout : () => push('/login')}
-          className={cn(
-            "text-[13px] cursor-pointer px-3 py-1.5 rounded-md transition-colors",
-            "bg-green-600 hover:bg-green-700 text-white font-medium"
-          )}
-        >
-          {currentUser?.uid ? '로그아웃' : '로그인'}
-        </button>
+        {mounted && (  // 추가: mounted 상태 확인
+          <button
+            onClick={currentUser?.uid ? handleLogout : () => push('/login')}
+            className={cn(
+              "text-[13px] cursor-pointer px-3 py-1.5 rounded-md transition-colors",
+              "bg-green-600 hover:bg-green-700 text-white font-medium"
+            )}
+          >
+            {currentUser?.uid ? '로그아웃' : '로그인'}
+          </button>
+        )}
       </div>
     </nav>
   );
