@@ -194,33 +194,44 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
         setError(''); // 모든 유효성 검사 통과 시 에러 초기화
 
         const userUid = currentUser.uid;
-        const id = `${userUid}-${timestamp}`;
-        const selectedKoreanCategory = formState.TopCategories;
-        const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
-        
-        let imageUrls = [];
+    const id = `${userUid}-${timestamp}`;
+    const selectedKoreanCategory = formState.TopCategories;
+    const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
+    let imageUrls = [];
 
-        // ✅ 이미지 처리 로직을 하나의 try...catch 블록으로 통합
-        try {
-          if (imageFiles.length > 0) {
-            const options = {
-              maxSizeMB: 0.5,
-              maxWidthOrHeight: 500,
-              useWebWorker: true,
-            };
+    // ★ Refined Image Processing Logic with Specific Error Handling ★
+    if (imageFiles.length > 0) {
+        // Set compression options based on device type
+        const options = {
+            maxSizeMB: isMobile ? 0.8 : 2, // 📱 Mobile: 0.8MB, 💻 PC: 2MB
+            maxWidthOrHeight: isMobile ? 800 : 1200, // 📱 Mobile: 800px, 💻 PC: 1200px
+            useWebWorker: true,
+        };
 
-            for (const file of imageFiles) {
-              const compressedFile = await imageCompression(file, options);
-              const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
-              imageUrls.push(url);
+        for (const file of imageFiles) {
+            let compressedFile;
+            try {
+                // Step 1: Attempt to compress the file
+                compressedFile = await imageCompression(file, options);
+            } catch (compressionError) {
+                console.error("이미지 압축 중 오류:", compressionError);
+                // Alert for specific compression errors (e.g., memory issues)
+                setError('이미지 압축 중 오류가 발생했습니다. 파일 크기를 줄여 다시 시도해주세요.');
+                return; // Stop the process on failure
             }
-          }
-        } catch (error) {
-          console.error("이미지 업로드 오류:", error);
-          // 더 구체적인 에러 메시지로 사용자에게 피드백 제공
-          alert("이미지 처리 중 오류가 발생했습니다. 파일 크기를 줄이거나 잠시 후 다시 시도해주세요.");
-          return; // 오류 발생 시 함수 실행 중단
+
+            try {
+                // Step 2: Attempt to upload the compressed file
+                const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
+                imageUrls.push(url);
+            } catch (uploadError) {
+                console.error("이미지 업로드 중 오류:", uploadError);
+                // Alert for specific upload errors (e.g., network issues)
+                setError('이미지 업로드 중 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                return; // Stop the process on failure
+            }
         }
+    }
 
         let fcmToken = null;
         try {
