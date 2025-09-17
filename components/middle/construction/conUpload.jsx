@@ -164,6 +164,50 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     loadUserData();
   }, [currentUser]);
 
+  const smartImageCompression = async (file) => {
+    const MAX_FILE_SIZE = 0.5; // 500KB = 0.5MB
+    const MAX_WIDTH = 1600;
+    const MIN_WIDTH = 800;
+    const INITIAL_QUALITY = 0.7; // 70%
+
+    let quality = INITIAL_QUALITY;
+    let width = MAX_WIDTH;
+    let compressedFile = file;
+
+    // 첫 번째 시도: 기본 설정으로 압축
+    try {
+        compressedFile = await imageCompression(file, {
+            maxSizeMB: MAX_FILE_SIZE,
+            maxWidthOrHeight: width,
+            initialQuality: quality,
+            useWebWorker: true
+        });
+
+        // 파일이 여전히 너무 크면 점진적으로 최적화
+        while (compressedFile.size > MAX_FILE_SIZE * 1024 * 1024 && (quality > 0.3 || width > MIN_WIDTH)) {
+            if (quality > 0.3) {
+                // 먼저 품질을 낮춤
+                quality -= 0.1;
+            } else if (width > MIN_WIDTH) {
+                // 품질을 더 낮출 수 없으면 크기를 줄임
+                width = Math.max(width * 0.9, MIN_WIDTH);
+            }
+
+            compressedFile = await imageCompression(file, {
+                maxSizeMB: MAX_FILE_SIZE,
+                maxWidthOrHeight: width,
+                initialQuality: quality,
+                useWebWorker: true
+            });
+        }
+
+        return compressedFile;
+    } catch (error) {
+        console.error("스마트 이미지 압축 중 오류:", error);
+        throw new Error("이미지 압축 중 오류가 발생했습니다.");
+    }
+};
+
 
    const handleSaveUsernameAndProfile = async () => {
         if (!formState.address || !formState.geoFirePoint) {
@@ -200,34 +244,22 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
     let imageUrls = [];
 
-       if (imageFiles.length > 0) {
-        const options = {
-              maxSizeMB: isMobile ? 0.3 : 2, // 📱 모바일은 0.3MB로 낮춤, 💻 PC는 2MB
-              maxWidthOrHeight: isMobile ? 600 : 1200, // 📱 모바일은 600px로 낮춤, 💻 PC는 1200px
-              useWebWorker: true,
-        };
-
-        for (const file of imageFiles) {
-            let compressedFile;
-            try {
-                compressedFile = await imageCompression(file, options);
-            } catch (compressionError) {
-                console.error("이미지 압축 중 오류:", compressionError);
-                setError('이미지 압축 중 오류가 발생했습니다. 사진 용량을 줄여서 다시 시도해주세요.');
-                return; // 압축 실패 시 함수 실행 중단
-            }
-
-            // ★ 2단계: 이미지 업로드 - 오류가 발생하면 바로 사용자에게 알림 ★
-            try {
-                const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
-                imageUrls.push(url);
-            } catch (uploadError) {
-                console.error("이미지 업로드 중 오류:", uploadError);
-                setError('이미지 업로드 중 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-                return; // 업로드 실패 시 함수 실행 중단
-            }
-        }
-    }
+    if (imageFiles.length > 0) {
+      for (const file of imageFiles) {
+          try {
+              // 스마트 리사이징 적용
+              const compressedFile = await smartImageCompression(file);
+              
+              // 압축된 이미지 업로드
+              const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
+              imageUrls.push(url);
+          } catch (error) {
+              console.error("이미지 처리 중 오류:", error);
+              setError('이미지 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+              return;
+          }
+      }
+  }
 
 
         let fcmToken = null;
