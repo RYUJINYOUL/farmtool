@@ -164,167 +164,148 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
   }, [currentUser]);
 
 
-  const handleSaveUsernameAndProfile = async () => {
-    if (!formState.address || !formState.geoFirePoint) {
-      setError('주소 검색을 통해 정확한 위치를 설정하고 입력해주세요.');
-      return;
-    }
-    if (formState.TopCategories === '전체') {
-      setError('카테고리(대분류)를 선택해주세요.');
-      return;
-    }
-    if (formState.SubCategories.length === 0 || (formState.SubCategories.length === 1 && formState.SubCategories[0] === '전체')) {
-      setError('카테고리(소분류)를 선택해주세요.');
-      return;
-    }
-
-    const currentEnglishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
-    const fieldsForCurrentCategory = CATEGORY_APPLY_FIELDS[currentEnglishCategory] || [];
-
-    for (const field of fieldsForCurrentCategory) {
-      if (field.required) {
-        const fieldValue = formState.categorySpecificData[currentEnglishCategory]?.[field.id];
-        if (!fieldValue || fieldValue.trim() === '') {
-          setError(`${field.placeholder} (필수)를 입력해주세요.`);
+   const handleSaveUsernameAndProfile = async () => {
+        if (!formState.address || !formState.geoFirePoint) {
+          setError('주소 검색을 통해 정확한 위치를 설정하고 입력해주세요.');
           return;
         }
-      }
-    }
-
-
-    setError(''); // 모든 유효성 검사 통과 시 에러 초기화
-
-    let imageUrls = [];
-    const batch = writeBatch(db);
-    const userUid = currentUser.uid;
-    const id = `${userUid}-${timestamp}`;
-
-    // 1. 이미지 압축 단계
-    let compressedFile;
-    try {
-  // 이미지를 압축하는 부분만 try 블록에 넣습니다.
-  const compressedFile = await imageCompression(file, options);
-  
-  // 압축 후, 업로드하는 부분은 따로 처리하여 오류를 분리합니다.
-  const url = await uploadGrassImage(compressedFile, userUid, currentEnglishCategory);
-  imageUrls.push(url);
-  
-} catch (error) {
-  // 오류 메시지를 분석하여 구체적인 원인을 알 수 있습니다.
-  console.error("오류 발생:", error);
-  
-  if (error.message && error.message.includes('image-compression')) {
-    alert("이미지 압축 오류: 파일이 너무 크거나 메모리가 부족합니다. 사진 크기를 줄여서 다시 시도해주세요.");
-  } else if (error.code && error.code.startsWith('storage')) {
-    alert("파일 업로드 오류: 네트워크가 불안정합니다. 잠시 후 다시 시도해주세요.");
-  } else {
-    alert("알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-  }
-}
-    
-    // 2. 이미지 업로드 단계
-    try {
-        if (compressedFile) { // 압축된 파일이 있다면
-            const url = await uploadGrassImage(compressedFile, userUid, currentEnglishCategory);
-            imageUrls.push(url);
+        if (formState.TopCategories === '전체') {
+          setError('카테고리(대분류)를 선택해주세요.');
+          return;
         }
-    } catch (uploadError) {
-      console.error("이미지 업로드 오류:", uploadError);
-      alert("이미지 업로드 오류: " + (uploadError.message || JSON.stringify(uploadError)));
-      return; // 업로드 실패 시 함수 종료
-    }
+        if (formState.SubCategories.length === 0 || (formState.SubCategories.length === 1 && formState.SubCategories[0] === '전체')) {
+          setError('카테고리(소분류)를 선택해주세요.');
+          return;
+        }
 
+        const currentEnglishCategory = KOREAN_TO_ENGLISH_APPLY[formState.TopCategories];
+        const fieldsForCurrentCategory = CATEGORY_APPLY_FIELDS[currentEnglishCategory] || [];
 
-    let fcmToken = null;
-    try {
-      fcmToken = await saveFcmToken(userUid);
-    } catch (error) {
-      console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
-    }
+        for (const field of fieldsForCurrentCategory) {
+          if (field.required) {
+            const fieldValue = formState.categorySpecificData[currentEnglishCategory]?.[field.id];
+            if (!fieldValue || fieldValue.trim() === '') {
+              setError(`${field.placeholder} (필수)를 입력해주세요.`);
+              return;
+            }
+          }
+        }
 
- 
-    const initialDataToSave = {
-      username: formState.username,
-      TopCategories: formState.TopCategories,
-      SubCategories: formState.SubCategories,
-      address: formState.address,
-      geoFirePoint: formState.geoFirePoint,
-      favorites: [],
-      fcmToken: fcmToken,
-      region: formState.region,
-      subRegion: formState.subRegion,
-      imageDownloadUrls: imageUrls,
-      categorySpecificData: formState.categorySpecificData,
-      badge: 0,
-      notice: false,
-      pushTime: serverTimestamp(),
-      createdDate: new Date()
-    };
+        setError(''); // 모든 유효성 검사 통과 시 에러 초기화
 
-    const dataToSave = cleanAndConvertToNull(initialDataToSave);
-    const selectedKoreanCategory = formState.TopCategories;
-    const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
+        const userUid = currentUser.uid;
+        const id = `${userUid}-${timestamp}`;
+        const selectedKoreanCategory = formState.TopCategories;
+        const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
+        
+        let imageUrls = [];
 
-    if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
-      const categoryUserDocRef = doc(db, englishCategoryToSave, id);   
-      const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
+        // ✅ 이미지 처리 로직을 하나의 try...catch 블록으로 통합
+        try {
+          if (imageFiles.length > 0) {
+            const options = {
+              maxSizeMB: 0.5,
+              maxWidthOrHeight: 500,
+              useWebWorker: true,
+            };
 
-      const categoryCollectionData = {
-          username: dataToSave.username, // dataToSave에서 가져옴
-          address: dataToSave.address,   // dataToSave에서 가져옴
-          userKey: userUid,
-          favorites: dataToSave.favorites,
-          TopCategories: dataToSave.TopCategories,
-          SubCategories: dataToSave.SubCategories,
-          geoFirePoint: dataToSave.geoFirePoint,
-          fcmToken: dataToSave.fcmToken,
-          region: dataToSave.region,
-          subRegion: dataToSave.subRegion,
-          imageDownloadUrls: dataToSave.imageDownloadUrls,
-          badge: dataToSave.badge,
-          notice: dataToSave.notice,
-          pushTime: dataToSave.pushTime,
-          createdDate: new Date(),
-          confirmed: false,
-          ...specificCategoryDataForCategoryCollection, // 동적 필드 데이터 병합
+            for (const file of imageFiles) {
+              const compressedFile = await imageCompression(file, options);
+              const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
+              imageUrls.push(url);
+            }
+          }
+        } catch (error) {
+          console.error("이미지 업로드 오류:", error);
+          // 더 구체적인 에러 메시지로 사용자에게 피드백 제공
+          alert("이미지 처리 중 오류가 발생했습니다. 파일 크기를 줄이거나 잠시 후 다시 시도해주세요.");
+          return; // 오류 발생 시 함수 실행 중단
+        }
 
-      };
-      batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
-  }
+        let fcmToken = null;
+        try {
+          fcmToken = await saveFcmToken(userUid);
+        } catch (error) {
+          console.error("FCM 토큰을 가져오는 데 실패했습니다. 토큰 없이 진행합니다:", error);
+        }
+     
+        const initialDataToSave = {
+          username: formState.username,
+          TopCategories: formState.TopCategories,
+          SubCategories: formState.SubCategories,
+          address: formState.address,
+          geoFirePoint: formState.geoFirePoint,
+          favorites: [],
+          fcmToken: fcmToken,
+          region: formState.region,
+          subRegion: formState.subRegion,
+          imageDownloadUrls: imageUrls,
+          categorySpecificData: formState.categorySpecificData,
+          badge: 0,
+          notice: false,
+          pushTime: serverTimestamp(),
+          createdDate: new Date()
+        };
 
+        const dataToSave = cleanAndConvertToNull(initialDataToSave);
+        const batch = writeBatch(db);
 
-   if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
-      const categoryUserDocRef = doc(db, "users", userUid, englishCategoryToSave, id)   //id
-      const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
+        if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
+          const categoryUserDocRef = doc(db, englishCategoryToSave, id);   
+          const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
-      const categoryCollectionData = {
-          username: dataToSave.username, // dataToSave에서 가져옴
-          address: dataToSave.address,   // dataToSave에서 가져옴
-          userKey: userUid,
-          favorites: dataToSave.favorites,
-          TopCategories: dataToSave.TopCategories,
-          SubCategories: dataToSave.SubCategories,
-          geoFirePoint: dataToSave.geoFirePoint,
-          fcmToken: dataToSave.fcmToken,
-          region: dataToSave.region,
-          subRegion: dataToSave.subRegion,
-          imageDownloadUrls: dataToSave.imageDownloadUrls,
-          ...specificCategoryDataForCategoryCollection, // 동적 필드 데이터 병합
-          badge: dataToSave.badge,
-          notice: dataToSave.notice,
-          pushTime: dataToSave.pushTime,
-          createdDate: new Date(),
-          confirmed: false
-      };
-      batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
-  }
+          const categoryCollectionData = {
+              username: dataToSave.username,
+              address: dataToSave.address,
+              userKey: userUid,
+              favorites: dataToSave.favorites,
+              TopCategories: dataToSave.TopCategories,
+              SubCategories: dataToSave.SubCategories,
+              geoFirePoint: dataToSave.geoFirePoint,
+              fcmToken: dataToSave.fcmToken,
+              region: dataToSave.region,
+              subRegion: dataToSave.subRegion,
+              imageDownloadUrls: dataToSave.imageDownloadUrls,
+              badge: dataToSave.badge,
+              notice: dataToSave.notice,
+              pushTime: dataToSave.pushTime,
+              createdDate: new Date(),
+              confirmed: false,
+              ...specificCategoryDataForCategoryCollection,
+          };
+          batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
+        }
 
+       if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
+          const categoryUserDocRef = doc(db, "users", userUid, englishCategoryToSave, id);
+          const specificCategoryDataForCategoryCollection = dataToSave.categorySpecificData[englishCategoryToSave] || {};
 
+          const categoryCollectionData = {
+              username: dataToSave.username,
+              address: dataToSave.address,
+              userKey: userUid,
+              favorites: dataToSave.favorites,
+              TopCategories: dataToSave.TopCategories,
+              SubCategories: dataToSave.SubCategories,
+              geoFirePoint: dataToSave.geoFirePoint,
+              fcmToken: dataToSave.fcmToken,
+              region: dataToSave.region,
+              subRegion: dataToSave.subRegion,
+              imageDownloadUrls: dataToSave.imageDownloadUrls,
+              ...specificCategoryDataForCategoryCollection,
+              badge: dataToSave.badge,
+              notice: dataToSave.notice,
+              pushTime: dataToSave.pushTime,
+              createdDate: new Date(),
+              confirmed: false
+          };
+          batch.set(categoryUserDocRef, categoryCollectionData, { merge: true });
+      }
 
-  const userDocRef = doc(db, "users", userUid);
-    const category = CATEGORY_LINK[englishCategoryToSave];
-  
-      const wishlistItem = { category: category, id: id, middle: 'apply', top: englishCategoryToSave };  //top 삭제 id로 저장
+      const userDocRef = doc(db, "users", userUid);
+      const category = CATEGORY_LINK[englishCategoryToSave];
+      
+      const wishlistItem = { category: category, id: id, middle: 'apply', top: englishCategoryToSave };
       if (englishCategoryToSave && selectedKoreanCategory !== '전체') {
           batch.update(userDocRef, {
               division: arrayUnion(
@@ -335,19 +316,16 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
               ),
           });
       }
-  
-
-
-    
-    try {
-      await batch.commit();
-      onClose();
-      push(`/`);
-    } catch (err) {
-      console.error("데이터 저장 중 오류 발생:", err);
-      setError('정보 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
-  };
+      
+      try {
+        await batch.commit();
+        onClose();
+        push(`/`);
+      } catch (err) {
+        console.error("데이터 저장 중 오류 발생:", err);
+        setError('정보 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    };
 
 
   if (loading) {
