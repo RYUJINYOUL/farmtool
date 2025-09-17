@@ -202,9 +202,9 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
 
        if (imageFiles.length > 0) {
         const options = {
-            maxSizeMB: isMobile ? 0.8 : 2, // 📱 모바일은 0.8MB, 💻 PC는 2MB
-            maxWidthOrHeight: isMobile ? 800 : 1200, // 📱 모바일은 800px, 💻 PC는 1200px
-            useWebWorker: true,
+              maxSizeMB: isMobile ? 0.3 : 2, // 📱 모바일은 0.3MB로 낮춤, 💻 PC는 2MB
+              maxWidthOrHeight: isMobile ? 600 : 1200, // 📱 모바일은 600px로 낮춤, 💻 PC는 1200px
+              useWebWorker: true,
         };
 
         for (const file of imageFiles) {
