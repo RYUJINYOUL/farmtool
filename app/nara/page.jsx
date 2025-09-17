@@ -84,7 +84,7 @@ function MobileFilterUI({
     <>
       {/* 1. 구분 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">구분</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">구분</label>
         <select
           value={type}
           onChange={handleTypeChange}
@@ -96,11 +96,11 @@ function MobileFilterUI({
       </div>
       {/* 업종명 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">업종명(다중선택)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">업종명(다중선택)</label>
         <button
           type="button"
           onClick={() => setShowIndustryList(v => !v)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <span className="text-gray-900">
             전체
@@ -108,7 +108,7 @@ function MobileFilterUI({
           <span className="float-right text-gray-400">{showIndustryList ? '▲' : '▼'}</span>
         </button>
         {showIndustryList && (
-          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-900 max-h-40 overflow-y-auto shadow-lg">
+          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto shadow-lg">
             <div className="flex flex-wrap gap-2">
               {industryNames.map(name => (
                 <button
@@ -156,19 +156,19 @@ function MobileFilterUI({
 
       {/* 지역 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">시도</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">시도</label>
         <button
           type="button"
           onClick={() => setShowRegionList(v => !v)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
-          <span className="text-gray-900 dark:text-gray-400">
+          <span className="text-gray-900">
            {selectedRegions !== '전국' ? selectedRegions : '전국'}
           </span>
           <span className="float-right text-gray-400">{showRegionList ? '▲' : '▼'}</span>
         </button>
         {showRegionList && (
-          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-900 max-h-40 overflow-y-auto shadow-lg">
+          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto shadow-lg">
             <div className="flex flex-wrap gap-1">
             {regions.map(region => {
                 const mappedRegion = regionNameMap[region] || region;
@@ -177,10 +177,10 @@ function MobileFilterUI({
                     key={region}
                     type="button"
                     onClick={() => handleRegionClick(region)}
-                    className={`px-3 py-1 rounded-md text-sm border transition-colors dark:text-gray-400
+                    className={`px-3 py-1 rounded-md text-sm border transition-colors
                       ${selectedRegions === mappedRegion
                         ? 'bg-green-500 text-white border-green-500'
-                        : 'bg-white dark:bg-gray-900 text-gray-700 border-gray-300 hover:bg-gray-50'}
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                       ${region === "전국" ? 'font-semibold' : ''}
                     `}
                   >
@@ -202,19 +202,19 @@ function MobileFilterUI({
 
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">시군구</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">시군구</label>
         <button
           type="button"
           onClick={() => setSubShowRegionList(v => !v)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-left bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
-          <span className="text-gray-900 dark:text-gray-400">
+          <span className="text-gray-900">
           {selectedSubRegions !== '시군구' ? selectedSubRegions : '시군구'}
           </span>
           <span className="float-right text-gray-400">{showSubRegionList ? '▲' : '▼'}</span>
         </button>
         {showSubRegionList && (
-          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white dark:bg-gray-900 max-h-40 overflow-y-auto shadow-lg">
+          <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-white max-h-40 overflow-y-auto shadow-lg">
             <div className="flex flex-wrap gap-1">
             {hselectedRegion && hselectedRegion.subRegions.map(region => { // hselectedRegion이 존재할 때만 맵핑
                 return (
@@ -225,7 +225,7 @@ function MobileFilterUI({
                     className={`px-3 py-1 rounded-md text-sm border transition-colors
                       ${selectedSubRegions === region
                         ? 'bg-green-500 text-white border-green-500'
-                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-white border-gray-300 hover:bg-gray-50'}
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                       ${region === "시군구" ? 'font-semibold' : ''}
                     `}
                   >
@@ -248,7 +248,7 @@ function MobileFilterUI({
 
       {/* 날짜/시간 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">조회 시작일</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2 ">조회 시작일</label>
         <div className="flex gap-2">
           <input
             type="date"
@@ -268,7 +268,7 @@ function MobileFilterUI({
         </div>
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">조회 종료일</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2 ">조회 종료일</label>
         <div className="flex gap-2">
           <input
             type="date"
@@ -289,7 +289,7 @@ function MobileFilterUI({
       </div>
       {/* 가격 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">가격(시작)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2 ">가격(시작)</label>
         <input
           type="text"
           value={presmptPrceBgn}
@@ -299,7 +299,7 @@ function MobileFilterUI({
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">가격(종료)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2 ">가격(종료)</label>
         <input
           type="text"
           value={presmptPrceEnd}
@@ -609,11 +609,11 @@ export default function NaraBidList() {
 
   // PC 필터 UI
   const PCFilterUI = (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* 지역 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">시도</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">시도</label>
           <div className="flex flex-wrap gap-1">
             {regions.map(region => {
               const mappedRegion = regionNameMap[region] || region;
@@ -625,7 +625,7 @@ export default function NaraBidList() {
                   className={`px-3 py-1 text-sm border rounded-lg transition-colors
                     ${selectedRegions === mappedRegion
                       ? 'bg-green-500 text-white border-green-500'
-                      : 'bg-white dark:bg-gray-900 text-gray-700 border-gray-300 hover:bg-gray-50'}
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                     ${region === "전국" ? 'font-semibold' : ''}
                   `}
                 >
@@ -638,7 +638,7 @@ export default function NaraBidList() {
 
         {/* 시/군/구 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">시/군/구</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">시/군/구</label>
           <div className="flex flex-wrap gap-1">
             {hselectedRegion && hselectedRegion.subRegions.map(region => {
               return (
@@ -649,7 +649,7 @@ export default function NaraBidList() {
                   className={`px-3 py-1 text-sm border rounded-lg transition-colors
                     ${selectedSubRegions === region
                       ? 'bg-green-500 text-white border-green-500'
-                      : 'bg-white dark:bg-gray-900 text-gray-700 border-gray-300 hover:bg-gray-50'}
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                     ${region === "전국" ? 'font-semibold' : ''}
                   `}
                 >
@@ -662,7 +662,7 @@ export default function NaraBidList() {
 
         {/* 업종명 (2칸 통합) */}
         <div className="lg:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">업종명</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">업종명</label>
           <div className="flex flex-wrap gap-2">
             {industryNames.map(name => (
               <button
@@ -672,7 +672,7 @@ export default function NaraBidList() {
                 className={`px-3 py-1 text-sm border rounded-lg transition-colors
                   ${selectedIndustries.includes(name)
                     ? 'bg-blue-500 text-white border-blue-500'
-                    : 'bg-white dark:bg-gray-900 text-gray-700 border-gray-300 hover:bg-gray-50'}
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}
                   ${name === "전체" ? 'font-semibold' : ''}
                 `}
               >
@@ -687,7 +687,7 @@ export default function NaraBidList() {
       {/* 날짜/가격 (두 번째 줄) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">조회 시작일</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">조회 시작일</label>
           <div className="flex gap-2">
             <input
               type="date"
@@ -707,7 +707,7 @@ export default function NaraBidList() {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">조회 종료일</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">조회 종료일</label>
           <div className="flex gap-2">
             <input
               type="date"
@@ -727,7 +727,7 @@ export default function NaraBidList() {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">가격(시작)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">가격(시작)</label>
           <input
             type="text"
             value={presmptPrceBgn}
@@ -737,7 +737,7 @@ export default function NaraBidList() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-400">가격(종료)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">가격(종료)</label>
           <input
             type="text"
             value={presmptPrceEnd}
@@ -754,7 +754,7 @@ export default function NaraBidList() {
           <select
             value={type}
             onChange={handleTypeChange}
-            className="bg-gray-100 border border-gray-300 rounded-lg py-3.5 px-3 focus:outline-none dark:text-gray-700"
+            className="bg-gray-100 border border-gray-300 rounded-lg py-3.5 px-3 focus:outline-none "
           >
             <option value="공사">공사</option>
             <option value="용역">용역</option>
@@ -795,10 +795,10 @@ export default function NaraBidList() {
         </div>
 
         {/* 결과 통계 및 정렬 */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 rounded-xl p-4 mb-6 shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6 shadow-sm">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 dark:text-white">총 <span className="font-semibold text-gray-900 dark:text-white">{totalCount.toLocaleString()}</span>건</span>
+              <span className="text-sm text-gray-600 ">총 <span className="font-semibold text-gray-900 ">{totalCount.toLocaleString()}</span>건</span>
               {loading && (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
@@ -812,7 +812,7 @@ export default function NaraBidList() {
                 className={`px-3 py-1 text-sm border rounded-lg transition-colors
                   ${sortBy === 'date'
                     ? 'bg-blue-500 text-white border-blue-500'
-                    : 'bg-white dark:bg-gray-900 text-gray-700 border-gray-300 hover:bg-gray-50 dark:text-white'}
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 '}
                 `}
               >
                 최신순
@@ -822,7 +822,7 @@ export default function NaraBidList() {
                 className={`px-3 py-1 text-sm border rounded-lg transition-colors
                   ${sortBy === 'amount'
                     ? 'bg-blue-500 text-white border-blue-500'
-                    : 'bg-white dark:bg-gray-900 text-gray-700 border-gray-300 hover:bg-gray-50 dark:text-white'}
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 '}
                 `}
               >
                 금액순
@@ -843,7 +843,7 @@ export default function NaraBidList() {
               const isFavorited = userFavoritedNaraIds.includes(naraDocId);
 
               return (
-                <div key={index} className="bg-white dark:bg-gray-900 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+                <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
                       {item.bidwinnrNm || '사업명 정보 없음'}
@@ -906,7 +906,7 @@ export default function NaraBidList() {
               <button
                 onClick={() => setPageNo(prev => Math.max(1, prev - 1))}
                 disabled={pageNo === 1 || loading}
-                className="px-3 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 이전
               </button>
@@ -916,7 +916,7 @@ export default function NaraBidList() {
               <button
                 onClick={() => setPageNo(prev => Math.min(totalPages, prev + 1))}
                 disabled={pageNo === totalPages || loading}
-                className="px-3 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 다음
               </button>
@@ -929,7 +929,7 @@ export default function NaraBidList() {
       <div
         className={`fixed inset-0 z-50 transform ${
           showDrawer ? 'translate-x-0' : 'translate-x-full'
-        } transition-transform duration-300 ease-in-out bg-white dark:bg-gray-900 shadow-xl md:hidden`}
+        } transition-transform duration-300 ease-in-out bg-white shadow-xl md:hidden`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold">필터</h2>
