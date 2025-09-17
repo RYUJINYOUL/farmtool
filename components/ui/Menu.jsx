@@ -8,6 +8,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import app from '../../firebase';
 import { clearUser } from '../../store/userSlice';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
+import { RiKakaoTalkFill, RiUser3Line } from "react-icons/ri";
 
 const scrollMap = {
   // "/con": [0, 0],
@@ -28,37 +29,18 @@ export default function Menu(props) {
 
   let total = props;
   const homeCategoryList = [
-    {
-      label: "건설업",
-      src: "/construction",
+   { 
+      label: "카톡상담", 
+      src: "http://pf.kakao.com/_zUZFG/chat",
+      icon: RiKakaoTalkFill,
+      iconSize: 26,
+      isExternal: true
     },
-    {
-      label: "건설장비",
-      src: "/equipment",
-    },
-    {
-      label: "건설자재",
-      src: "/materials",
-    },
-    // {
-    //   label: "인허가",
-    //   src: "/permit",
-    // },
-    // {
-    //   label: "나라장터낙찰",
-    //   src: "/nara",
-    // },
-    // {
-    //   label: "구인구직",
-    //   src: "/job",
-    // },
-    {
-      label: "전문인력",
-      src: "/professionals",
-    },
-     {
-      label: "내정보",
+    { 
+      label: "내정보", 
       src: "/myinfo",
+      icon: RiUser3Line,
+      iconSize: 20
     },
   ];
 
@@ -101,7 +83,7 @@ export default function Menu(props) {
     <nav id="nav" className="flex items-center w-full+10 md:m-0 md:px-60 ml-5 pr-4 md:pr-0 overflow-x-auto">
       {homeCategoryList.map((item, i) => (
         <div
-          onClick={() => onClickCategory(item)}
+          onClick={() => item.isExternal ? window.open(item.src, '_blank', 'noopener,noreferrer') : onClickCategory(item)}
           key={item.label}
           id={i}
           className={cn(
@@ -112,23 +94,27 @@ export default function Menu(props) {
             pathname === "/" && total.total && "lg:text-black"
           )}
         >
-          {item.label}
+          {item.icon ? (
+            <item.icon size={item.iconSize} className={cn(
+              "text-gray-700",
+              total.total && "md:text-black text-[#ffffff80]",
+              pathname !== "/" && "lg:text-black"
+            )} />
+          ) : (
+            item.label
+          )}
         </div>
       ))}
       <div className="flex items-center pl-4 sticky right-1">
-        {currentUser?.uid ? (
-          <FiLogOut
-            size={22}
-            onClick={handleLogout}
-            className={cn("cursor-pointer", total.total && "md:text-black text-white", pathname !== "/"&&"lg:text-black")}
-          />
-        ) : (
-          <FiLogIn
-            size={22}
-            onClick={() => push('/login')}
-            className={cn("cursor-pointer", total.total && "md:text-black text-white", pathname !== "/"&&"lg:text-black")}
-          />
-        )}
+        <button
+          onClick={currentUser?.uid ? handleLogout : () => push('/login')}
+          className={cn(
+            "text-[13px] cursor-pointer px-3 py-1.5 rounded-md transition-colors",
+            "bg-green-600 hover:bg-green-700 text-white font-medium"
+          )}
+        >
+          {currentUser?.uid ? '로그아웃' : '로그인'}
+        </button>
       </div>
     </nav>
   );
