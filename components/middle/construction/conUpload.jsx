@@ -21,6 +21,7 @@ import AddressSearchModal from '@/components/AddressSearchModal';
 import imageCompression from 'browser-image-compression';
 import { uploadGrassImage } from '@/hooks/useUploadImage';
 import { KOREAN_TO_ENGLISH_APPLY, CATEGORY_APPLY_FIELDS, CATEGORY_LINK } from '@/lib/constants';
+import { isMobile } from 'react-device-detect'; 
 
 // 데이터 클리닝 함수 (변화 없음)
 const cleanAndConvertToNull = (data) => {
@@ -199,39 +200,35 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
     let imageUrls = [];
 
-    // ★ Refined Image Processing Logic with Specific Error Handling ★
-    if (imageFiles.length > 0) {
-        // Set compression options based on device type
+       if (imageFiles.length > 0) {
         const options = {
-            maxSizeMB: isMobile ? 0.8 : 2, // 📱 Mobile: 0.8MB, 💻 PC: 2MB
-            maxWidthOrHeight: isMobile ? 800 : 1200, // 📱 Mobile: 800px, 💻 PC: 1200px
+            maxSizeMB: isMobile ? 0.8 : 2, // 📱 모바일은 0.8MB, 💻 PC는 2MB
+            maxWidthOrHeight: isMobile ? 800 : 1200, // 📱 모바일은 800px, 💻 PC는 1200px
             useWebWorker: true,
         };
 
         for (const file of imageFiles) {
             let compressedFile;
             try {
-                // Step 1: Attempt to compress the file
                 compressedFile = await imageCompression(file, options);
             } catch (compressionError) {
                 console.error("이미지 압축 중 오류:", compressionError);
-                // Alert for specific compression errors (e.g., memory issues)
-                setError('이미지 압축 중 오류가 발생했습니다. 파일 크기를 줄여 다시 시도해주세요.');
-                return; // Stop the process on failure
+                setError('이미지 압축 중 오류가 발생했습니다. 사진 용량을 줄여서 다시 시도해주세요.');
+                return; // 압축 실패 시 함수 실행 중단
             }
 
+            // ★ 2단계: 이미지 업로드 - 오류가 발생하면 바로 사용자에게 알림 ★
             try {
-                // Step 2: Attempt to upload the compressed file
                 const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
                 imageUrls.push(url);
             } catch (uploadError) {
                 console.error("이미지 업로드 중 오류:", uploadError);
-                // Alert for specific upload errors (e.g., network issues)
                 setError('이미지 업로드 중 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-                return; // Stop the process on failure
+                return; // 업로드 실패 시 함수 실행 중단
             }
         }
     }
+
 
         let fcmToken = null;
         try {
