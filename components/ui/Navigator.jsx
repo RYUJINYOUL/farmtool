@@ -6,7 +6,6 @@ import app from "../../firebase";
 import useUIState from "@/hooks/useUIState";
 import { cn } from "@/lib/utils";
 
-
 export default function Navigator() {
   const { push } = useRouter();
   const auth = getAuth(app);
@@ -25,31 +24,14 @@ export default function Navigator() {
     { label: "건설업", src: "/construction" },
     { label: "건설장비", src: "/equipment" },
     { label: "건설자재", src: "/materials" },
-    { label: "인허가", src: "/permit" },
-    { label: "나라장터낙찰", src: "/nara" },
-    { label: "구인구직", src: "/job" },
+    // { label: "인허가", src: "/permit" },
+    // { label: "나라장터낙찰", src: "/nara" },
+    // { label: "구인구직", src: "/job" },
+    { label: "전문인력", src: "/professionals" },
     { label: "내정보", src: "/myinfo" },
-    // { 
-    //   label: "카톡상담", 
-    //   src: "http://pf.kakao.com/_zUZFG/chat",
-    //   icon: RiKakaoTalkFill,
-    //   iconSize: 20,
-    //   isExternal: true
-    // },
-    // { 
-    //   label: "내정보", 
-    //   src: "/myinfo",
-    //   icon: RiUser3Line,
-    //   iconSize: 20
-    // },
   ];
 
   const onClickCategory = (item) => {
-    // if (item.isExternal) {
-    //   window.open(item.src, '_blank', 'noopener,noreferrer');
-    //   return;
-    // }
-
     if (homeCategory === item.label) {
       setHeaderImageSrc("");
       setHomeCategory(item.label);

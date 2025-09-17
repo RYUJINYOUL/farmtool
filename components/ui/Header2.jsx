@@ -18,7 +18,7 @@ import {
   DrawerTrigger,
   DrawerTitle,
 } from "@/components/ui/drawer"
-import { RiMenu4Line, RiUser3Line } from "react-icons/ri";
+import { RiMenu4Line, RiUser3Line, RiKakaoTalkFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -86,7 +86,10 @@ const Header2 = ({children}) => {
                   <Menu total={isScrolled} />
                 </div>
 
-                <div className="flex items-center gap-4 lg:hidden">
+                 <div className="flex items-center gap-4 lg:hidden">
+                  <Link href="http://pf.kakao.com/_zUZFG/chat" className="flex items-center">
+                    <RiKakaoTalkFill className={cn("text-black", isScrolled&&"text-black")} size={24} />
+                  </Link>
                   <Link href="/myinfo" className="flex items-center">
                     <RiUser3Line className={cn("text-black", isScrolled&&"text-black")} size={24} />
                   </Link>
