@@ -164,49 +164,44 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
     loadUserData();
   }, [currentUser]);
 
+
+
+
   const smartImageCompression = async (file) => {
-    const MAX_FILE_SIZE = 0.5; // 500KB = 0.5MB
-    const MAX_WIDTH = 1600;
-    const MIN_WIDTH = 800;
-    const INITIAL_QUALITY = 0.7; // 70%
+    // 모바일과 PC에 따라 다른 초기 설정값 사용
+    const MAX_FILE_SIZE = isMobile ? 0.8 : 2; // MB 단위
+    const INITIAL_QUALITY = isMobile ? 0.7 : 0.8;
+    const MAX_WIDTH = isMobile ? 1200 : 1600;
+    const MIN_WIDTH = isMobile ? 600 : 800;
 
     let quality = INITIAL_QUALITY;
     let width = MAX_WIDTH;
-    let compressedFile = file;
+    
+    // 초기 압축 시도
+    let compressedFile = await imageCompression(file, {
+        maxSizeMB: MAX_FILE_SIZE,
+        maxWidthOrHeight: width,
+        initialQuality: quality,
+        useWebWorker: true
+    });
 
-    // 첫 번째 시도: 기본 설정으로 압축
-    try {
+    // 파일 크기가 목표치를 초과하면 점진적으로 재압축
+    while (compressedFile.size > MAX_FILE_SIZE * 1024 * 1024) {
+        // 품질과 크기를 점진적으로 낮춤
+        quality = Math.max(0.3, quality - 0.1); // 품질 최소값 0.3
+        width = Math.max(MIN_WIDTH, width * 0.9); // 크기 최소값
+
         compressedFile = await imageCompression(file, {
             maxSizeMB: MAX_FILE_SIZE,
             maxWidthOrHeight: width,
             initialQuality: quality,
             useWebWorker: true
         });
-
-        // 파일이 여전히 너무 크면 점진적으로 최적화
-        while (compressedFile.size > MAX_FILE_SIZE * 1024 * 1024 && (quality > 0.3 || width > MIN_WIDTH)) {
-            if (quality > 0.3) {
-                // 먼저 품질을 낮춤
-                quality -= 0.1;
-            } else if (width > MIN_WIDTH) {
-                // 품질을 더 낮출 수 없으면 크기를 줄임
-                width = Math.max(width * 0.9, MIN_WIDTH);
-            }
-
-            compressedFile = await imageCompression(file, {
-                maxSizeMB: MAX_FILE_SIZE,
-                maxWidthOrHeight: width,
-                initialQuality: quality,
-                useWebWorker: true
-            });
-        }
-
-        return compressedFile;
-    } catch (error) {
-        console.error("스마트 이미지 압축 중 오류:", error);
-        throw new Error("이미지 압축 중 오류가 발생했습니다.");
     }
+
+    return compressedFile;
 };
+
 
 
    const handleSaveUsernameAndProfile = async () => {
@@ -239,27 +234,28 @@ export default function ConUpload({ // 컴포넌트 이름을 카멜케이스로
         setError(''); // 모든 유효성 검사 통과 시 에러 초기화
 
         const userUid = currentUser.uid;
-    const id = `${userUid}-${timestamp}`;
-    const selectedKoreanCategory = formState.TopCategories;
-    const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
-    let imageUrls = [];
+        const id = `${userUid}-${timestamp}`;
+        const selectedKoreanCategory = formState.TopCategories;
+        const englishCategoryToSave = KOREAN_TO_ENGLISH_APPLY[selectedKoreanCategory];
+        let imageUrls = [];
 
-    if (imageFiles.length > 0) {
-      for (const file of imageFiles) {
-          try {
-              // 스마트 리사이징 적용
-              const compressedFile = await smartImageCompression(file);
-              
-              // 압축된 이미지 업로드
-              const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
-              imageUrls.push(url);
-          } catch (error) {
-              console.error("이미지 처리 중 오류:", error);
-              setError('이미지 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-              return;
-          }
-      }
-  }
+       try {
+        if (imageFiles.length > 0) {
+            const compressedFiles = await Promise.all(
+                imageFiles.map(file => smartImageCompression(file))
+            );
+
+            // 2단계: 압축된 파일들 업로드
+            for (const compressedFile of compressedFiles) {
+                const url = await uploadGrassImage(compressedFile, userUid, englishCategoryToSave);
+                imageUrls.push(url);
+            }
+        }
+    } catch (error) {
+        console.error("이미지 처리 중 오류:", error);
+        setError('이미지 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
 
 
         let fcmToken = null;
