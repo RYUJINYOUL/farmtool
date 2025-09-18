@@ -59,7 +59,9 @@ export default function Menu(props) {
   ];
 
   const onClickCategory = (item) => {
-    if (homeCategory === item.label) {
+    if (item.isExternal) {
+      window.open(item.src, '_blank', 'noopener,noreferrer');
+    } else if (homeCategory === item.label) {
       setHeaderImageSrc("");
       setHomeCategory(item.label);
     } else {
