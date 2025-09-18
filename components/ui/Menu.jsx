@@ -28,18 +28,33 @@ export default function Menu(props) {
 
   let total = props;
   const homeCategoryList = [
-   { 
+    // { 
+    //   label: "전문가 갤러리", 
+    //   src: "/board",
+    //   isImage: true,
+    //   imageSrc: "/Image/icon1.png",
+    //   iconSize: 24
+    // },
+    // { 
+    //   label: "공사 갤러리", 
+    //   src: "/gallery",
+    //   isImage: true,
+    //   imageSrc: "/Image/icon2.png",
+    //   iconSize: 24
+    // },
+    { 
       label: "카톡상담", 
       src: "http://pf.kakao.com/_zUZFG/chat",
-      icon: RiKakaoTalkFill,
-      iconSize: 26,
+      isImage: true,
+      imageSrc: "/Image/kakao-icon.png",
+      iconSize: 24,
       isExternal: true
     },
     { 
       label: "내정보", 
       src: "/myinfo",
       icon: RiUser3Line,
-      iconSize: 20
+      iconSize: 24
     },
   ];
 
@@ -71,7 +86,7 @@ export default function Menu(props) {
     <nav id="nav" className="flex items-center w-full+10 md:m-0 md:px-60 ml-5 pr-4 md:pr-0 overflow-x-auto">
       {homeCategoryList.map((item, i) => (
         <div
-          onClick={() => item.isExternal ? window.open(item.src, '_blank', 'noopener,noreferrer') : onClickCategory(item)}
+          onClick={() => onClickCategory(item)}
           key={item.label}
           id={i}
           className={cn(
@@ -82,7 +97,13 @@ export default function Menu(props) {
             pathname === "/" && total.total && "lg:text-black"
           )}
         >
-          {item.icon ? (
+          {item.isImage ? (
+            <img 
+              src={item.imageSrc}
+              alt={item.label}
+              className="w-6 h-6 object-contain"
+            />
+          ) : item.icon ? (
             <item.icon size={item.iconSize} className={cn(
               "text-gray-700",
               total.total && "md:text-black text-[#ffffff80]",

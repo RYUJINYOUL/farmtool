@@ -87,15 +87,33 @@ const Header2 = ({children}) => {
                 </div>
 
                  <div className="flex items-center gap-4 lg:hidden">
-                  <Link href="http://pf.kakao.com/_zUZFG/chat" className="flex items-center">
-                    <RiKakaoTalkFill className={cn("text-black", isScrolled&&"text-black")} size={24} />
+                  {/* <Link href="/board" className="flex items-center">
+                    <img 
+                      src="/Image/icon1.png" 
+                      alt="전문가 갤러리"
+                      className="w-5 h-5 object-contain" 
+                    />
+                  </Link>
+                  <Link href="/gallery" className="flex items-center">
+                    <img 
+                      src="/Image/icon2.png" 
+                      alt="공사 갤러리"
+                      className="w-5 h-5 object-contain" 
+                    />
+                  </Link> */}
+                  <Link href="/chat" className="flex items-center">
+                    <img 
+                      src="/Image/kakao-icon.png" 
+                      alt="카카오톡 상담"
+                      className="w-5 h-5 object-contain" 
+                    />
                   </Link>
                   <Link href="/myinfo" className="flex items-center">
-                    <RiUser3Line className={cn("text-black", isScrolled&&"text-black")} size={24} />
+                    <RiUser3Line className={cn("text-black", isScrolled&&"text-black")} size={20} />
                   </Link>
                   <HeaderDrawer>
                     <div className="pr-5">
-                      <RiMenu4Line className={cn("text-black", isScrolled&&"text-black")} size={28} />
+                      <RiMenu4Line className={cn("text-black", isScrolled&&"text-black")} size={24} />
                     </div>
                   </HeaderDrawer>
                 </div>
