@@ -101,7 +101,7 @@ const Header2 = ({children}) => {
                       className="w-5 h-5 object-contain" 
                     />
                   </Link> */}
-                  <Link href="/chat" className="flex items-center">
+                  <Link href="http://pf.kakao.com/_zUZFG/chat" target="_blank" rel="noopener noreferrer" className="flex items-center">
                     <img 
                       src="/Image/kakao-icon.png" 
                       alt="카카오톡 상담"
