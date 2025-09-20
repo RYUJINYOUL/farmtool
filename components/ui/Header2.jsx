@@ -87,20 +87,14 @@ const Header2 = ({children}) => {
                 </div>
 
                  <div className="flex items-center gap-4 lg:hidden">
-                  {/* <Link href="/board" className="flex items-center">
+                  <Link href="/board" className="flex items-center">
                     <img 
                       src="/Image/icon1.png" 
                       alt="전문가 갤러리"
                       className="w-5 h-5 object-contain" 
                     />
                   </Link>
-                  <Link href="/gallery" className="flex items-center">
-                    <img 
-                      src="/Image/icon2.png" 
-                      alt="공사 갤러리"
-                      className="w-5 h-5 object-contain" 
-                    />
-                  </Link> */}
+                  {/* 공사 갤러리 아이콘 숨김 */}
                   <Link href="http://pf.kakao.com/_zUZFG/chat" target="_blank" rel="noopener noreferrer" className="flex items-center">
                     <img 
                       src="/Image/kakao-icon.png" 

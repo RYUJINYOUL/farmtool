@@ -603,7 +603,7 @@ export default function GalleryBoard() {
                   <p className="text-gray-500">
                     {activeCategory === 'all' 
                       ? '첫 게시물을 등록해 보세요!'
-                      : '현재 등록된 게시물이 없습니다'}
+                      : '로딩 중입니다'}
                   </p>
                 </div>
               )}

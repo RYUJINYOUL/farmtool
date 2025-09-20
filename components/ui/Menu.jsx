@@ -28,19 +28,19 @@ export default function Menu(props) {
 
   let total = props;
   const homeCategoryList = [
+    { 
+      label: "전문가 갤러리", 
+      src: "/board",
+      isImage: true,
+      imageSrc: "/Image/icon1.png",
+      iconSize: 24
+    },
     // { 
-    //   label: "전문가 갤러리", 
-    //   src: "/board",
-    //   isImage: true,
-    //   imageSrc: "/Image/icon1.png",
-    //   iconSize: 24
-    // },
-    // { 
-    //   label: "공사 갤러리", 
-    //   src: "/gallery",
-    //   isImage: true,
-    //   imageSrc: "/Image/icon2.png",
-    //   iconSize: 24
+     // label: "공사 갤러리", 
+     // src: "/gallery",
+     // isImage: true,
+     // imageSrc: "/Image/icon2.png",
+    //  iconSize: 24
     // },
     { 
       label: "카톡상담", 
